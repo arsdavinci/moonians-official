@@ -4,12 +4,12 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="theme-color" content="#f1eaff">
-  <title>ムーニアンズ｜月と地球のあいだへ。</title>
+  <title>ムーニアンズ｜月の内側へ、ようこそ。</title>
   <meta name="description" content="らんぴょんとぴょんぴーのムーニアンズ。月からやってきた二人の世界、プロフィール、出演・活動記録、動画、音楽、SNSが集まる公式ホームページ。">
   <meta property="og:type" content="website">
-  <meta property="og:title" content="ムーニアンズ｜月と地球のあいだへ。">
+  <meta property="og:title" content="ムーニアンズ｜月の内側へ、ようこそ。">
   <meta property="og:description" content="かわいい未来で、きみを待ってる。ムーニアンズの街へようこそ。">
-  <meta property="og:image" content="https://arsdavinci.github.io/moonians-official/assets/duo.jpeg">
+  <meta property="og:image" content="https://arsdavinci.github.io/moonians-official/assets/moon-city.png">
   <meta name="twitter:card" content="summary_large_image">
   <link rel="canonical" href="https://arsdavinci.github.io/moonians-official/">
   <link rel="icon" href="assets/embassy.png" type="image/png">
@@ -17,7 +17,9 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DotGothic16&family=Noto+Sans+JP:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css?v=20261110-2">
-  <script src="app.js" defer></script>
+  <link rel="stylesheet" href="experience.css?v=20261110-3">
+  <script src="app.js?v=20261110-3" defer></script>
+  <script src="experience.js?v=20261110-3" defer></script>
 </head>
 <body>
   <a class="skip" href="#main">本文へ進む</a>
@@ -28,28 +30,17 @@
     <nav id="main-nav" aria-label="メインナビゲーション"><a href="#world">この世界のこと</a><a href="#characters">仲間たち</a><a href="#journal">街のおたより</a><a href="#history">活動の記録</a><a class="nav-social" href="#connect">SNSで会おう <span>↗</span></a></nav>
   </header>
   <main id="main">
-    <section class="hero section-wrap" id="home">
-      <div class="hero-copy">
-        <p class="eyebrow"><span class="tiny-star">✦</span> WELCOME TO THE MOONIANS</p>
-        <h1>ようこそ、<br>月と地球の<br><span>あいだへ。</span></h1>
-        <p class="hero-description">ちょっと不思議で、めいっぱい愛おしい。<br>月から来た二人と、かわいい未来をのぞいてみよう。</p>
-        <a class="button button-dark" href="#world">ムーニアンズの街を歩く <span>↘</span></a>
-        <div class="hero-foot"><span class="moon-symbol" aria-hidden="true">☾</span><span>らんぴょん × ぴょんぴー<br><b>地球を愛で満たそう。</b></span><span class="coordinates">EST. 2021<br>FROM THE MOON</span></div>
-      </div>
-      <div class="hero-visual">
-        <span class="orbit orbit-one" aria-hidden="true"></span><span class="orbit orbit-two" aria-hidden="true"></span>
-        <div class="image-terminal"><div class="terminal-bar"><span><i></i><i></i><i></i></span><span>MOONIANS / LUNAR CHANNEL_01</span><span>✦</span></div><img class="hero-image" src="assets/pyonpy-world.jpg" alt="パステル色のサイバーな世界に立つ、うさぎのムーニアン・ぴょんぴー" width="3508" height="2480" fetchpriority="high"><div class="terminal-bottom"><span><i class="status-dot"></i> HELLO, EARTH!</span><span>月に代わっておもてなし ↗</span></div></div>
-        <div class="floating-sticker sticker-moon"><span>☾</span><small>MADE OF<br>LOVE & LAUGHTER</small></div>
-        <span class="floating-sticker sticker-love">地球のみんな、<br>会いたかったで！<span aria-hidden="true">♡</span></span>
-        <span class="pixel-spark spark-one" aria-hidden="true">✳</span><span class="pixel-spark spark-two" aria-hidden="true">✦</span>
-      </div>
-      <a class="scroll-cue" href="#world">SCROLL TO EXPLORE <span>↓</span></a>
+    <section class="hero immersive-hero" id="home" aria-label="月の内部都市へようこそ">
+      <div class="panorama" id="panorama"><img id="scene-image" src="assets/moon-city.png" alt="ムーニアンズが暮らす月の内部都市。パステルの建物とうさぎのロボットが並び、星とネオンが光る街" width="1915" height="821" fetchpriority="high"><div class="panorama-shade"></div><canvas id="moon-particles" aria-hidden="true"></canvas></div>
+      <div class="hero-hud"><span><i class="status-dot"></i> LIVE FROM THE INNER MOON</span><span id="scene-coordinate">01 / MOON CITY</span></div>
+      <div class="hero-intro section-wrap"><div class="hero-copy"><p class="eyebrow">STEP INTO OUR LITTLE UNIVERSE</p><h1><span class="hero-line">月の内側へ、</span><br><span class="hero-line hero-gradient">ようこそ。</span></h1><p class="hero-description">月の中には、こんな街がある。<br>らんぴょんとぴょんぴーが暮らす、<br class="mobile-break">かわいい未来へ。</p><a class="button button-dark magnetic" href="#world">街の探索をはじめる <span>↘</span></a></div><div class="hero-transmission"><span class="transmission-icon">☾</span><div><span class="eyebrow">A MESSAGE FROM THE MOON</span><p>地球のみんな、<br>会いたかったで！</p><small>RANPYON & PYONPY</small></div><span class="signal-waves" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span></div></div>
+      <div class="scene-console"><div class="scene-console-label"><span class="console-cross" aria-hidden="true">⌖</span><span>WINDOW TO OUR WORLD<small id="scene-name" aria-live="polite">月の内部都市</small></span></div><div class="scene-switcher" role="group" aria-label="眺める風景を選ぶ"><button type="button" data-scene="moon" aria-pressed="true"><span>01</span> 月の内部都市</button><button type="button" data-scene="earth" aria-pressed="false"><span>02</span> 歌舞月町</button><button type="button" data-scene="studio" aria-pressed="false"><span>03</span> 月のスタジオ</button></div><a class="scene-next" href="#world" aria-label="この世界のことへ進む">↓</a></div>
     </section>
     <div class="marquee" aria-hidden="true"><div>MOON PEOPLE, EARTH FRIENDS. <span>✦</span> 地球を愛で満たそう <span>☾</span> MOON PEOPLE, EARTH FRIENDS. <span>✦</span> 地球を愛で満たそう <span>☾</span></div></div>
 
     <section class="world-section section-wrap section-space" id="world">
       <div class="section-heading"><div><p class="eyebrow">01 / OUR LITTLE UNIVERSE</p><h2>ここは、<span>ムーニアンズの世界。</span></h2></div><span class="section-glyph" aria-hidden="true">✳</span></div>
-      <div class="world-layout"><div class="world-photo"><img src="assets/city.png" alt="ピンクとミントのネオンが光る歌舞月町の街並み" width="869" height="1024" loading="lazy"><span class="location-tag">☾ 歌舞月町 / KABUTKI-CHO</span></div><div class="world-copy"><span class="outline-label">月生まれ、月育ち。</span><h3>遠い月から、<br>笑いと愛を届けに。</h3><p>らんぴょんと、ぴょんぴー。<br>ムーニアンズは、月からやってきた二人組。<br>名前の由来は「ムーニアン＝月人」たち。</p><p>三日月大使館で出会った二人が、<br>地球のみんなと友達になるために、<br>今日も自分たちらしい笑いを届けます。</p><div class="world-note"><img src="assets/embassy.png" alt="三日月大使館のシンボル" width="400" height="400" loading="lazy"><div><b>CRESCENT EMBASSY</b><p>二人の出会いの場所、三日月大使館。<br>月と地球をつなぐ物語は、ここから。</p></div></div><p class="world-sign">かわいい未来で、きみを待ってる。 <span>↗</span></p></div></div>
+      <div class="world-layout"><div class="world-photo"><img src="assets/moon-city.png" alt="ムーニアンズの住む、月の内部のパステル色の都市" width="1915" height="821" loading="lazy"><span class="location-tag">☾ 月の内部都市 / INNER MOON CITY</span></div><div class="world-copy"><span class="outline-label">月生まれ、月育ち。</span><h3>月の内側には、<br>こんな暮らしがある。</h3><p>パステルの建物、きらめくネオン。<br>ここは、月の内部に広がる都市。<br>らんぴょんとぴょんぴーが暮らす世界です。</p><p>「ムーニアン＝月人」たち、ムーニアンズ。<br>三日月大使館で出会った二人が、<br>笑いと愛で、月と地球をつなぎます。</p><div class="world-note"><img src="assets/embassy.png" alt="三日月大使館のシンボル" width="400" height="400" loading="lazy"><div><b>CRESCENT EMBASSY</b><p>二人の出会いの場所、三日月大使館。<br>月と地球をつなぐ物語は、ここから。</p></div></div><p class="world-sign">かわいい未来で、きみを待ってる。 <span>↗</span></p></div></div>
       <div class="world-facts"><div><span>OUR STYLE</span><b>サイバー系 × 宇宙漫才</b></div><div><span>OUR FRIENDS</span><b>ファンの名前は「ムーニー」</b></div><div><span>OUR LANGUAGE</span><b>ムーニアン語、ときどき地球語。</b></div></div>
     </section>
 
@@ -65,7 +56,7 @@
       <div class="journal-grid"><a class="journal-card" href="#gallery"><div class="journal-image"><img src="assets/duo.jpeg" alt="ネオンの街で一緒に過ごすらんぴょんとぴょんぴー" width="1932" height="2576" loading="lazy"><span>PHOTO DIARY</span></div><div class="journal-meta"><span>二人の日常</span><span>↗</span></div><h3>地球で見つけた、<br>とっておきの瞬間。</h3><p>街の光も、二人の笑顔も。<br>ムーニアンズのフォトアルバムへ。</p></a><a class="journal-card" href="https://www.youtube.com/channel/UCBpwXFh6RjG9uLDooOS7pDw" target="_blank" rel="noopener noreferrer"><div class="journal-image"><img src="assets/city-duo.png" alt="歌舞月町の街に立つぴょんぴーとらんぴょん" width="1468" height="844" loading="lazy"><span>MOONIANS TV</span><b class="play-symbol" aria-hidden="true">▶</b></div><div class="journal-meta"><span>動画で会おう</span><span>↗</span></div><h3>今日も、地球と交信中。<br>ムーニアンズTV</h3><p>二人の世界を、もっと近くで。<br>YouTubeチャンネルはこちら。</p></a><a class="journal-card" href="https://linkco.re/8YX35bcQ" target="_blank" rel="noopener noreferrer"><div class="journal-image music-image"><span class="record" aria-hidden="true"><span>☾</span></span><span>MUSIC FROM THE MOON</span><b class="music-note" aria-hidden="true">♪</b></div><div class="journal-meta"><span>テーマソング</span><span>↗</span></div><h3>ぼくらはム〜ニアンズ<br><small>by ぴょんぴー</small></h3><p>音楽でも、地球とつながろう。<br>配信サービスでテーマ曲を聴く。</p></a></div>
     </section>
 
-    <section class="gallery-section section-space" id="gallery"><div class="section-wrap"><div class="section-heading"><div><p class="eyebrow">04 / A GLIMPSE OF OUR DAYS</p><h2>月と地球の、<span>アルバム。</span></h2></div><span class="outline-label">写真をタップして、のぞいてみて。</span></div><div class="gallery-grid"><button class="gallery-item gallery-wide" data-photo="assets/friends.jpeg" data-caption="らんぴょんとぴょんぴー。月と地球をつなぐ二人。"><img src="assets/friends.jpeg" alt="ぴょんぴーを抱いて笑顔のらんぴょん" width="6677" height="4451" loading="lazy"><span>TOGETHER, ALWAYS. <b>＋</b></span></button><button class="gallery-item" data-photo="assets/duo.jpeg" data-caption="ネオンの街で、地球のみんなと交信中。"><img src="assets/duo.jpeg" alt="ネオンの街にいる二人" width="1932" height="2576" loading="lazy"><span>HELLO, EARTH. <b>＋</b></span></button><button class="gallery-item" data-photo="assets/city.png" data-caption="歌舞月町。ムーニアンズの世界を彩る街並み。"><img src="assets/city.png" alt="歌舞月町のサイバーな街並み" width="869" height="1024" loading="lazy"><span>NEON MOON. <b>＋</b></span></button></div></div></section>
+    <section class="gallery-section section-space" id="gallery"><div class="section-wrap"><div class="section-heading"><div><p class="eyebrow">04 / A GLIMPSE OF OUR DAYS</p><h2>月と地球の、<span>アルバム。</span></h2></div><span class="outline-label">写真をタップして、のぞいてみて。</span></div><div class="gallery-grid"><button class="gallery-item gallery-moon" data-photo="assets/moon-city.png" data-caption="ムーニアンズが暮らす月の内部都市。パステルの光が満ちる、二人のふるさと。"><img src="assets/moon-city.png" alt="ムーニアンズが暮らす月の内部都市の全景" width="1915" height="821" loading="lazy"><span>HOME INSIDE THE MOON. <b>＋</b></span></button><button class="gallery-item" data-photo="assets/friends.jpeg" data-caption="らんぴょんとぴょんぴー。月と地球をつなぐ二人。"><img src="assets/friends.jpeg" alt="ぴょんぴーを抱いて笑顔のらんぴょん" width="6677" height="4451" loading="lazy"><span>TOGETHER, ALWAYS. <b>＋</b></span></button><button class="gallery-item" data-photo="assets/duo.jpeg" data-caption="ネオンの街で、地球のみんなと交信中。"><img src="assets/duo.jpeg" alt="ネオンの街にいる二人" width="1932" height="2576" loading="lazy"><span>HELLO, EARTH. <b>＋</b></span></button><button class="gallery-item" data-photo="assets/city.png" data-caption="歌舞月町。ムーニアンズの世界を彩る街並み。"><img src="assets/city.png" alt="歌舞月町のサイバーな街並み" width="869" height="1024" loading="lazy"><span>NEON MOON. <b>＋</b></span></button></div></div></section>
 
     <section class="section-wrap section-space history-section" id="history"><div class="section-heading"><div><p class="eyebrow">05 / OUR EARTH CHRONICLE</p><h2>地球での、<span>活動の記録。</span></h2></div><p class="heading-note">笑って、出会って、また一歩。<br>二人の足あとをたどろう。</p></div>
       <div class="history-layout"><aside class="history-aside"><span class="big-year">2021<br><span>↓ NOW</span></span><p>テレビ、ライブ、配信。<br>地球で重ねてきた、<br>ムーニアンズの物語。</p><a class="text-link" href="https://profile.yoshimoto.co.jp/talent/detail?id=12554" target="_blank" rel="noopener noreferrer">公式プロフィール ↗</a></aside><div class="history-list">
