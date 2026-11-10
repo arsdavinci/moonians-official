@@ -63,6 +63,7 @@
     'らんぴょんとぴょんぴーのムーニアンズ。月からやってきた二人の世界、プロフィール、出演・活動記録、動画、音楽、SNSが集まる公式ホームページ。':'The official home of Moonians, Ranpyon and Pyonpy. Discover their world inside the Moon, profiles, appearances, videos, music and social links.', 'かわいい未来で、きみを待ってる。ムーニアンズの街へようこそ。':'We’re waiting for you in a cuter future. Welcome to the Moonians’ city.'
   };
   Object.assign(copy, {
+    'ムーニアンズTV。らんぴょんとぴょんぴー':'Moonians TV — Ranpyon and Pyonpy', 'ホバーで音なしプレビュー':'Hover for a silent preview', '最新動画を音声付きで再生する':'Play the latest video with sound', '再生ボタンで音を出す':'Press Play for sound', 'ムーニアンズTVの最新動画':'The latest from Moonians TV', 'YouTubeで最新動画を見る ↗':'Watch the latest videos on YouTube ↗', '音なしでプレビュー中':'Previewing without sound', 'プレビューを準備中…':'Getting the preview ready…', '動画を読み込めませんでした。YouTubeでご覧ください。':'The video couldn’t load. Please watch on YouTube.', '再生ボタンで動画をご覧ください。':'Press Play to watch the video.',
     '月灯ふんわり亭のグッズショップを開く':'Open the Tsukiakari Funwari-tei merch shop', '月灯ふんわり亭。らんぴょんとぴょんぴーのグッズ販売':'Tsukiakari Funwari-tei — Ranpyon and Pyonpy merchandise',
     'ムーニアンズTVのタイトルロゴ':'Moonians TV title logo', '地球のふしぎを、二人と一緒に。':'Explore Earth’s curiosities with us.', 'YouTubeチャンネルを開く':'Open our YouTube channel', '動画を再生する：ことわざクイズ':'Play video: a quiz on proverbs', 'あなたは何問正解できる？実在する面白いことわざクイズ！':'How many can you get right? A quiz on real, surprising proverbs!', 'この画面で動画を再生':'Play here', 'YouTubeでこの動画を見る ↗':'Watch this video on YouTube ↗', 'ムーニアンズTVの動画プレーヤー':'Moonians TV video player',
     '参考資料｜ムーニアンズ':'Sources | Moonians', '← ムーニアンズの街へ戻る':'← Back to the Moonians’ city',
