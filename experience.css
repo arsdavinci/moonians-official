@@ -124,8 +124,10 @@ body{padding-bottom:76px;transition:background-color .6s,color .6s}
 .social-gallery-card[data-social="instagram"]>img{object-position:center 43%}
 .social-gallery-card[data-social="tiktok"]>img{object-position:center 30%}
 .social-gallery-card>span{background:#fffcfff0;padding:10px 13px;backdrop-filter:blur(14px)}
-.social-gallery-card strong{font:600 12px 'Noto Sans JP',sans-serif;line-height:1.5}
-.social-gallery-card small{display:block;font:9px var(--mono);color:#8b739e;letter-spacing:.4px;margin-top:3px}
+.social-gallery-card strong{flex:1;min-width:0;font:600 12px 'Noto Sans JP',sans-serif;line-height:1.5}
+.social-gallery-card small{display:block;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font:9px var(--mono);color:#8b739e;letter-spacing:.4px;margin-top:3px}
+.social-gallery-card>span>b{flex-shrink:0;margin-left:8px}
+.site-night .social-gallery-card small{color:#c5a9d8}
 .social-gallery-card:hover{box-shadow:0 8px 25px #85619c22;border-color:#ad87c4}
 .photo-prev[hidden],.photo-next[hidden]{display:none}
 .world-photo{height:500px}
