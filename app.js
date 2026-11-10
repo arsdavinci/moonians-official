@@ -21,6 +21,10 @@ document.addEventListener('keydown', event => {
 });
 const dialog = document.querySelector('#photo-dialog');
 const photoButtons = [...document.querySelectorAll('[data-photo]')];
+if (photoButtons.length < 2) {
+  dialog.querySelector('.photo-prev').hidden = true;
+  dialog.querySelector('.photo-next').hidden = true;
+}
 const photoImage = document.querySelector('#dialog-image');
 const photoCaption = document.querySelector('#dialog-caption');
 let photoIndex = 0;

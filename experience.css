@@ -118,6 +118,16 @@ body{padding-bottom:76px;transition:background-color .6s,color .6s}
 .gallery-grid{grid-template-columns:repeat(3,1fr)}
 .gallery-item.gallery-moon{grid-column:1/-1;height:400px}
 .gallery-moon img{object-position:center 42%}
+.social-gallery-card{display:block}
+.social-gallery-card[data-social="x"]{background:#101017}
+.social-gallery-card[data-social="x"]>img{object-fit:contain}
+.social-gallery-card[data-social="instagram"]>img{object-position:center 43%}
+.social-gallery-card[data-social="tiktok"]>img{object-position:center 30%}
+.social-gallery-card>span{background:#fffcfff0;padding:10px 13px;backdrop-filter:blur(14px)}
+.social-gallery-card strong{font:600 12px 'Noto Sans JP',sans-serif;line-height:1.5}
+.social-gallery-card small{display:block;font:9px var(--mono);color:#8b739e;letter-spacing:.4px;margin-top:3px}
+.social-gallery-card:hover{box-shadow:0 8px 25px #85619c22;border-color:#ad87c4}
+.photo-prev[hidden],.photo-next[hidden]{display:none}
 .world-photo{height:500px}
 .world-photo>img{object-position:52% center;filter:none}
 .world-photo .location-tag{max-width:calc(100% - 30px);font-size:9px}

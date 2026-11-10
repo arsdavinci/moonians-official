@@ -1,0 +1,28 @@
+{
+  "captured_on": "2026-11-10",
+  "selection": "各プロフィールを開いて最初に表示された投稿の画像。固定投稿を含む。動画はサムネイルを使用。",
+  "update_mode": "手動取得した画像をサイト内に保存。SNSの更新を自動取得する仕組みは使用しない。",
+  "cards": [
+    {
+      "platform": "X",
+      "profile": "https://x.com/ranpyon_moonian",
+      "source_post": "https://x.com/ranpyon_moonian/status/1641929313892315141",
+      "image": "assets/social-x.webp",
+      "selection_note": "先頭の固定動画のサムネイル"
+    },
+    {
+      "platform": "Instagram",
+      "profile": "https://www.instagram.com/pyonpy_moonians/",
+      "source_post": "https://www.instagram.com/pyonpy_moonians/p/DdS7aTXzBCC/",
+      "image": "assets/social-instagram.jpg",
+      "selection_note": "投稿一覧の先頭の写真"
+    },
+    {
+      "platform": "TikTok",
+      "profile": "https://www.tiktok.com/@moonians0422",
+      "source_post": "https://www.tiktok.com/@moonians0422/video/7257866387425742088",
+      "image": "assets/social-tiktok.avif",
+      "selection_note": "先頭の固定動画のサムネイル。公式表示のあるプロフィールで確認。旧リンク集の @_moonians は現在アカウントが見つからないため使用しない。"
+    }
+  ]
+}
