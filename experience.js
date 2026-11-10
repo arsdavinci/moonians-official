@@ -161,11 +161,17 @@
   }
   function applyMotion() {
     body.classList.toggle('motion-paused', !motion);
+    root.style.scrollBehavior=motion?'':'auto';
     const button=dock.querySelector('[data-action="motion"]');
     button.setAttribute('aria-pressed', String(!motion));
     button.setAttribute('aria-label', motion?'画面の動きを抑える':'画面の動きを再開する');
     button.querySelector('.motion-label').textContent=motion?'動きを抑える':'動きを楽しむ';
-    if(!motion) document.querySelectorAll('[data-tilt]').forEach(el=>el.style.transform='');
+    if(!motion) {
+      document.querySelectorAll('[data-tilt]').forEach(el=>el.style.transform='');
+      document.querySelectorAll('.magnetic').forEach(el=>el.style.translate='');
+      document.querySelector('.immersive-hero').style.setProperty('--scene-x','0px');
+      document.querySelector('.immersive-hero').style.setProperty('--scene-y','0px');
+    }
     updateAnimation();
   }
   dock.querySelector('[data-action="theme"]').addEventListener('click', () => { night=!night; store.set('night',night); applyTheme(); });
