@@ -7,6 +7,7 @@
   const badge = screen.querySelector('.tv-preview-status');
   const hoverMedia = matchMedia('(hover: hover) and (pointer: fine)');
   const t = text => window.MoonLanguage.t(text);
+  const quietTest = new URL(location.href).searchParams.get('quiet-test') === '1';
   let mode = 'idle';
   let hovering = false;
   let visible = true;
@@ -64,7 +65,7 @@
     discardPlayer();
     const token = generation;
     const params = new URLSearchParams({
-      list:screen.dataset.playlist, index:'0', autoplay:'1', mute:audible?'0':'1',
+      list:screen.dataset.playlist, index:'0', autoplay:'1', mute:audible&&!quietTest?'0':'1',
       playsinline:'1', controls:'1', rel:'0', enablejsapi:'1', hl:window.MoonLanguage.current
     });
     if (location.protocol === 'https:' || location.protocol === 'http:') params.set('origin', location.origin);
@@ -84,6 +85,7 @@
         onReady(event) {
           if (token !== generation) return;
           ready = true;
+          if (quietTest) event.target.setVolume(5);
           if (mode === 'watch') { event.target.unMute(); event.target.playVideo(); }
           else if (mode === 'preview' && hovering && visible && !document.hidden) {
             event.target.mute(); event.target.playVideoAt(0);
@@ -144,7 +146,7 @@
     clearTimeout(hoverTimer);
     document.querySelector('#moon-audio')?.pause();
     state('watch');
-    if (ready) { player.unMute(); player.playVideo(); }
+    if (ready) { if (quietTest) player.setVolume(5); player.unMute(); player.playVideo(); }
     else createPlayer(true);
     if (frame) frame.tabIndex = 0;
     frame?.focus({preventScroll:true});

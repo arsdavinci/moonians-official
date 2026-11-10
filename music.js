@@ -71,6 +71,7 @@
     const saved = localStorage.getItem('moonians.music-volume');
     if (saved !== null && Number.isFinite(Number(saved))) volume = Math.max(0, Math.min(1, Number(saved)));
   } catch { /* Volume works without browser storage. */ }
+  if (new URL(location.href).searchParams.get('quiet-test') === '1') volume = .05;
   let lastAudibleVolume = volume || .3;
   let context;
   let gain;
