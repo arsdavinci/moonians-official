@@ -126,6 +126,7 @@
     // Both calls start directly inside the visitor's Yes/Play click.
     // There is no sound, audio download or autoplay attempt before that click.
     try {
+      if (!audio.getAttribute('src')) audio.src = audio.dataset.src;
       const resumed = connectAudio();
       const started = audio.play();
       Promise.all([resumed, started]).then(() => {
