@@ -101,7 +101,9 @@
       if (!ja) return;
       const prefix = raw.slice(0, raw.indexOf(text));
       const suffix = raw.slice(raw.indexOf(text) + text.length);
-      record = {ja:prefix + ja + suffix, en:prefix + copy[ja] + suffix};
+      // Japanese line breaks need a word boundary when English text reflows.
+      const separator = !suffix && node.nextSibling?.nodeType === 1 && node.nextSibling.matches('br,span,small,b,strong') ? ' ' : '';
+      record = {ja:prefix + ja + suffix, en:prefix + copy[ja] + suffix + separator};
       originals.set(node, record);
     }
     if (raw !== record[language]) node.nodeValue = record[language];
