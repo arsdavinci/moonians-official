@@ -187,7 +187,7 @@
   audio.addEventListener('timeupdate', updateProgress);
   audio.addEventListener('play', render);
   audio.addEventListener('playing', () => { waiting = false; failure = ''; render(); });
-  audio.addEventListener('pause', render);
+  audio.addEventListener('pause', () => { waiting = false; render(); });
   audio.addEventListener('waiting', () => { if (!audio.paused) { waiting = true; render(); } });
   audio.addEventListener('ended', () => { stopped = true; render(); });
   audio.addEventListener('error', () => {
