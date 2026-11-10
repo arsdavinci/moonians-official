@@ -17,7 +17,7 @@
     '音楽はまだ再生していません。':'Music is not playing yet.', '音楽を再生する':'Play music', '再生':'Play', '音楽を停止する':'Stop music', '停止':'Stop',
     '音楽を一時停止する':'Pause music', '一時停止':'Pause', '曲の再生位置':'Playback position', 'ミュートする':'Mute', 'ミュートを解除する':'Unmute', '音量':'Volume',
     '音楽と、月の街を。 / LOOP':'EXPLORE WITH MUSIC / LOOP', '配信で聴く ↗':'Stream the song ↗',
-    '音楽の操作':'Music controls', '音楽の操作を閉じる':'Close music controls', '音楽プレーヤーを開く':'Open music player', '再生中の音楽プレーヤーを開く':'Open music player — playing', '音楽':'Music',
+    '音楽の操作':'Music controls', '音楽の操作を開く':'Open music controls', '音楽の操作を閉じる':'Close music controls', '音楽プレーヤーを開く':'Open music player', '再生中の音楽プレーヤーを開く':'Open music player — playing', '音楽':'Music',
     '音楽を流してもいい？':'Shall we play some music?', 'テーマソング「ぼくらはムーニアンズ」を':'Enjoy our theme song, “We Are Moonians”,', '聴きながら、月の街を楽しもう。':'while you explore our city on the Moon.',
     'はい、音楽と楽しむ':'Yes, play the music', 'いいえ、音楽なしで':'No, explore without music', '後からプレーヤーで再生・停止・音量を変更できます。':'You can play, stop or adjust the volume later.',
     '再生中 — 音楽と、月の街を。':'Playing — explore the Moon with music.', '停止中 — 再生ボタンで、いつでも。':'Stopped — press Play whenever you like.', '一時停止中 — 続きから再生できます。':'Paused — pick up where you left off.', '音楽を読み込んでいます…':'Loading the music…', '再生ボタンを押すと音楽が始まります。':'Press Play to start the music.', '音楽を読み込めませんでした。再生ボタンでもう一度お試しください。':'The music couldn’t load. Press Play to try again.',

@@ -9,9 +9,44 @@
   flyout.id = 'music-flyout';
   flyout.hidden = true;
   flyout.setAttribute('aria-label', '音楽の操作');
-  flyout.innerHTML = '<div class="music-flyout-header"><span>MOONIANS RADIO</span><button type="button" class="music-flyout-close" aria-label="音楽の操作を閉じる">×</button></div>' +
-    ['.music-track','.music-status','.music-transport','.music-seek','.music-volume'].map(selector => card.querySelector(selector).outerHTML).join('');
+  flyout.innerHTML = '<div class="music-flyout-header"><button type="button" class="music-flyout-close" aria-label="音楽の操作を閉じる">×</button></div>' +
+    ['.music-track','.music-status','.music-compact-controls','.music-footer'].map(selector => card.querySelector(selector).outerHTML).join('');
   document.body.append(flyout);
+
+  const disclosure = card.querySelector('.music-disclosure');
+  const summary = disclosure.querySelector('summary');
+  const fineHover = matchMedia('(hover: hover) and (pointer: fine)');
+  let hovering = false;
+  let keyboardInput = false;
+  document.addEventListener('keydown', () => { keyboardInput = true; });
+  document.addEventListener('pointerdown', () => { keyboardInput = false; }, {passive:true});
+  function collapseCard() {
+    if (card.contains(document.activeElement) && document.activeElement !== summary) summary.focus({preventScroll:true});
+    disclosure.open = false;
+  }
+  card.addEventListener('pointerenter', event => {
+    if (event.pointerType !== 'mouse' || !fineHover.matches) return;
+    hovering = true;
+    disclosure.open = true;
+  });
+  card.addEventListener('pointerleave', event => {
+    if (event.pointerType !== 'mouse') return;
+    hovering = false;
+    if (!(keyboardInput && card.contains(document.activeElement))) collapseCard();
+  });
+  summary.addEventListener('click', event => {
+    if (event.pointerType === 'mouse' && fineHover.matches) { event.preventDefault(); disclosure.open = true; }
+  });
+  disclosure.addEventListener('toggle', () => {
+    summary.setAttribute('aria-label', disclosure.open ? '音楽の操作を閉じる' : '音楽の操作を開く');
+  });
+  card.addEventListener('focusout', () => queueMicrotask(() => {
+    if (!hovering && !card.contains(document.activeElement)) disclosure.open = false;
+  }));
+  document.addEventListener('click', event => { if (!card.contains(event.target)) collapseCard(); });
+  card.addEventListener('keydown', event => {
+    if (event.key === 'Escape') { event.preventDefault(); collapseCard(); }
+  });
 
   const dock = document.querySelector('.site-dock');
   const dockButton = document.createElement('button');
@@ -41,14 +76,8 @@
   let stopped = true;
   let waiting = false;
   let failure = '';
-  let isSeeking = false;
   const players = [card, flyout];
   const each = (selector, callback) => players.forEach(player => player.querySelectorAll(selector).forEach(callback));
-  const formatTime = seconds => {
-    const safe = Number.isFinite(seconds) ? Math.max(0, Math.floor(seconds)) : 0;
-    return `${Math.floor(safe / 60)}:${String(safe % 60).padStart(2, '0')}`;
-  };
-  const duration = () => Number.isFinite(audio.duration) ? audio.duration : 185.716757;
   function status(text) {
     each('[data-music-status]', el => { if (el.textContent !== text) el.textContent = text; });
   }
@@ -89,21 +118,12 @@
     }
     return context?.state === 'suspended' ? context.resume() : Promise.resolve();
   }
-  function updateProgress() {
-    const time = audio.currentTime || 0;
-    each('[data-music-elapsed]', el => { el.textContent = formatTime(time); });
-    each('[data-music-duration]', el => { el.textContent = formatTime(Math.ceil(duration())); });
-    each('[data-music-seek]', input => {
-      input.max = String(duration());
-      input.disabled = !Number.isFinite(audio.duration);
-      if (!isSeeking) input.value = String(time);
-      input.setAttribute('aria-valuetext', `${formatTime(time)} / ${formatTime(Math.ceil(duration()))}`);
-      input.style.setProperty('--range-fill', `${Math.min(100, time / duration() * 100)}%`);
-    });
-  }
   function render() {
     const playing = !audio.paused && !audio.ended;
-    players.forEach(player => player.classList.toggle('is-playing', playing && !waiting));
+    players.forEach(player => {
+      player.classList.toggle('is-playing', playing && !waiting);
+      player.classList.toggle('has-error', Boolean(failure));
+    });
     dockButton.classList.toggle('is-playing', playing);
     dockButton.setAttribute('aria-label', playing ? '再生中の音楽プレーヤーを開く' : '音楽プレーヤーを開く');
     each('[data-music-play]', button => {
@@ -116,7 +136,6 @@
     else if (playing) status('再生中 — 音楽と、月の街を。');
     else if (stopped) status('停止中 — 再生ボタンで、いつでも。');
     else status('一時停止中 — 続きから再生できます。');
-    updateProgress();
   }
   function play() {
     stopped = false;
@@ -174,17 +193,6 @@
     else volume = lastAudibleVolume;
     updateVolume();
   }));
-  each('[data-music-seek]', input => {
-    input.addEventListener('pointerdown', () => { isSeeking = true; });
-    input.addEventListener('input', () => {
-      if (Number.isFinite(audio.duration)) audio.currentTime = Math.min(audio.duration, Number(input.value));
-      input.setAttribute('aria-valuetext', formatTime(Number(input.value)));
-    });
-    input.addEventListener('change', () => { isSeeking = false; updateProgress(); });
-    input.addEventListener('blur', () => { isSeeking = false; updateProgress(); });
-  });
-  audio.addEventListener('loadedmetadata', updateProgress);
-  audio.addEventListener('timeupdate', updateProgress);
   audio.addEventListener('play', render);
   audio.addEventListener('playing', () => { waiting = false; failure = ''; render(); });
   audio.addEventListener('pause', () => { waiting = false; render(); });
