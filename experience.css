@@ -222,3 +222,6 @@ body.motion-paused .reveal-element{opacity:1;translate:none;filter:none;transiti
 body.motion-paused .panorama>img{transform:scale(1.02)}
 body.motion-paused .cursor-aura{display:none}
 @media(prefers-reduced-motion:reduce){.reveal-element.reveal-wait{opacity:1;translate:none;filter:none}.cursor-aura{display:none}.hero-transmission{animation:none}.panorama>img{will-change:auto}}
+
+/* A full-image link to the Moonians merchandise shop. */
+.shop-banner{display:block;width:min(100%,720px);margin:34px auto 0;overflow:hidden;border:1px solid #bba6cf;border-radius:16px;background:#25263f;box-shadow:5px 6px 0 #c6aedb40;transition:transform .2s,box-shadow .2s}.shop-banner>img{display:block;width:100%;height:auto}.shop-banner:hover{transform:translateY(-3px);box-shadow:5px 9px 0 #c6aedb50}.shop-banner:focus-visible{outline:3px solid #9466d1;outline-offset:5px}.site-night .shop-banner{border-color:#71528a;box-shadow:5px 6px 0 #120e1c55}.motion-paused .shop-banner{transition:none}.motion-paused .shop-banner:hover{transform:none}@media(max-width:560px){.shop-banner{margin-top:27px;border-radius:12px;box-shadow:3px 4px 0 #c6aedb40}}

@@ -63,6 +63,7 @@
     'らんぴょんとぴょんぴーのムーニアンズ。月からやってきた二人の世界、プロフィール、出演・活動記録、動画、音楽、SNSが集まる公式ホームページ。':'The official home of Moonians, Ranpyon and Pyonpy. Discover their world inside the Moon, profiles, appearances, videos, music and social links.', 'かわいい未来で、きみを待ってる。ムーニアンズの街へようこそ。':'We’re waiting for you in a cuter future. Welcome to the Moonians’ city.'
   };
   Object.assign(copy, {
+    '月灯ふんわり亭のグッズショップを開く':'Open the Tsukiakari Funwari-tei merch shop', '月灯ふんわり亭。らんぴょんとぴょんぴーのグッズ販売':'Tsukiakari Funwari-tei — Ranpyon and Pyonpy merchandise',
     'ムーニアンズTVのタイトルロゴ':'Moonians TV title logo', '地球のふしぎを、二人と一緒に。':'Explore Earth’s curiosities with us.', 'YouTubeチャンネルを開く':'Open our YouTube channel', '動画を再生する：ことわざクイズ':'Play video: a quiz on proverbs', 'あなたは何問正解できる？実在する面白いことわざクイズ！':'How many can you get right? A quiz on real, surprising proverbs!', 'この画面で動画を再生':'Play here', 'YouTubeでこの動画を見る ↗':'Watch this video on YouTube ↗', 'ムーニアンズTVの動画プレーヤー':'Moonians TV video player',
     '参考資料｜ムーニアンズ':'Sources | Moonians', '← ムーニアンズの街へ戻る':'← Back to the Moonians’ city',
     'ムーニアンズの世界観と、地球での活動を紹介するために参照した公開資料です。キャラクターの出身・誕生日などの設定は、所属事務所の芸歴プロフィールと区別して紹介しています。':'These public sources inform our introduction to the Moonians’ world and activities on Earth. Character details, such as lunar origins and birthdays, are presented separately from professional agency profiles.',
