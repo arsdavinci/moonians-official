@@ -234,12 +234,19 @@
 
   if ('mediaSession' in navigator && 'MediaMetadata' in window) {
     try {
-      navigator.mediaSession.metadata = new MediaMetadata({title:'ぼくらはムーニアンズ',artist:'ムーニアンズ'});
+      navigator.mediaSession.metadata = new MediaMetadata({title:window.MoonLanguage.t('ぼくらはムーニアンズ'),artist:window.MoonLanguage.t('ムーニアンズ')});
       navigator.mediaSession.setActionHandler('play', play);
       navigator.mediaSession.setActionHandler('pause', () => audio.pause());
       navigator.mediaSession.setActionHandler('stop', stop);
     } catch { /* On-page buttons remain available. */ }
   }
+  document.addEventListener('moonians:languagechange', () => {
+    render();
+    updateVolume();
+    if ('mediaSession' in navigator && 'MediaMetadata' in window) {
+      navigator.mediaSession.metadata = new MediaMetadata({title:window.MoonLanguage.t('ぼくらはムーニアンズ'),artist:window.MoonLanguage.t('ムーニアンズ')});
+    }
+  });
   updateVolume();
   render();
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', ask, {once:true});

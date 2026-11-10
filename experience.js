@@ -1,5 +1,6 @@
 'use strict';
 (() => {
+  const t = value => window.MoonLanguage.t(value);
   const root = document.documentElement;
   const body = document.body;
   const reduceQuery = matchMedia('(prefers-reduced-motion: reduce)');
@@ -80,9 +81,9 @@
     passport.querySelectorAll('[data-stamp]').forEach(el => {
       const collected = visited.has(el.dataset.stamp);
       el.classList.toggle('collected', collected);
-      el.setAttribute('aria-label', `${destinations.find(d=>d.id===el.dataset.stamp).title}：${collected?'訪問済み':'未訪問'}`);
+      el.setAttribute('aria-label', `${t(destinations.find(d=>d.id===el.dataset.stamp).title)}: ${t(collected?'訪問済み':'未訪問')}`);
     });
-    passport.querySelector('.passport-progress').textContent = visited.size===6 ? '街めぐり、完了！またいつでも遊びに来てな。' : `${visited.size} / 6 SPOTS EXPLORED — 次の思い出を見つけに行こう。`;
+    passport.querySelector('.passport-progress').textContent = visited.size===6 ? '街めぐり、完了！またいつでも遊びに来てな。' : `${visited.size} / 6 SPOTS EXPLORED — ${t('次の思い出を見つけに行こう。')}`;
   }
   updateStamps();
   const visitsObserver = new IntersectionObserver(entries => {
@@ -93,7 +94,7 @@
       store.set('visits', [...visited]);
       updateStamps();
       if (visited.size===6) { announce('6つの思い出がそろった！パスポートをのぞいてみて。'); celebrate(); }
-      else announce(`${destination.title} のスタンプを受け取ったよ。 ${visited.size}/6`);
+      else announce(`${t(destination.title)} — ${t('スタンプを受け取ったよ。')} ${visited.size}/6`);
     });
   }, {threshold:.12});
   destinations.forEach(d => visitsObserver.observe(document.getElementById(d.id)));
@@ -115,7 +116,7 @@
     const term = search.value.normalize('NFKC').toLocaleLowerCase().trim();
     let shown=0;
     guide.querySelectorAll('[data-search]').forEach(a => {
-      a.hidden = !a.dataset.search.normalize('NFKC').toLocaleLowerCase().includes(term);
+      a.hidden = !`${a.dataset.search} ${a.textContent}`.normalize('NFKC').toLocaleLowerCase().includes(term);
       if(!a.hidden) shown++;
     });
     guide.querySelector('.guide-empty').hidden = shown!==0;
@@ -136,13 +137,13 @@
   });
 
   passport.querySelector('.passport-download').addEventListener('click', () => {
-    const date = new Intl.DateTimeFormat('ja-JP',{year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
+    const date = new Intl.DateTimeFormat(window.MoonLanguage.current==='en'?'en-GB':'ja-JP',{year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
     const stamps = destinations.map((d,i) => {
       const x=145+(i%3)*195, y=350+Math.floor(i/3)*165;
       const active=visited.has(d.id);
-      return `<g transform="translate(${x},${y}) rotate(${i%2?6:-6})"><circle r="64" fill="${active?'#e5d5f6':'#f3ecfa'}" stroke="${active?'#ad82c9':'#cdbbdb'}" stroke-width="2" ${active?'':'stroke-dasharray="4 5"'}/><circle r="57" fill="none" stroke="#bca0cc"/><text text-anchor="middle" y="-5" font-size="30" fill="${active?'#7f5099':'#c4b4ce'}">${d.symbol}</text><text text-anchor="middle" y="20" font-size="12" fill="#695275">${d.title}</text><text text-anchor="middle" y="36" font-size="8" fill="#9d7ab0">${active?'VISITED':'NEXT TIME'}</text></g>`;
+      return `<g transform="translate(${x},${y}) rotate(${i%2?6:-6})"><circle r="64" fill="${active?'#e5d5f6':'#f3ecfa'}" stroke="${active?'#ad82c9':'#cdbbdb'}" stroke-width="2" ${active?'':'stroke-dasharray="4 5"'}/><circle r="57" fill="none" stroke="#bca0cc"/><text text-anchor="middle" y="-5" font-size="30" fill="${active?'#7f5099':'#c4b4ce'}">${d.symbol}</text><text text-anchor="middle" y="20" font-size="12" fill="#695275">${t(d.title)}</text><text text-anchor="middle" y="36" font-size="8" fill="#9d7ab0">${active?'VISITED':'NEXT TIME'}</text></g>`;
     }).join('');
-    const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="680" height="800" viewBox="0 0 680 800"><defs><linearGradient id="bg" x2="1" y2="1"><stop stop-color="#e9ddff"/><stop offset=".55" stop-color="#ffe2ee"/><stop offset="1" stop-color="#d6f8e7"/></linearGradient></defs><rect width="680" height="800" rx="32" fill="url(#bg)"/><rect x="25" y="25" width="630" height="750" rx="22" fill="none" stroke="#b59ac9"/><g font-family="sans-serif" fill="#44304f"><text x="60" y="90" font-size="13" letter-spacing="3">MOONIANS / VISITOR PASSPORT</text><text x="60" y="163" font-size="40" font-weight="700">きみも、ムーニー。</text><text x="60" y="205" font-size="15">月の内側で出会った、きみだけの思い出。</text><path d="M60 242H620" stroke="#b59ac9" stroke-dasharray="4 5"/><text x="60" y="275" font-size="12">EARTH VISITOR</text><text x="620" y="275" font-size="12" text-anchor="end">${visited.size} / 6 SPOTS EXPLORED</text>${stamps}<text x="340" y="660" font-size="15" text-anchor="middle">地球を愛で満たそう。</text><text x="340" y="695" font-size="11" text-anchor="middle" fill="#9273a2">FROM THE MOON, WITH LOVE. / ${date}</text><text x="340" y="736" font-size="10" text-anchor="middle" fill="#9273a2">arsdavinci.github.io/moonians-official</text></g></svg>`;
+    const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="680" height="800" viewBox="0 0 680 800"><defs><linearGradient id="bg" x2="1" y2="1"><stop stop-color="#e9ddff"/><stop offset=".55" stop-color="#ffe2ee"/><stop offset="1" stop-color="#d6f8e7"/></linearGradient></defs><rect width="680" height="800" rx="32" fill="url(#bg)"/><rect x="25" y="25" width="630" height="750" rx="22" fill="none" stroke="#b59ac9"/><g font-family="sans-serif" fill="#44304f"><text x="60" y="90" font-size="13" letter-spacing="3">MOONIANS / VISITOR PASSPORT</text><text x="60" y="163" font-size="32" font-weight="700">${t('きみも、ムーニー。')}</text><text x="60" y="205" font-size="15">${t('月の内側で出会った、きみだけの思い出。')}</text><path d="M60 242H620" stroke="#b59ac9" stroke-dasharray="4 5"/><text x="60" y="275" font-size="12">EARTH VISITOR</text><text x="620" y="275" font-size="12" text-anchor="end">${visited.size} / 6 SPOTS EXPLORED</text>${stamps}<text x="340" y="660" font-size="15" text-anchor="middle">${t('地球を愛で満たそう。')}</text><text x="340" y="695" font-size="11" text-anchor="middle" fill="#9273a2">FROM THE MOON, WITH LOVE. / ${date}</text><text x="340" y="736" font-size="10" text-anchor="middle" fill="#9273a2">arsdavinci.github.io/moonians-official</text></g></svg>`;
     const url = URL.createObjectURL(new Blob([svg],{type:'image/svg+xml;charset=utf-8'}));
     const link=document.createElement('a');
     link.href=url; link.download='moonians-moon-passport.svg';
@@ -214,6 +215,14 @@
     });
   });
 
+  document.addEventListener('moonians:languagechange', () => {
+    applyTheme();
+    applyMotion();
+    updateStamps();
+    sceneImage.alt=t(scenes[currentScene].alt);
+    document.getElementById('scene-name').textContent=t(scenes[currentScene].name);
+  });
+
   const greetings={
     ranpyon:['よう来てくれたな！月の内側の街、ゆっくり見ていってな。','ぴょんぴーがボケたら、ツッコむのが僕の仕事やで。','月と地球の架け橋に。きみとも、友達になれたらええな。','もう中学生さんと一緒に仕事がしたくて、NSCに入ったんや。'],
     pyonpy:['地球には面白いヤツがぎょうさんおるって聞いてな！相方のらんぴょんとお笑いで勝負しに来てん！','ツッコミの速さやな！月はのんびりやから地球のスピード感に毎回ビックリやで！','歌舞伎町！ネオンと人の多さ、ちょっと月のナイトシティ思い出すねん','好きな芸人さんは、もう中学生さん。','ムーニアンズで、いつか地球のM-1を獲ること！月と地球を笑いでつなぐこと。']
@@ -230,14 +239,24 @@
     bubble.setAttribute('role','status'); bubble.setAttribute('aria-live','polite');
     button.setAttribute('aria-controls',bubble.id);
     card.querySelector('dl').before(button,bubble);
-    let index=0, timer;
+    let index=0, timer, lastMessage;
+    document.addEventListener('moonians:languagechange', () => {
+      if (!lastMessage) return;
+      clearInterval(timer);
+      const message=t(lastMessage);
+      bubble.querySelector('span').textContent=message;
+      bubble.setAttribute('aria-label',`${t(name)}: ${message}`);
+      bubble.classList.add('is-complete');
+    });
     button.addEventListener('click', () => {
       clearInterval(timer); bubble.hidden=false; bubble.classList.remove('is-complete');
       button.setAttribute('aria-expanded','true'); button.textContent='もうひとこと、聞いてみる';
-      const message=greetings[kind][index++%greetings[kind].length];
+      const original=greetings[kind][index++%greetings[kind].length];
+      lastMessage=original;
+      const message=t(original);
       const text=bubble.querySelector('span');
       // Announce the complete message once; visual typing is decorative.
-      bubble.setAttribute('aria-label',`${name}：${message}`);
+      bubble.setAttribute('aria-label',`${t(name)}: ${message}`);
       text.setAttribute('aria-hidden','true'); text.textContent='';
       if(!motion) { text.textContent=message; bubble.classList.add('is-complete'); return; }
       const characters=Array.from(message); let position=0;
