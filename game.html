@@ -16,8 +16,8 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DotGothic16&family=M+PLUS+Rounded+1c:wght@700;800;900&family=Noto+Sans+JP:wght@400;500;600;700;800;900&family=Unbounded:wght@700;900&display=swap" rel="stylesheet">
   <style>@import url("style.css?v=20261110-2") layer(legacy);@import url("experience.css?v=20261110-18") layer(legacy);@import url("language.css?v=20261110-12") layer(legacy);</style>
-  <link rel="stylesheet" href="cyber.css?v=20261111-20">
-  <script src="language.js?v=20261111-20"></script>
+  <link rel="stylesheet" href="cyber.css?v=20261112-2">
+  <script src="language.js?v=20261112-1"></script>
   <script src="cyber.js?v=20261111-19" defer></script>
 </head>
 <body class="anime-page game-page">
@@ -33,11 +33,14 @@
     <section class="anime-hero game-hero" aria-label="ぴょんぴーの大冒険">
       <img class="anime-hero-bg" src="assets/game/title-keyvisual.jpg" alt="ぴょんぴーの大冒険のキービジュアル" width="1672" height="941" fetchpriority="high">
       <div class="anime-hero-shade"></div>
-      <div class="section-wrap anime-hero-copy">
+      <div class="section-wrap anime-hero-copy game-hero-grid">
+        <div class="game-hero-text">
         <p class="eyebrow">MOONIANS GAME / FREE TO PLAY</p>
         <h1><span class="hero-line">ぴょんぴーの大冒険</span><br><span class="hero-line hero-gradient game-subtitle">〜ワライスターをとりもどせ〜</span></h1>
         <p class="anime-lead">宇宙じゅうの“笑い”をうばった魔王から、6つのかけらを取りもどせ。<br>ムーニアンズのアクションゲームが、ブラウザで遊べます。</p>
         <div class="game-cta-row"><a class="button anime-cta" href="https://arsdavinci.github.io/pyon-p-adventure/" target="_blank" rel="noopener noreferrer">いますぐあそぶ <span>▶</span></a><span class="game-free">無料 ／ インストール不要</span></div>
+        </div>
+        <a class="game-play-video" href="https://arsdavinci.github.io/pyon-p-adventure/" target="_blank" rel="noopener noreferrer" aria-label="プレイ動画。押すとゲームがはじまります"><video muted loop playsinline preload="none" poster="assets/game/play-poster.jpg" width="768" height="432"><source src="assets/game/play.mp4" type="video/mp4"></video><span class="game-play-tag" aria-hidden="true"><i></i>PLAY MOVIE</span><span class="game-play-go" aria-hidden="true">▶ いますぐあそぶ</span></a>
       </div>
     </section>
 
@@ -120,5 +123,17 @@
     </section>
   </main>
   <footer><div class="section-wrap footer-top"><a class="brand" href="./" data-language-link aria-label="ムーニアンズ ホーム"><img src="assets/logo.png?v=20261110-11" alt="ムーニアンズ" width="2421" height="833" loading="lazy"></a><p>地球を愛で満たそう。<br><span>FROM THE MOON, WITH LOVE.</span></p><a class="back-top" href="#main" aria-label="ページの先頭へ戻る">↑</a></div><div class="section-wrap footer-bottom"><small>© 2026 MOONIANS</small><a data-language-link href="./">← ムーニアンズの街へ戻る</a><span>MADE ON EARTH. LOVED ON THE MOON.</span></div><div class="footer-giant" aria-hidden="true">MOONIANS</div></footer>
+  <script>
+    (function () {
+      // The play movie loops silently while it is on screen (not when motion is turned off).
+      var video = document.querySelector('.game-play-video video');
+      if (!video) return;
+      new IntersectionObserver(function (entries) {
+        var moving = !document.body.classList.contains('motion-paused');
+        if (entries[0].isIntersecting && moving) { var p = video.play(); if (p && p.catch) p.catch(function () {}); }
+        else video.pause();
+      }, {threshold:.3}).observe(video);
+    })();
+  </script>
 </body>
 </html>
