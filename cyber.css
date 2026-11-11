@@ -792,3 +792,6 @@ body:not(.motion-paused) .crawl-text{position:absolute;left:0;right:0;top:100%;p
 
 .friend-body>.friend-note{margin:0;padding:12px 14px;border:1px solid var(--c-border);border-radius:12px;background:var(--lavender);font-size:11px;line-height:1.9;color:var(--c-text)}
 .friend-note b{display:block;margin-bottom:4px;font:9px var(--mono);letter-spacing:1.5px;color:var(--c-accent)}
+
+.friend-body>.friend-note+.model-sheet{margin-top:14px}
+.friend-image>img[src*="yanabisu"]{object-position:center 35%}

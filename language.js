@@ -179,6 +179,7 @@
     '翻訳酸素カプセルから聞こえる声の主。ぴょんぴーのムーニアン語を、日本語に同時翻訳してくれる人工知能です。':'The voice from the translation oxygen capsule: an AI that interprets Pyonpy’s Moonian into Japanese in real time.',
     '名前の由来':'Where the name comes from',
     '開発者に「You Are Not A Very Intelligent System（あんまり賢くないシステムやな）」と言われたのを、自分の名前だと勘違い。その頭文字が、正式名称「Y.A.N.A.V.I.S」になりました。':'Its developer once snapped, “You Are Not A Very Intelligent System.” It took that for its name, and the initials became the official one: Y.A.N.A.V.I.S.',
+    'ヤナビスのキャラクターモデルシート。四面図と、6つの表情。':'Yanabisu’s character model sheet: four views and six expressions.', 'ヤナビスのキャラクターモデルシート。正面・横・後ろ・斜めの図と、6種類の表情':'Yanabisu’s character model sheet, with front, side, back and three-quarter views and six expressions.',
     '宇宙に浮かぶラーメン屋台の宇宙船':'A ramen-stall spaceship floating in space', '3Dアニメ劇場':'3D Anime Theater'
   });
   function resolveLanguage(saved, languages, requested) {
