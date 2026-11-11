@@ -394,6 +394,7 @@
     '大型化 ＋ 音量アップ':'Larger body + more volume',
     'R-1グランプリ2022 予選':'R-1 Grand Prix 2022 preliminaries',
     '翻訳酸素カプセル02':'Translation Oxygen Capsule 02',
+    'ぴょんぴーの大冒険のタイトルロゴと、月面を跳ぶぴょんぴー':'The Pyonpy’s Big Adventure title logo, with Pyonpy leaping over the Moon',
     '宇宙に浮かぶラーメン屋台の宇宙船':'A ramen-stall spaceship floating in space', '3Dアニメ劇場':'3D Anime Theater'
   });
   function resolveLanguage(saved, languages, requested) {
