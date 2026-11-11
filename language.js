@@ -334,6 +334,22 @@
     '翻訳酸素カプセルと、からくりぴょんぴー。':'The translation capsule and Karakuri Pyonpy.',
     'できるまでの記録を、少しずつ。':'Follow the build, bit by bit.',
     '制作ラボ':'Lab',
+    '白い樹脂で囲ったスピーカーとLEDを、横から見た写真':'A side view of the speaker and LEDs, framed in white resin',
+    '荒い手作り感。カバー被せるからいーの。':'Rough and handmade. It’s fine, a cover goes over it.',
+    '雑！':'Sloppy!',
+    '同じ物を作る作業、刺激なくて嫌。':'Making the same thing twice. No thrill. Not a fan.',
+    '両耳完成。あとは配線つないで、あれしてこれして。':'Both ears done. Now to hook up the wiring, and this, and that.',
+    '今日はここまで。準備して仕事行きます。':'That’s it for today. Getting ready for work.',
+    '長さ足りんくて諦めかけて、でも繋げた。':'The wire was too short. Nearly gave up. Connected it anyway.',
+    'LEDテスト2。完璧やん。':'LED test 2. Perfect.',
+    '24h駆動可の最強バッテリーと最強スピーカーで、音の問題解決。':'A battery good for 24 hours and a mighty speaker: sound problem solved.',
+    '耳のカバーを、縫う。':'Sewing the ear covers.',
+    'あとは耳のカバーさえ作れば完成。型紙を切って、ミシンで縫う。':'Only the ear covers are left. Cut the pattern, then sew it on the machine.',
+    '後は耳のカバーさえ作れば完成。':'Just the ear covers to go, and it’s done.',
+    '何ができるかな。':'What will this turn into?',
+    'らんぴょんカラーで、かわゆい。':'Ranpyon colours. So cute.',
+    'ぺたぺた。':'Stick, stick.',
+    'えー感じに縫えた。':'Sewn up nicely.',
     '宇宙に浮かぶラーメン屋台の宇宙船':'A ramen-stall spaceship floating in space', '3Dアニメ劇場':'3D Anime Theater'
   });
   function resolveLanguage(saved, languages, requested) {
