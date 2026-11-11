@@ -376,6 +376,18 @@
     setInterval(kickOrbit, 400);
   }
 
+  /* ── 3D Pyonpy: three.js and the model load only when the stage is near ── */
+  const pyonpyStage = document.getElementById('pyonpy-3d');
+  if (pyonpyStage) {
+    pyonpyStage.hidden = false;
+    const stageObserver = new IntersectionObserver(entries => {
+      if (!entries[0].isIntersecting) return;
+      stageObserver.disconnect();
+      import('./pyonpy3d.js?v=20261111-8').then(module => module.mountPyonpy(pyonpyStage, {motionOn})).catch(() => { pyonpyStage.hidden = true; });
+    }, {rootMargin:'80% 0px'});
+    stageObserver.observe(pyonpyStage);
+  }
+
   /* ── easter egg: type “moon”, or tap the giant footer logo three times ── */
   let typed = '', gravityTimer = 0, taps = 0, tapTimer = 0;
   function lowGravity() {

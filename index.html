@@ -17,11 +17,12 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DotGothic16&family=M+PLUS+Rounded+1c:wght@700;800;900&family=Noto+Sans+JP:wght@400;500;600;700;800;900&family=Unbounded:wght@700;900&display=swap" rel="stylesheet">
   <style>@import url("style.css?v=20261110-2") layer(legacy);@import url("experience.css?v=20261110-18") layer(legacy);@import url("music.css?v=20261110-17") layer(legacy);@import url("language.css?v=20261110-12") layer(legacy);@import url("tv.css?v=20261110-21") layer(legacy);</style>
-  <link rel="stylesheet" href="cyber.css?v=20261111-6">
-  <script src="language.js?v=20261111-5"></script>
+  <link rel="stylesheet" href="cyber.css?v=20261111-8">
+  <script type="importmap">{"imports":{"three":"./vendor/three/three.module.min.js"}}</script>
+  <script src="language.js?v=20261111-8"></script>
   <script src="app.js?v=20261110-6" defer></script>
   <script src="experience.js?v=20261111-1" defer></script>
-  <script src="cyber.js?v=20261111-5" defer></script>
+  <script src="cyber.js?v=20261111-8" defer></script>
   <script src="music.js?v=20261111-1" defer></script>
   <script src="tv.js?v=20261110-20" defer></script>
 </head>
@@ -127,6 +128,21 @@
             </details>
           </div>
         </article>
+      </div><div class="pyonpy-stage" id="pyonpy-3d" hidden data-error="3Dモデルを読み込めなかったみたい。ページを開き直してみてね。">
+        <div class="pyonpy-view" role="img" aria-label="3Dのぴょんぴー。ドラッグで回転できます"><p class="pyonpy-status" role="status">3Dモデルを読み込み中…</p></div>
+        <div class="pyonpy-panel">
+          <p class="eyebrow">3D PYONPY / DRAG TO ROTATE</p>
+          <h3>ぴょんぴー先輩を、<span>ぐるっと一周。</span></h3>
+          <p>ドラッグでくるくる回して、<br>ボタンで動かしてみてな。</p>
+          <div class="pyonpy-motions" role="group" aria-label="ぴょんぴーの動き">
+            <button type="button" data-motion="Talk" aria-pressed="false" disabled>おしゃべり</button>
+            <button type="button" data-motion="Cheer" aria-pressed="false" disabled>やったー！</button>
+            <button type="button" data-motion="Jump" aria-pressed="false" disabled>ジャンプ</button>
+            <button type="button" data-motion="Walk" aria-pressed="false" disabled>あるく</button>
+            <button type="button" data-motion="Run" aria-pressed="false" disabled>はしる</button>
+            <button type="button" data-motion="Attack" aria-pressed="false" disabled>ツッコミ</button>
+          </div>
+        </div>
       </div><p class="character-footnote">☾ 月でのプロフィールと、地球での活動。それぞれの物語を楽しんでね。</p>
     </div></section>
 
@@ -142,7 +158,7 @@
         </div>
         <div class="tv-feature-caption"><div><span class="eyebrow">LATEST FROM MOONIANS TV</span><h4>ムーニアンズTVの最新動画</h4></div><a href="https://www.youtube.com/playlist?list=UULFBpwXFh6RjG9uLDooOS7pDw" target="_blank" rel="noopener noreferrer">YouTubeで最新動画を見る ↗</a></div>
       </article>
-      <div class="journal-grid journal-grid-secondary"><a class="journal-card anime-teaser" href="anime.html" data-language-link><div class="journal-image"><img src="assets/anime/uchu-ramen-poster.jpg" alt="宇宙船のコックピットでラーメンを食べる、3Dアニメのらんぴょんとぴょんぴー" width="864" height="496" loading="lazy"><span>MOONIANS 3D ANIME</span><b class="anime-teaser-play" aria-hidden="true">▶</b></div><div class="journal-meta"><span>3Dアニメ</span><span>↗</span></div><h3>ムーニアンズ、<br>3Dアニメになる。</h3><p>第1話「宇宙ラーメン」公開中。<br>つづきのお話も、準備中。</p></a><a class="journal-card" href="#gallery"><div class="journal-image"><img src="assets/duo.jpeg" alt="ネオンの街で一緒に過ごすらんぴょんとぴょんぴー" width="1932" height="2576" loading="lazy"><span>PHOTO DIARY</span></div><div class="journal-meta"><span>二人の日常</span><span>↗</span></div><h3>地球で見つけた、<br>とっておきの瞬間。</h3><p>街の光も、二人の笑顔も。<br>ムーニアンズのフォトアルバムへ。</p></a><a class="journal-card" href="https://linkco.re/8YX35bcQ" target="_blank" rel="noopener noreferrer"><div class="journal-image music-image"><span class="record" aria-hidden="true"><span>☾</span></span><span>MUSIC FROM THE MOON</span><b class="music-note" aria-hidden="true">♪</b></div><div class="journal-meta"><span>テーマソング</span><span>↗</span></div><h3>ぼくらはム〜ニアンズ<br><small>by ぴょんぴー</small></h3><p>音楽でも、地球とつながろう。<br>配信サービスでテーマ曲を聴く。</p></a></div>
+      <div class="journal-grid journal-grid-secondary"><a class="journal-card anime-teaser" href="anime.html" data-language-link><div class="journal-image"><img src="assets/anime/uchu-ramen-poster.jpg" alt="宇宙船のコックピットでラーメンを食べる、3Dアニメのらんぴょんとぴょんぴー" width="864" height="496" loading="lazy"><span>MOONIANS 3D ANIME</span><b class="anime-teaser-play" aria-hidden="true">▶</b></div><div class="journal-meta"><span>3Dアニメ</span><span>↗</span></div><h3>ムーニアンズ、<br>3Dアニメになる。</h3><p>第1話「宇宙ラーメン」公開中。<br>つづきのお話も、準備中。</p></a><a class="journal-card" href="karakuri.html" data-language-link><div class="journal-image"><img src="assets/karakuri/face-thumb.jpg" alt="3Dプリントで作った、からくりぴょんぴーの顔。紫の目と舌、青い鼻先がついている" width="480" height="640" loading="lazy"><span>KARAKURI PYONPY / BUILD LOG</span></div><div class="journal-meta"><span>制作日記</span><span>↗</span></div><h3>からくりぴょんぴー、<br>ただいま制作中。</h3><p>腹話術の人形みたいに動くぴょんぴー。<br>できるまでの記録を、少しずつ。</p></a><a class="journal-card" href="#gallery"><div class="journal-image"><img src="assets/duo.jpeg" alt="ネオンの街で一緒に過ごすらんぴょんとぴょんぴー" width="1932" height="2576" loading="lazy"><span>PHOTO DIARY</span></div><div class="journal-meta"><span>二人の日常</span><span>↗</span></div><h3>地球で見つけた、<br>とっておきの瞬間。</h3><p>街の光も、二人の笑顔も。<br>ムーニアンズのフォトアルバムへ。</p></a><a class="journal-card" href="https://linkco.re/8YX35bcQ" target="_blank" rel="noopener noreferrer"><div class="journal-image music-image"><span class="record" aria-hidden="true"><span>☾</span></span><span>MUSIC FROM THE MOON</span><b class="music-note" aria-hidden="true">♪</b></div><div class="journal-meta"><span>テーマソング</span><span>↗</span></div><h3>ぼくらはム〜ニアンズ<br><small>by ぴょんぴー</small></h3><p>音楽でも、地球とつながろう。<br>配信サービスでテーマ曲を聴く。</p></a></div>
     </section>
 
     <section class="gallery-section section-space" id="gallery"><div class="section-wrap"><div class="section-heading"><div><p class="eyebrow">04 / A GLIMPSE OF OUR DAYS</p><h2>月と地球の、<span>アルバム。</span></h2></div><span class="outline-label">写真をタップして、のぞいてみて。</span></div><div class="gallery-grid"><button class="gallery-item gallery-moon" data-photo="assets/moon-city.png" data-caption="ムーニアンズが暮らす月の内部都市。パステルの光が満ちる、二人のふるさと。"><img src="assets/moon-city.png" alt="ムーニアンズが暮らす月の内部都市の全景" width="1915" height="821" loading="lazy"><span>HOME INSIDE THE MOON. <b>＋</b></span></button><a class="gallery-item social-gallery-card" data-social="x" href="https://x.com/ranpyon_moonian" target="_blank" rel="noopener noreferrer" aria-label="Xのプロフィールを開く：@ranpyon_moonian"><img src="assets/social-x.webp" alt="Xの先頭の固定投稿：拡張現実とお笑いを組み合わせたARライブのサムネイル" loading="lazy"><span><strong>X<small>@ranpyon_moonian</small></strong><b aria-hidden="true">↗</b></span></a><a class="gallery-item social-gallery-card" data-social="instagram" href="https://www.instagram.com/pyonpy_moonians/" target="_blank" rel="noopener noreferrer" aria-label="Instagramのプロフィールを開く：@pyonpy_moonians"><img src="assets/social-instagram.jpg" alt="Instagramの先頭の投稿：スマートフォンを持つぴょんぴー" loading="lazy"><span><strong>Instagram<small>@pyonpy_moonians</small></strong><b aria-hidden="true">↗</b></span></a><a class="gallery-item social-gallery-card" data-social="tiktok" href="https://www.tiktok.com/@moonians0422" target="_blank" rel="noopener noreferrer" aria-label="TikTokのプロフィールを開く：@moonians0422"><img src="assets/social-tiktok.avif" alt="TikTokの先頭の固定動画：五条先生に好きな芸人を聞くムーニアンズのサムネイル" loading="lazy"><span><strong>TikTok<small>@moonians0422</small></strong><b aria-hidden="true">↗</b></span></a></div></div></section>
@@ -164,7 +180,7 @@
       <a href="https://www.showroom-live.com/r/moonians" target="_blank" rel="noopener noreferrer"><span class="social-icon">◉</span><div><b>SHOWROOM</b><small>二人の配信ルームへ</small></div><span>↗</span></a>
     </div><a class="shop-banner" id="goods-shop" href="https://suzuri.jp/Ranpyon" target="_blank" rel="noopener noreferrer" aria-label="月灯ふんわり亭のグッズショップを開く"><img src="assets/tsukiakari-funwaritei-banner.png" alt="月灯ふんわり亭。らんぴょんとぴょんぴーのグッズ販売" width="611" height="180" loading="lazy"></a><div class="related-links" aria-label="グッズと音楽"><a href="https://suzuri.jp/Ranpyon" target="_blank" rel="noopener noreferrer">♧ 月灯ふんわり亭のグッズ ↗</a><a href="https://linkco.re/8YX35bcQ" target="_blank" rel="noopener noreferrer">♫ テーマソングを聴く ↗</a></div><div class="moon-message"><span aria-hidden="true">☾</span><p>地球人のみなさん、<br><b>これからも、よろしゅうな。</b></p><span aria-hidden="true">✦</span></div><div class="moon-signature" role="img" aria-label="ムーニアンズ らんぴょんのサイン" style="aspect-ratio:979/629"></div></div></section>
   </main>
-  <footer><div class="section-wrap footer-top"><a class="brand" href="#home" aria-label="ページの先頭へ"><img src="assets/logo.png?v=20261110-11" alt="ムーニアンズ" width="2421" height="833" loading="lazy"></a><p>地球を愛で満たそう。<br><span>FROM THE MOON, WITH LOVE.</span></p><a class="back-top" href="#home" aria-label="ページの先頭へ戻る">↑</a></div><div class="section-wrap footer-bottom"><small>© 2026 MOONIANS</small><a data-language-link href="sources.html">プロフィール・活動記録の参考資料</a><span>MADE ON EARTH. LOVED ON THE MOON.</span></div><div class="footer-giant" aria-hidden="true">MOONIANS</div></footer>
+  <footer><div class="section-wrap footer-top"><a class="brand" href="#home" aria-label="ページの先頭へ"><img src="assets/logo.png?v=20261110-11" alt="ムーニアンズ" width="2421" height="833" loading="lazy"></a><p>地球を愛で満たそう。<br><span>FROM THE MOON, WITH LOVE.</span></p><a class="back-top" href="#home" aria-label="ページの先頭へ戻る">↑</a></div><div class="section-wrap footer-bottom"><small>© 2026 MOONIANS</small><a data-language-link href="karakuri.html">からくりぴょんぴー 制作日記</a><a data-language-link href="sources.html">プロフィール・活動記録の参考資料</a><span>MADE ON EARTH. LOVED ON THE MOON.</span></div><div class="footer-giant" aria-hidden="true">MOONIANS</div></footer>
   <dialog id="photo-dialog" aria-label="フォトアルバム"><button class="dialog-close" type="button" aria-label="写真を閉じる">閉じる ×</button><button class="photo-prev" type="button" aria-label="前の写真">←</button><figure><img id="dialog-image" src="assets/friends.jpeg" alt=""><figcaption id="dialog-caption"></figcaption></figure><button class="photo-next" type="button" aria-label="次の写真">→</button><p class="photo-counter" aria-live="polite"></p></dialog>
 </body>
 </html>

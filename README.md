@@ -116,3 +116,16 @@ SNS欄の締めのメッセージ「これからも、よろしゅうな。」�
 - 動きを抑える設定とJavaScript無効時は、1枚目の静止画と最初の見出しだけを通常の区間として表示します。
 - 映像を差し替えるときは、同じ手順でコマを書き出し、`index.html` の `data-frames` を枚数に合わせます。
   `ffmpeg -i in.mp4 -vf "select=not(mod(n\,3)),scale=640:-2" -fps_mode vfr -c:v libwebp -q:v 60 assets/orbit/f%03d.webp`
+
+## 3Dのぴょんぴー（ホーム）
+
+「仲間たち」の下に、本人提供のリグ入りモデル（`assets/models/pyonpy.glb`、約5.8MB）を回して動かせるステージがあります。ドラッグで回転、ボタンで「おしゃべり・やったー！・ジャンプ・あるく・はしる・ツッコミ」のモーションを再生します。表示は `pyonpy3d.js`、three.js 0.180（MITライセンス）は `vendor/three/` に同梱し、ステージが近づいたときだけ読み込みます。
+
+## からくりぴょんぴー 制作日記（karakuri.html）
+
+腹話術の人形のように動く「からくりぴょんぴー」の制作記録ページです。
+
+- **分解図**：CADデータ（STEP）を部品ごとの3Dデータ `assets/models/karakuri-face.glb`（33部品・約2.7MB）に変換し、スクロールでバラバラの部品が組み上がります。「中をのぞく」で外側の大きな部品が透けます。表示は `karakuri3d.js`。
+- **記録**：`.lab-entry` が1件の記録です。新しい記録は、HTML内のコメントの位置に `<article class="lab-entry">` を1つ足し、写真は `assets/karakuri/` に置きます（サムネイルは長辺640px）。対訳は `language.js` に追加します。
+- 記録の日付（2025.09／2026.02）は素材ファイルの日付からの仮のものです。
+- STEPの再変換は、作業フォルダで `npm install occt-import-js` のうえ、変換スクリプト（STEP→部品ごとのGLB）を実行します。元のSTEPはリポジトリに入れていません。

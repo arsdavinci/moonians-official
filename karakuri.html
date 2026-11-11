@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#080717">
+  <title>からくりぴょんぴー 制作日記｜ムーニアンズ</title>
+  <meta name="description" content="ぴょんぴーを、腹話術の人形のように動かしたい。からくりぴょんぴーができるまでの制作日記。">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="からくりぴょんぴー 制作日記｜ムーニアンズ">
+  <meta property="og:image" content="https://arsdavinci.github.io/moonians-official/assets/karakuri/face.jpg">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="canonical" href="https://arsdavinci.github.io/moonians-official/karakuri.html">
+  <link rel="icon" href="assets/embassy.png" type="image/png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DotGothic16&family=M+PLUS+Rounded+1c:wght@700;800;900&family=Noto+Sans+JP:wght@400;500;600;700;800;900&family=Unbounded:wght@700;900&display=swap" rel="stylesheet">
+  <style>@import url("style.css?v=20261110-2") layer(legacy);@import url("experience.css?v=20261110-18") layer(legacy);@import url("language.css?v=20261110-12") layer(legacy);</style>
+  <link rel="stylesheet" href="cyber.css?v=20261111-9">
+  <script type="importmap">{"imports":{"three":"./vendor/three/three.module.min.js"}}</script>
+  <script src="language.js?v=20261111-8"></script>
+  <script src="cyber.js?v=20261111-8" defer></script>
+</head>
+<body class="anime-page lab-page">
+  <script>(function(){var n=true;try{n=JSON.parse(localStorage.getItem("moonians.night"))!==false}catch(e){}if(n)document.body.classList.add("site-night")})()</script>
+  <a class="skip" href="#main">本文へ進む</a>
+  <div class="signal-bar"><span>KARAKURI PYONPY / BUILD LOG</span><span><i class="status-dot"></i> 今日も、地球と交信中。</span><span class="moon-age" data-moon-age>35° → ∞</span></div>
+  <header class="site-header">
+    <a class="brand" href="./" data-language-link aria-label="ムーニアンズ ホーム"><img src="assets/logo.png?v=20261110-11" alt="ムーニアンズ" width="2421" height="833"></a>
+    <a class="anime-back" href="./" data-language-link><span aria-hidden="true">←</span> <span>街へ戻る</span></a>
+    <div class="language-switch" data-language-switch role="group" aria-label="Language / 言語"><button type="button" data-language="ja" lang="ja" aria-pressed="true">日本語</button><button type="button" data-language="en" lang="en" aria-pressed="false">EN</button></div>
+  </header>
+  <main id="main">
+    <section class="lab-hero section-wrap" aria-label="からくりぴょんぴー 制作日記">
+      <div class="lab-hero-copy">
+        <p class="eyebrow">KARAKURI PYONPY / BUILD LOG</p>
+        <h1><span class="hero-line">からくりぴょんぴー</span><br><span class="hero-line hero-gradient">制作日記。</span></h1>
+        <p class="anime-lead">ぴょんぴーを、腹話術の人形みたいに動かしたい。<br>目も、口も、舌も。手元の仕掛けで動く「からくりぴょんぴー」を、いま作っています。</p>
+        <ul class="lab-specs"><li><span>STATUS</span><b>制作中</b></li><li><span>METHOD</span><b>3Dプリント ＋ 糸とトリガー</b></li><li><span>PARTS</span><b>33</b></li><li><span>LOGS</span><b>03</b></li></ul>
+      </div>
+      <figure class="lab-hero-photo"><img src="assets/karakuri/face.jpg" alt="3Dプリントで作った、からくりぴょんぴーの顔。紫の目と舌、青い鼻先がついている" width="1200" height="1600" fetchpriority="high"><figcaption>PROTOTYPE / FACE UNIT</figcaption></figure>
+    </section>
+
+    <section class="explode-scene" id="assembly" hidden aria-label="からくりぴょんぴーの分解図" data-error="3Dモデルを読み込めなかったみたい。ページを開き直してみてね。">
+      <div class="explode-sticky">
+        <div class="explode-view" role="img" aria-label="からくりぴょんぴーの顔の3Dモデル。スクロールすると部品が組み上がります"><p class="explode-status" role="status">3Dモデルを読み込み中…</p></div>
+        <div class="section-wrap explode-layout">
+          <div class="explode-copy">
+            <p class="eyebrow">EXPLODED VIEW / CAD DATA</p>
+            <div class="explode-steps">
+              <div class="explode-step is-active"><h2 class="explode-title">顔の中身は、<span>33個のパーツ。</span></h2><p>設計データを、部品ごとにバラバラにしてみました。<br>スクロールすると、組み上がっていきます。</p></div>
+              <div class="explode-step"><p class="explode-title">内側の仕掛けから、<span>ひとつずつ。</span></p><p>目を動かすパーツ、口を開けるパーツ。<br>最後に、白い頭がかぶさります。</p></div>
+              <div class="explode-step"><p class="explode-title">これが、<span>からくりぴょんぴーの顔。</span></p><p>「中をのぞく」を押すと、<br>組み上がった中の仕掛けが透けて見えます。</p></div>
+            </div>
+            <button class="explode-xray" type="button" aria-pressed="false"><span aria-hidden="true">◎</span> 中をのぞく</button>
+          </div>
+        </div>
+        <div class="explode-hud" aria-hidden="true"><span class="explode-parts">PARTS --</span><span class="explode-percent">ASSEMBLY 000%</span><span class="explode-bar"><i></i></span></div>
+      </div>
+    </section>
+
+    <section class="section-wrap section-space" id="logs">
+      <div class="section-heading"><div><p class="eyebrow">01 / BUILD LOG</p><h2>できるまでの<span>きろく</span></h2></div><p class="heading-note">新しい記録ほど、上に並びます。</p></div>
+      <div class="lab-log">
+
+        <!-- 新しい記録を足すときは、この <article class="lab-entry"> を1つコピーして一番上に置き、
+             日付・LOG番号・見出し・本文・写真を書き換えます。対訳は language.js に追加します。 -->
+
+        <article class="lab-entry lab-entry-next">
+          <header><span class="lab-entry-id big-label">LOG 04</span><span class="episode-chip">準備中</span></header>
+          <h3>つぎの記録</h3>
+          <p>直したパーツが組み上がったら、ここに書きます。もう少し待っててな。</p>
+        </article>
+
+        <article class="lab-entry">
+          <header><span class="lab-entry-id big-label">LOG 03</span><time datetime="2026-02">2026.02</time><span class="episode-chip">修正メモ</span></header>
+          <h3>直したいところを、書き込んだ。</h3>
+          <p>動かしてみて気になったところを、写真に赤ペンでメモ。まぶたの固定と、トリガーのかたさが次の課題です。</p>
+          <div class="lab-photos">
+            <button type="button" data-zoom="assets/karakuri/note-4.jpg"><img src="assets/karakuri/note-4-thumb.jpg" alt="顔の写真に、まぶたの固定とトリガーについて赤ペンで書き込んだメモ" width="480" height="640" loading="lazy"></button>
+            <button type="button" data-zoom="assets/karakuri/note-1.jpg"><img src="assets/karakuri/note-1-thumb.jpg" alt="頭の内側の写真に、固定してほしい場所を赤ペンで書き込んだメモ" width="480" height="640" loading="lazy"></button>
+            <button type="button" data-zoom="assets/karakuri/note-2.jpg"><img src="assets/karakuri/note-2-thumb.jpg" alt="頭の内側の写真に、パーツの固定について赤ペンで書き込んだメモ" width="480" height="640" loading="lazy"></button>
+            <button type="button" data-zoom="assets/karakuri/note-3.jpg"><img src="assets/karakuri/note-3-thumb.jpg" alt="糸を通すパーツの写真に、赤ペンで書き込んだメモ" width="480" height="640" loading="lazy"></button>
+          </div>
+        </article>
+
+        <article class="lab-entry">
+          <header><span class="lab-entry-id big-label">LOG 02</span><time datetime="2026-02">2026.02</time><span class="episode-chip">なかみ</span></header>
+          <h3>頭の中は、こうなってる。</h3>
+          <p>白い頭の内側に、目と口を動かすための紫と青のパーツ。糸を引くと、仕掛けが動きます。</p>
+          <div class="lab-photos">
+            <button type="button" data-zoom="assets/karakuri/face.jpg"><img src="assets/karakuri/face-thumb.jpg" alt="からくりぴょんぴーの顔。紫の目と舌、青い鼻先" width="480" height="640" loading="lazy"></button>
+            <button type="button" data-zoom="assets/karakuri/inside-1.jpg"><img src="assets/karakuri/inside-1-thumb.jpg" alt="頭の内側。目の裏のパーツと、持ち手につながる青いトリガー" width="480" height="640" loading="lazy"></button>
+            <button type="button" data-zoom="assets/karakuri/inside-2.jpg"><img src="assets/karakuri/inside-2-thumb.jpg" alt="頭の内側のアップ。茶色い糸が左右のパーツをつないでいる" width="480" height="640" loading="lazy"></button>
+            <button type="button" data-zoom="assets/karakuri/string.jpg"><img src="assets/karakuri/string-thumb.jpg" alt="頭の下から出た糸の先に、指をかける白い輪がついている" width="480" height="640" loading="lazy"></button>
+          </div>
+        </article>
+
+        <article class="lab-entry">
+          <header><span class="lab-entry-id big-label">LOG 01</span><time datetime="2025-09">2025.09</time><span class="episode-chip">試作</span></header>
+          <h3>顔のからくり、はじめての試作。</h3>
+          <p>3Dプリントした頭に、目と舌のパーツを組み込みました。まずは手で動かして、表情を確認。</p>
+          <div class="lab-video"><video controls muted playsinline preload="none" poster="assets/karakuri/prototype-poster.jpg" width="480" height="854" aria-label="からくりぴょんぴーの試作を、手に持って回して見せる動画（音声なし）"><source src="assets/karakuri/prototype.mp4" type="video/mp4"></video><span>12秒 ／ 音声なし</span></div>
+        </article>
+
+      </div>
+    </section>
+  </main>
+  <footer><div class="section-wrap footer-top"><a class="brand" href="./" data-language-link aria-label="ムーニアンズ ホーム"><img src="assets/logo.png?v=20261110-11" alt="ムーニアンズ" width="2421" height="833" loading="lazy"></a><p>地球を愛で満たそう。<br><span>FROM THE MOON, WITH LOVE.</span></p><a class="back-top" href="#main" aria-label="ページの先頭へ戻る">↑</a></div><div class="section-wrap footer-bottom"><small>© 2026 MOONIANS</small><a data-language-link href="./">← ムーニアンズの街へ戻る</a><span>MADE ON EARTH. LOVED ON THE MOON.</span></div><div class="footer-giant" aria-hidden="true">MOONIANS</div></footer>
+  <dialog class="lab-zoom" aria-label="写真を大きく表示"><button type="button" class="lab-zoom-close" aria-label="写真を閉じる">閉じる ×</button><img alt=""></dialog>
+  <script>
+    (function () {
+      // Photos open in a simple full-screen viewer.
+      var dialog = document.querySelector('.lab-zoom');
+      var image = dialog.querySelector('img');
+      document.querySelectorAll('[data-zoom]').forEach(function (button) {
+        button.addEventListener('click', function () {
+          image.src = button.dataset.zoom;
+          image.alt = button.querySelector('img').alt;
+          dialog.showModal();
+        });
+      });
+      dialog.querySelector('.lab-zoom-close').addEventListener('click', function () { dialog.close(); });
+      dialog.addEventListener('click', function (event) { if (event.target === dialog) dialog.close(); });
+    })();
+  </script>
+  <script type="module">
+    // The 3D viewer and the CAD model load only when the section is close.
+    const scene = document.getElementById('assembly');
+    scene.hidden = false;
+    // Reserve the scroll length straight away so the page does not jump when the viewer mounts.
+    if (!document.body.classList.contains('motion-paused')) scene.classList.add('is-scrub');
+    const observer = new IntersectionObserver(entries => {
+      if (!entries[0].isIntersecting) return;
+      observer.disconnect();
+      import('./karakuri3d.js?v=20261111-9').then(module => module.mountExplode(scene)).catch(() => { scene.hidden = true; });
+    }, {rootMargin:'100% 0px'});
+    observer.observe(scene);
+  </script>
+</body>
+</html>
