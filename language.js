@@ -350,6 +350,17 @@
     'らんぴょんカラーで、かわゆい。':'Ranpyon colours. So cute.',
     'ぺたぺた。':'Stick, stick.',
     'えー感じに縫えた。':'Sewn up nicely.',
+    '完成した翻訳酸素カプセルと、その横で話すらんぴょんの動画':'A video of the finished Translation Oxygen Capsule, with Ranpyon talking beside it',
+    '完成':'Complete',
+    'これが、':'This is',
+    '完成形。':'the finished one.',
+    'ぴょんぴーは、地球の言葉が話せなかった。だから、かわりにこの翻訳機をつくった。':'Pyonpy couldn’t speak Earth’s languages. So we built this translator instead.',
+    'ぴょんぴーがこの中に入れば、地球のみんなと会話ができる。カプセルから聞こえる声は、人工知能ヤナビス。':'With Pyonpy inside, he can talk with everyone on Earth. The voice from the capsule is the AI, Yanabisu.',
+    '「地球の空気、ホンマまずいわ」':'“Earth’s air really tastes awful.”',
+    '約15秒 ／ 音声あり':'About 15 sec / with sound',
+    'ヤナビスの声が出る、あのカプセルをつくりました。':'We built the capsule that Yanabisu’s voice comes from.',
+    '記録は、まだつづく。':'The log goes on.',
+    '完成までの記録には、まだ続きがあります。ここに足していきます。':'There is more of the build to show. It will be added here.',
     '宇宙に浮かぶラーメン屋台の宇宙船':'A ramen-stall spaceship floating in space', '3Dアニメ劇場':'3D Anime Theater'
   });
   function resolveLanguage(saved, languages, requested) {
