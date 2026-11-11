@@ -233,6 +233,19 @@
   }), {threshold:.6});
   document.querySelectorAll('.eyebrow,.english-name,.big-label').forEach(el => decodeObserver.observe(el));
 
+  /* ── the signature is written out when the message above it scrolls into view
+     (a fully clipped element never reports as intersecting, so watch its neighbour) ── */
+  const signature = document.querySelector('.moon-signature');
+  if (signature && motionOn()) {
+    signature.classList.add('sig-wait');
+    new IntersectionObserver((entries, observer) => {
+      if (!entries[0].isIntersecting) return;
+      observer.disconnect();
+      signature.classList.add('is-signing');
+      signature.classList.remove('sig-wait');
+    }, {threshold:.9}).observe(signature.previousElementSibling || signature.parentElement);
+  }
+
   /* ── holo sheen follows the pointer on character cards ── */
   document.querySelectorAll('.character').forEach(card => {
     card.addEventListener('pointermove', event => {

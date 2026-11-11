@@ -103,6 +103,7 @@
     'ぴょんぴーのキャラクターモデルシート。9つの表情と、三面図。':'Pyonpy’s character model sheet: nine expressions and three views.',
     'らんぴょんのキャラクターモデルシート。ホログラムの衣装を前・横・後ろから見た三面図':'Ranpyon’s character model sheet, showing the holographic outfit from the front, side and back.',
     'ぴょんぴーのキャラクターモデルシート。9つの表情と、側面・正面・背面の三面図':'Pyonpy’s character model sheet, with nine expressions and side, front and back views.',
+    'ムーニアンズ らんぴょんのサイン':'Signature of Ranpyon from Moonians',
     '宇宙に浮かぶラーメン屋台の宇宙船':'A ramen-stall spaceship floating in space', '3Dアニメ劇場':'3D Anime Theater'
   });
   function resolveLanguage(saved, languages, requested) {
