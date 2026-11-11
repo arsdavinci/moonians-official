@@ -144,6 +144,10 @@
     '内側の仕掛けから、':'From the inner mechanism,', 'ひとつずつ。':'one piece at a time.', '目を動かすパーツ、口を開けるパーツ。':'Parts that move the eyes, parts that open the mouth.', '最後に、白い頭がかぶさります。':'Last of all, the white head closes over them.',
     'これが、':'This is', 'からくりぴょんぴーの顔。':'the face of Karakuri Pyonpy.', '「中をのぞく」を押すと、':'Press “Look inside”', '組み上がった中の仕掛けが透けて見えます。':'to see the assembled mechanism through the shell.',
     '中をのぞく':'Look inside',
+    'ムーニアンズは、':'Moonians: a', 'のコンビ。':'duo.', 'サイバー系':'cyber-style', '宇宙漫才':'space-manzai', '月と地球':'Moon-and-Earth',
+    '月と地球の風景':'Scenes from the Moon and Earth', '前の風景':'Previous scene', '次の風景':'Next scene',
+    'これまでのお話':'The story so far', '月の内側には、街がある。':'Inside the Moon, there is a city.', '三日月大使館で出会った、':'Ranpyon and Pyonpy', 'らんぴょんとぴょんぴー。':'met at the Crescent Embassy.',
+    '笑いと愛で、':'To link the Moon and Earth', '月と地球をつなぐために。':'with laughter and love,', '二人は、地球へやってきた。':'the two of them came to Earth.',
     '宇宙に浮かぶラーメン屋台の宇宙船':'A ramen-stall spaceship floating in space', '3Dアニメ劇場':'3D Anime Theater'
   });
   function resolveLanguage(saved, languages, requested) {

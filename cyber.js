@@ -255,6 +255,149 @@
     }, {passive:true});
   });
 
+  /* ══ motion kit ══ */
+  // Rotating word: the words stay in Japanese here; language.js translates them as they change.
+  document.querySelectorAll('[data-rotator]').forEach(line => {
+    const words = line.dataset.rotator.split('|');
+    const word = line.querySelector('b');
+    let index = 0;
+    setInterval(() => {
+      if (!motionOn() || document.hidden) return;
+      word.style.translate = '0 -100%';
+      setTimeout(() => {
+        index = (index + 1) % words.length;
+        word.style.transition = 'none';
+        word.textContent = words[index];
+        word.style.translate = '0 100%';
+        void word.offsetHeight;
+        word.style.transition = '';
+        word.style.translate = '0 0';
+      }, 600);
+    }, 2600);
+  });
+
+  // Magnetic buttons.
+  if (fine) document.querySelectorAll('.tv-channel-link,.nav-social,.anime-cta,.character-talk,.back-top,.explode-xray,.passport-download,.anime-back').forEach(button => {
+    button.classList.add('is-magnetic');
+    button.addEventListener('pointermove', event => {
+      if (!motionOn()) return;
+      const box = button.getBoundingClientRect();
+      button.style.translate = `${(event.clientX - box.left - box.width / 2) * .22}px ${(event.clientY - box.top - box.height / 2) * .3}px`;
+    }, {passive:true});
+    button.addEventListener('pointerleave', () => { button.style.translate = ''; });
+  });
+
+  // Night lens: the same photo, graded as night, shows through around the cursor.
+  const albumPhoto = document.querySelector('.gallery-moon');
+  if (albumPhoto && fine) {
+    const lens = document.createElement('i');
+    lens.className = 'night-lens';
+    lens.setAttribute('aria-hidden', 'true');
+    lens.style.backgroundImage = `url(${albumPhoto.querySelector('img').getAttribute('src')})`;
+    albumPhoto.append(lens);
+    albumPhoto.classList.add('has-lens');
+    albumPhoto.addEventListener('pointermove', event => {
+      const box = albumPhoto.getBoundingClientRect();
+      lens.style.setProperty('--x', `${event.clientX - box.left}px`);
+      lens.style.setProperty('--y', `${event.clientY - box.top}px`);
+    }, {passive:true});
+  }
+
+  // Pointer parallax layers.
+  const depthLayers = [['.anime-hero-bg', 22], ['.anime-hero-copy', -8], ['.lab-hero-photo', 14], ['.footer-giant', 10]]
+    .map(([selector, depth]) => ({el:document.querySelector(selector), depth})).filter(layer => layer.el);
+  if (fine && depthLayers.length) {
+    depthLayers.forEach(layer => layer.el.setAttribute('data-depth', layer.depth));
+    addEventListener('pointermove', event => {
+      if (!motionOn() || event.pointerType !== 'mouse') return;
+      const x = event.clientX / innerWidth - .5, y = event.clientY / innerHeight - .5;
+      depthLayers.forEach(layer => { layer.el.style.translate = `${(-x * layer.depth).toFixed(1)}px ${(-y * layer.depth).toFixed(1)}px`; });
+    }, {passive:true});
+  }
+
+  // Ink reveal: wrap the intro paragraphs so their text lights up with the scroll.
+  const inks = [...document.querySelectorAll('.world-copy>p:not(.world-sign)')].map(paragraph => {
+    const ink = document.createElement('span');
+    ink.className = 'ink';
+    ink.append(...paragraph.childNodes);
+    paragraph.append(ink);
+    return ink;
+  });
+
+  // Stacking cards for the build log, only when every entry fits the screen.
+  const stackLog = document.querySelector('.lab-log');
+  const stackCards = stackLog ? [...stackLog.querySelectorAll('.lab-entry')] : [];
+  function checkStack() {
+    if (!stackLog) return;
+    stackCards.forEach((cardEl, index) => { cardEl.style.setProperty('--i', index); });
+    const fits = motionOn() && innerWidth > 860 && stackCards.every(cardEl => cardEl.offsetHeight < innerHeight - 190);
+    stackLog.classList.toggle('can-stack', fits);
+    if (!fits) stackCards.forEach(cardEl => { cardEl.style.scale = ''; cardEl.style.filter = ''; });
+  }
+  checkStack();
+  addEventListener('resize', checkStack, {passive:true});
+  addEventListener('load', checkStack);
+
+  // Count-up for plain numbers.
+  document.querySelectorAll('.lab-specs b').forEach(el => {
+    const text = el.textContent.trim();
+    if (!/^\d+$/.test(text) || !motionOn()) return;
+    const to = Number(text), started = performance.now() + 500;
+    (function step(now) {
+      const p = Math.max(0, Math.min(1, (now - started) / 1500));
+      el.textContent = String(Math.round(to * (1 - Math.pow(1 - p, 3)))).padStart(text.length, '0');
+      if (p < 1) requestAnimationFrame(step);
+    })(performance.now());
+  });
+
+  // Depth carousel of the four scenes in the world section.
+  const worldLayout = document.querySelector('.world-layout');
+  if (worldLayout) {
+    const sceneList = [['assets/moon-city.png', '月の内部都市'], ['assets/city.png', '歌舞月町'], ['assets/lunar-studio.jpeg', '月のスタジオ'], ['assets/scene-cockpit.jpg', '宇宙船コックピット']];
+    const carousel = document.createElement('div');
+    carousel.className = 'scene-carousel';
+    carousel.setAttribute('role', 'group');
+    carousel.setAttribute('aria-label', '月と地球の風景');
+    carousel.innerHTML = `<div class="scene-cards">${sceneList.map(([src, name], index) => `<button class="scene-card" type="button" data-slot="${index}"><img src="${src}" alt="" loading="lazy"><span class="location-tag">${name}</span></button>`).join('')}</div><div class="scene-carousel-nav"><button type="button" data-turn="-1" aria-label="前の風景">←</button><span class="scene-dots" aria-hidden="true">${sceneList.map(() => '<i></i>').join('')}</span><button type="button" data-turn="1" aria-label="次の風景">→</button></div>`;
+    worldLayout.querySelector('.world-photo').after(carousel);
+    worldLayout.classList.add('has-carousel');
+    const sceneCards = [...carousel.querySelectorAll('.scene-card')], dots = [...carousel.querySelectorAll('.scene-dots i')];
+    let front = 0;
+    const place = () => {
+      sceneCards.forEach((cardEl, index) => {
+        const slot = (index - front + sceneCards.length) % sceneCards.length;
+        cardEl.dataset.slot = slot;
+        cardEl.tabIndex = slot === 2 ? -1 : 0;
+      });
+      dots.forEach((dot, index) => dot.classList.toggle('is-on', index === front));
+    };
+    sceneCards.forEach((cardEl, index) => cardEl.addEventListener('click', () => { front = index === front ? (front + 1) % sceneCards.length : index; place(); }));
+    carousel.querySelectorAll('[data-turn]').forEach(button => button.addEventListener('click', () => { front = (front + Number(button.dataset.turn) + sceneCards.length) % sceneCards.length; place(); }));
+    place();
+  }
+
+  // Star trail across the closing section.
+  const trailArea = document.querySelector('.connect-section');
+  if (trailArea && fine) {
+    let lastSpark = 0;
+    const marks = ['✦', '✧', '☾', '★'], tints = ['#ff9be0', '#8dffd9', '#b9a5ff', '#fff09a'];
+    trailArea.addEventListener('pointermove', event => {
+      const now = performance.now();
+      if (!motionOn() || event.pointerType !== 'mouse' || now - lastSpark < 55) return;
+      lastSpark = now;
+      const spark = document.createElement('i');
+      spark.className = 'trail-spark';
+      spark.setAttribute('aria-hidden', 'true');
+      spark.textContent = marks[Math.floor(Math.random() * marks.length)];
+      spark.style.left = `${event.clientX - 7}px`;
+      spark.style.top = `${event.clientY - 9}px`;
+      spark.style.setProperty('--sx', `${Math.random() * 60 - 30}px`);
+      spark.style.setProperty('--spark', tints[Math.floor(Math.random() * tints.length)]);
+      body.append(spark);
+      setTimeout(() => spark.remove(), 900);
+    }, {passive:true});
+  }
+
   /* ── orbit rail: section dots + a moon that fills as you scroll ── */
   const sections = [['world', 'この世界のこと'], ['characters', '仲間たち'], ['journal', '街のおたより'], ['gallery', 'アルバム'], ['history', '活動の記録'], ['connect', 'SNSで会おう']]
     .map(([id, label]) => ({id, label, el:document.getElementById(id)})).filter(section => section.el);
@@ -271,7 +414,7 @@
 
   /* ── scroll-driven bits: rail, flight-log trace, marquee speed ── */
   const historyList = document.querySelector('.history-list');
-  const marqueeTrack = document.querySelector('.marquee>div');
+  const marqueeTracks = [...document.querySelectorAll('.marquee>div')];
   let scrollFrame = 0, lastScroll = scrollY, lastTime = performance.now(), marqueeTimer = 0;
   function onScroll() {
     scrollFrame = 0;
@@ -290,14 +433,26 @@
       const box = historyList.getBoundingClientRect();
       historyList.style.setProperty('--trace', Math.max(0, Math.min(1, (innerHeight * .7 - box.top) / box.height)).toFixed(3));
     }
-    if (marqueeTrack && motionOn() && marqueeTrack.getAnimations) {
+    if (marqueeTracks.length && motionOn() && marqueeTracks[0].getAnimations) {
       const velocity = Math.abs(scrollY - lastScroll) / Math.max(16, now - lastTime);
-      const animation = marqueeTrack.getAnimations()[0];
-      if (animation) {
-        animation.playbackRate = 1 + Math.min(9, velocity * 5);
-        clearTimeout(marqueeTimer);
-        marqueeTimer = setTimeout(() => { animation.playbackRate = 1; }, 220);
-      }
+      const running = marqueeTracks.map(track => track.getAnimations()[0]).filter(Boolean);
+      running.forEach(animation => { animation.playbackRate = 1 + Math.min(9, velocity * 5); });
+      clearTimeout(marqueeTimer);
+      marqueeTimer = setTimeout(() => running.forEach(animation => { animation.playbackRate = 1; }), 220);
+    }
+    inks.forEach(ink => {
+      const box = ink.parentElement.getBoundingClientRect();
+      ink.style.setProperty('--lit', motionOn() ? Math.max(0, Math.min(1, (innerHeight * .88 - box.top) / (innerHeight * .42))).toFixed(3) : '1');
+    });
+    if (stackLog) {
+      stackCards.forEach((cardEl, index) => {
+        const next = stackCards[index + 1];
+        if (!next) return;
+        const gap = next.getBoundingClientRect().top - cardEl.getBoundingClientRect().top;
+        const covered = Math.max(0, Math.min(1, 1 - gap / Math.max(1, cardEl.offsetHeight)));
+        cardEl.style.scale = (1 - covered * .06).toFixed(3);
+        cardEl.style.filter = `brightness(${(1 - covered * .35).toFixed(2)})`;
+      });
     }
     lastScroll = scrollY; lastTime = now;
   }
