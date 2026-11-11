@@ -4,6 +4,35 @@
   const card = document.getElementById('moon-music');
   if (!audio || !card) return;
 
+  const body = card.querySelector('.music-expanded-body');
+  if (body && !body.querySelector('[data-music-lyric]')) {
+    body.insertAdjacentHTML('afterbegin', '<div class="music-lyric" lang="ja" aria-hidden="true"><p data-music-lyric>♪</p><p class="music-lyric-next" data-music-lyric-next></p></div>');
+  }
+  // The player floats: it leaves the hero and follows the page while scrolling.
+  card.classList.add('music-float');
+  document.body.append(card);
+  const hide = document.createElement('button');
+  hide.type = 'button';
+  hide.className = 'music-float-hide';
+  hide.setAttribute('aria-label', 'プレーヤーをしまう');
+  hide.textContent = '×';
+  card.append(hide);
+  const bubble = document.createElement('button');
+  bubble.type = 'button';
+  bubble.className = 'music-bubble';
+  bubble.hidden = true;
+  bubble.setAttribute('aria-label', '音楽プレーヤーを出す');
+  bubble.innerHTML = '<span aria-hidden="true">♫</span><i class="music-dock-light" aria-hidden="true"></i>';
+  document.body.append(bubble);
+  function setFloatHidden(hidden) {
+    card.hidden = hidden;
+    bubble.hidden = !hidden;
+    try { sessionStorage.setItem('moonians.music-hidden', hidden ? '1' : ''); } catch { /* Optional. */ }
+  }
+  hide.addEventListener('click', event => { event.stopPropagation(); setFloatHidden(true); bubble.focus({preventScroll:true}); });
+  bubble.addEventListener('click', event => { event.stopPropagation(); setFloatHidden(false); card.querySelector('.music-disclosure').open = true; });
+  try { if (sessionStorage.getItem('moonians.music-hidden') === '1') setFloatHidden(true); } catch { /* Optional. */ }
+
   const flyout = document.createElement('section');
   flyout.className = 'music-flyout';
   flyout.id = 'music-flyout';
@@ -44,7 +73,9 @@
   card.addEventListener('focusout', () => queueMicrotask(() => {
     if (!hovering && !card.contains(document.activeElement)) disclosure.open = false;
   }));
-  document.addEventListener('click', event => { if (!card.contains(event.target)) collapseCard(); });
+  document.addEventListener('click', event => {
+    if (!card.contains(event.target) && !event.target.closest?.('[data-action="music"],.music-bubble,[data-music-page-play],[data-lyrics]')) collapseCard();
+  });
   card.addEventListener('keydown', event => {
     if (event.key === 'Escape') { event.preventDefault(); collapseCard(); }
   });
@@ -57,7 +88,10 @@
   dockButton.setAttribute('aria-expanded', 'false');
   dockButton.setAttribute('aria-label', '音楽プレーヤーを開く');
   dockButton.innerHTML = '<span class="dock-symbol">♫</span><span>音楽</span><i class="music-dock-light" aria-hidden="true"></i>';
-  dock.querySelector('[data-action="passport"]').before(dockButton);
+  if (dock) {
+    const passport = dock.querySelector('[data-action="passport"]');
+    if (passport) passport.before(dockButton); else dock.append(dockButton);
+  }
 
   const consent = document.createElement('dialog');
   consent.className = 'fx-dialog music-consent';
@@ -79,6 +113,47 @@
   let waiting = false;
   let failure = '';
   const players = [card, flyout];
+  const pagePlay = [...document.querySelectorAll('[data-music-page-play]')];
+  const lyricList = document.querySelector('[data-lyrics]');
+  const LYRICS = window.MoonLyrics || [];
+  let lyricIndex = -2;
+  if (lyricList) {
+    lyricList.innerHTML = LYRICS.map(([time, text], index) => text
+      ? `<button type="button" data-lyric-index="${index}" data-lyric-time="${time}">${text}</button>`
+      : '<span class="lyric-gap" aria-hidden="true"></span>').join('');
+    lyricList.addEventListener('click', event => {
+      const line = event.target.closest?.('[data-lyric-time]');
+      if (line) seekTo(Number(line.dataset.lyricTime));
+    });
+  }
+  function updateLyrics(time) {
+    let index = -1;
+    for (let i = 0; i < LYRICS.length; i++) { if (LYRICS[i][0] <= time + .05) index = i; else break; }
+    if (index === lyricIndex) return;
+    lyricIndex = index;
+    const text = index >= 0 ? LYRICS[index][1] : '';
+    let next = '';
+    for (let i = index + 1; i < LYRICS.length; i++) { if (LYRICS[i][1]) { next = LYRICS[i][1]; break; } }
+    each('[data-music-lyric]', el => {
+      el.textContent = text || '♪';
+      el.classList.remove('is-in'); void el.offsetWidth; el.classList.add('is-in');
+    });
+    each('[data-music-lyric-next]', el => { el.textContent = next; });
+    if (lyricList) {
+      lyricList.querySelectorAll('.is-current').forEach(el => el.classList.remove('is-current'));
+      const current = text && lyricList.querySelector(`[data-lyric-index="${index}"]`);
+      if (current) {
+        current.classList.add('is-current');
+        const top = current.offsetTop - lyricList.clientHeight / 2 + current.offsetHeight / 2;
+        if (!audio.paused) lyricList.scrollTo({top, behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth'});
+      }
+    }
+  }
+  function seekTo(time) {
+    const jump = () => { try { audio.currentTime = time; } catch { /* Not seekable yet. */ } updateProgress(); };
+    if (audio.readyState >= 1) jump(); else audio.addEventListener('loadedmetadata', jump, {once:true});
+    if (audio.paused) play();
+  }
   const each = (selector, callback) => players.forEach(player => player.querySelectorAll(selector).forEach(callback));
   let seekingInput = null;
   const duration = () => Number.isFinite(audio.duration) && audio.duration > 0 ? audio.duration : 185.716757;
@@ -89,6 +164,7 @@
   function updateProgress() {
     const time = audio.currentTime || 0;
     const length = duration();
+    updateLyrics(time);
     each('[data-music-elapsed]', el => { el.textContent = formatTime(time); });
     each('[data-music-duration]', el => { el.textContent = formatTime(Math.ceil(length)); });
     each('[data-music-seek]', input => {
@@ -146,6 +222,13 @@
       player.classList.toggle('has-error', Boolean(failure));
     });
     dockButton.classList.toggle('is-playing', playing);
+    bubble.classList.toggle('is-playing', playing);
+    document.body.classList.toggle('music-playing', playing && !waiting);
+    pagePlay.forEach(button => {
+      button.setAttribute('aria-label', playing ? '音楽を一時停止する' : '音楽を再生する');
+      const icon = button.querySelector('[data-music-play-icon]'); if (icon) icon.textContent = playing ? 'Ⅱ' : '▶';
+      const label = button.querySelector('[data-music-play-label]'); if (label) label.textContent = playing ? '一時停止' : '再生する';
+    });
     dockButton.setAttribute('aria-label', playing ? '再生中の音楽プレーヤーを開く' : '音楽プレーヤーを開く');
     each('[data-music-play]', button => {
       button.setAttribute('aria-label', playing ? '音楽を一時停止する' : '音楽を再生する');
@@ -204,6 +287,10 @@
     if (!audio.paused && !audio.ended) { waiting = false; audio.pause(); }
     else play();
   }));
+  pagePlay.forEach(button => button.addEventListener('click', () => {
+    if (!audio.paused && !audio.ended) { waiting = false; audio.pause(); }
+    else { setFloatHidden(false); play(); }
+  }));
   each('[data-music-stop]', button => button.addEventListener('click', stop));
   each('[data-music-volume]', input => input.addEventListener('input', () => {
     volume = Number(input.value) / 100;
@@ -245,11 +332,13 @@
     dockButton.setAttribute('aria-expanded', 'false');
     if (restoreFocus) dockButton.focus({preventScroll:true});
   }
+  dockButton.setAttribute('aria-controls', card.id);
   dockButton.addEventListener('click', () => {
-    const open = flyout.hidden;
-    flyout.hidden = !open;
+    const open = card.hidden || !disclosure.open;
+    setFloatHidden(false);
+    disclosure.open = open;
     dockButton.setAttribute('aria-expanded', String(open));
-    if (open) flyout.querySelector('[data-music-play]').focus({preventScroll:true});
+    if (open) card.querySelector('[data-music-play]').focus({preventScroll:true});
   });
   flyout.querySelector('.music-flyout-close').addEventListener('click', () => closeFlyout(true));
   document.addEventListener('click', event => {
@@ -295,6 +384,7 @@
   render();
   // The question waits for the opening sequence (cyber.js) when there is one.
   const askAfterBoot = () => (window.MoonBootDone || Promise.resolve()).then(ask);
-  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', askAfterBoot, {once:true});
+  if (audio.dataset.consent === 'off') { /* The music page starts from its own play button. */ }
+  else if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', askAfterBoot, {once:true});
   else askAfterBoot();
 })();
