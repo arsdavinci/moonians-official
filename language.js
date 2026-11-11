@@ -176,6 +176,9 @@
     'ミントグリーンの毛並みに、つぎはぎと舌ぺろ。耳には宇宙人のチャーム、体には光るパーツ。ちょっとこわいけど、どこかにくめないやつ。':'Mint-green fur, stitches and a cheeky tongue. Alien charms on the ears, glowing parts on the body. A little scary, but hard to dislike.',
     'うさ耳のついた丸い頭に、にっこり顔の画面がある小さなロボット、ヤナビス':'Yanabisu, a small robot with rabbit ears and a smiling face on its screen.', '人工知能':'Artificial intelligence', 'ヤナビス':'Yanabisu',
     '月の人工知能。ムーニアン語を地球の言葉に訳してくれる、二人のたよれる通訳です。うさ耳と、にっこり顔の画面がめじるし。':'The Moon’s AI. It turns the Moonian language into Earth’s words, a reliable interpreter for the two. Look for the rabbit ears and the smiling screen.',
+    '翻訳酸素カプセルから聞こえる声の主。ぴょんぴーのムーニアン語を、日本語に同時翻訳してくれる人工知能です。':'The voice from the translation oxygen capsule: an AI that interprets Pyonpy’s Moonian into Japanese in real time.',
+    '名前の由来':'Where the name comes from',
+    '開発者に「You Are Not A Very Intelligent System（あんまり賢くないシステムやな）」と言われたのを、自分の名前だと勘違い。その頭文字が、正式名称「Y.A.N.A.V.I.S」になりました。':'Its developer once snapped, “You Are Not A Very Intelligent System.” It took that for its name, and the initials became the official one: Y.A.N.A.V.I.S.',
     '宇宙に浮かぶラーメン屋台の宇宙船':'A ramen-stall spaceship floating in space', '3Dアニメ劇場':'3D Anime Theater'
   });
   function resolveLanguage(saved, languages, requested) {
