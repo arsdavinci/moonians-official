@@ -17,9 +17,9 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DotGothic16&family=M+PLUS+Rounded+1c:wght@700;800;900&family=Noto+Sans+JP:wght@400;500;600;700;800;900&family=Unbounded:wght@700;900&display=swap" rel="stylesheet">
   <style>@import url("style.css?v=20261110-2") layer(legacy);@import url("experience.css?v=20261110-18") layer(legacy);@import url("music.css?v=20261110-17") layer(legacy);@import url("language.css?v=20261110-12") layer(legacy);@import url("tv.css?v=20261110-21") layer(legacy);</style>
-  <link rel="stylesheet" href="cyber.css?v=20261111-19">
+  <link rel="stylesheet" href="cyber.css?v=20261111-20">
   <script type="importmap">{"imports":{"three":"./vendor/three/three.module.min.js"}}</script>
-  <script src="language.js?v=20261111-19"></script>
+  <script src="language.js?v=20261111-20"></script>
   <script src="app.js?v=20261110-6" defer></script>
   <script src="experience.js?v=20261111-13" defer></script>
   <script src="cyber.js?v=20261111-13" defer></script>
@@ -33,7 +33,7 @@
   <header class="site-header">
     <a class="brand" href="#home" aria-label="ムーニアンズ ホーム"><img src="assets/logo.png?v=20261110-11" alt="ムーニアンズ" width="2421" height="833"></a>
     <button class="menu-toggle" type="button" aria-controls="main-nav" aria-expanded="false"><span>MENU</span><span class="menu-lines" aria-hidden="true">☰</span></button>
-    <nav id="main-nav" aria-label="メインナビゲーション"><a href="#world">この世界のこと</a><a href="#characters">仲間たち</a><a href="#journal">街のおたより</a><a href="anime.html" data-language-link>3Dアニメ</a><a href="#history">活動の記録</a><a class="nav-social" href="#connect">SNSで会おう <span>↗</span></a></nav>
+    <nav id="main-nav" aria-label="メインナビゲーション"><a href="#world">この世界のこと</a><a href="#characters">仲間たち</a><a href="#journal">街のおたより</a><a href="anime.html" data-language-link>3Dアニメ</a><a href="game.html" data-language-link>ゲーム</a><a href="karakuri.html" data-language-link>からくり日記</a><a href="#history">活動の記録</a><a class="nav-social" href="#connect">SNSで会おう <span>↗</span></a></nav>
     <div class="language-switch" data-language-switch role="group" aria-label="Language / 言語"><button type="button" data-language="ja" lang="ja" aria-pressed="true">日本語</button><button type="button" data-language="en" lang="en" aria-pressed="false">EN</button></div>
   </header>
   <main id="main">
@@ -194,6 +194,7 @@
         </div>
         <div class="tv-feature-caption"><div><span class="eyebrow">LATEST FROM MOONIANS TV</span><h4>ムーニアンズTVの最新動画</h4></div><a href="https://www.youtube.com/playlist?list=UULFBpwXFh6RjG9uLDooOS7pDw" target="_blank" rel="noopener noreferrer">YouTubeで最新動画を見る ↗</a></div>
       </article>
+      <article class="game-feature" id="moonians-game" aria-label="ぴょんぴーの大冒険"><img class="game-feature-art" src="assets/game/title-keyvisual.jpg" alt="ぴょんぴーの大冒険のキービジュアル" width="1672" height="941" loading="lazy"><div class="game-feature-body"><p class="eyebrow">MOONIANS GAME / FREE TO PLAY</p><h3>ぴょんぴーの大冒険<span>〜ワライスターをとりもどせ〜</span></h3><p>宇宙じゅうの“笑い”をうばった魔王から、6つのかけらを取りもどせ。<br>ムーニアンズのアクションゲームが、ブラウザで遊べます。</p><ul class="game-feature-specs"><li>6つの星</li><li>全35ステージ</li><li>無料 ／ インストール不要</li></ul><div class="game-feature-actions"><a class="button anime-cta" href="https://arsdavinci.github.io/pyon-p-adventure/" target="_blank" rel="noopener noreferrer">いますぐあそぶ <span>▶</span></a><a class="text-link" href="game.html" data-language-link>キャラクターとあそびかたを見る ↗</a></div></div></article>
       <div class="journal-grid journal-grid-secondary"><a class="journal-card" href="game.html" data-language-link><div class="journal-image"><img src="assets/game/title-keyvisual.jpg" alt="ぴょんぴーの大冒険のキービジュアル" width="1672" height="941" loading="lazy"><span>MOONIANS GAME</span><b class="anime-teaser-play" aria-hidden="true">▶</b></div><div class="journal-meta"><span>ゲーム</span><span>↗</span></div><h3>ぴょんぴーの大冒険、<br>あそべます。</h3><p>うばわれた“笑い”を取りもどせ。<br>ブラウザで無料のアクションゲーム。</p></a><a class="journal-card anime-teaser" href="anime.html" data-language-link><div class="journal-image"><img src="assets/anime/uchu-ramen-poster.jpg" alt="宇宙船のコックピットでラーメンを食べる、3Dアニメのらんぴょんとぴょんぴー" width="864" height="496" loading="lazy"><span>MOONIANS 3D ANIME</span><b class="anime-teaser-play" aria-hidden="true">▶</b></div><div class="journal-meta"><span>3Dアニメ</span><span>↗</span></div><h3>ムーニアンズ、<br>3Dアニメになる。</h3><p>第1話「宇宙ラーメン」公開中。<br>つづきのお話も、準備中。</p></a><a class="journal-card" href="karakuri.html" data-language-link><div class="journal-image"><img src="assets/karakuri/face-thumb.jpg" alt="3Dプリントで作った、からくりぴょんぴーの顔。紫の目と舌、青い鼻先がついている" width="480" height="640" loading="lazy"><span>KARAKURI PYONPY / BUILD LOG</span></div><div class="journal-meta"><span>制作日記</span><span>↗</span></div><h3>からくりぴょんぴー、<br>ただいま制作中。</h3><p>腹話術の人形みたいに動くぴょんぴー。<br>できるまでの記録を、少しずつ。</p></a><a class="journal-card" href="#gallery"><div class="journal-image"><img src="assets/duo.jpeg" alt="ネオンの街で一緒に過ごすらんぴょんとぴょんぴー" width="1932" height="2576" loading="lazy"><span>PHOTO DIARY</span></div><div class="journal-meta"><span>二人の日常</span><span>↗</span></div><h3>地球で見つけた、<br>とっておきの瞬間。</h3><p>街の光も、二人の笑顔も。<br>ムーニアンズのフォトアルバムへ。</p></a><a class="journal-card" href="https://linkco.re/8YX35bcQ" target="_blank" rel="noopener noreferrer"><div class="journal-image music-image"><span class="record" aria-hidden="true"><span>☾</span></span><span>MUSIC FROM THE MOON</span><b class="music-note" aria-hidden="true">♪</b></div><div class="journal-meta"><span>テーマソング</span><span>↗</span></div><h3>ぼくらはム〜ニアンズ<br><small>by ぴょんぴー</small></h3><p>音楽でも、地球とつながろう。<br>配信サービスでテーマ曲を聴く。</p></a></div>
     </section>
 

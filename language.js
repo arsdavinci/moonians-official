@@ -288,6 +288,7 @@
     '住人たち':'the six planets',
     '行く手をはばむ、ちいさな敵たち。':'The little foes who stand in your way.',
     '上からふむと、ピヨります。':'Stomp them from above and they go dizzy.',
+    'からくり日記':'Build log', 'ホーム':'Home', 'ページ':'Pages', '6つの星':'6 planets', '全35ステージ':'35 stages', 'キャラクターとあそびかたを見る ↗':'See the characters and how to play ↗',
     '宇宙に浮かぶラーメン屋台の宇宙船':'A ramen-stall spaceship floating in space', '3Dアニメ劇場':'3D Anime Theater'
   });
   function resolveLanguage(saved, languages, requested) {
