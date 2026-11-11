@@ -202,6 +202,15 @@ dt{color:var(--c-accent)}
 .speech-bubble small{color:var(--c-accent)}
 .speech-bubble>span::after{color:var(--c-mint)}
 .character-footnote{color:var(--c-muted)}
+.model-sheet{position:relative;display:flex;align-items:center;gap:16px;width:100%;margin:0 0 22px;padding:10px 16px 10px 10px;border:1px solid var(--c-border-strong);border-radius:14px;background:var(--corners),var(--lavender);background-origin:border-box;text-align:left;overflow:hidden;transition:border-color .3s,box-shadow .3s,translate .3s}
+.model-sheet:hover{border-color:var(--c-mint);box-shadow:0 0 26px -8px var(--c-mint);translate:0 -2px}
+.model-sheet img{width:118px;height:84px;flex-shrink:0;object-fit:cover;border-radius:8px;border:1px solid var(--c-border-strong);background:#fff}
+.model-sheet::after{content:'';position:absolute;left:10px;top:10px;width:118px;height:30px;pointer-events:none;background:linear-gradient(180deg,transparent,rgba(141,255,217,.45),transparent);animation:sheet-scan 2.8s linear infinite}
+.model-sheet small{display:block;font:700 9px var(--tech);letter-spacing:2.5px;color:var(--c-accent)}
+.model-sheet b{display:block;margin-top:5px;font-size:13px;font-weight:700;line-height:1.5}
+.model-sheet i{margin-left:auto;font-style:normal;font-size:20px;color:var(--c-mint)}
+@keyframes sheet-scan{from{translate:0 -30px}to{translate:0 84px}}
+@media(max-width:560px){.model-sheet img{width:96px;height:68px}.model-sheet::after{width:96px}.model-sheet b{font-size:12px}}
 
 /* ── Moonians TV + journal ─────────────────────── */
 .tv-feature{background:var(--c-surface);border-color:var(--c-border-strong);box-shadow:0 50px 110px -60px var(--c-glow);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}

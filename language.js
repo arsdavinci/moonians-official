@@ -98,6 +98,11 @@
     '新しいお話は、YouTubeとSNSでもお知らせします。':'New episodes will also be announced on YouTube and social media.',
     '公開中の':'Now', 'エピソード':'showing', 'これからの':'Coming', 'お話':'soon', '3Dの':'The duo', 'ふたり':'in 3D', 'YouTubeチャンネルを開く ↗':'Open our YouTube channel ↗',
     'らんぴょんとぴょんぴーの3Dアニメ劇場。第1話「宇宙ラーメン」公開中。つづきのお話も準備中です。':'The Ranpyon and Pyonpy 3D anime theater. Episode 1, “Space Ramen”, is out now, with more on the way.',
+    'らんぴょんの設定資料を見る':'See Ranpyon’s model sheet', 'ぴょんぴーの設定資料を見る':'See Pyonpy’s model sheet',
+    'らんぴょんのキャラクターモデルシート。衣装の三面図と、ディテールの解説。':'Ranpyon’s character model sheet: three views of the outfit, with detail callouts.',
+    'ぴょんぴーのキャラクターモデルシート。9つの表情と、三面図。':'Pyonpy’s character model sheet: nine expressions and three views.',
+    'らんぴょんのキャラクターモデルシート。ホログラムの衣装を前・横・後ろから見た三面図':'Ranpyon’s character model sheet, showing the holographic outfit from the front, side and back.',
+    'ぴょんぴーのキャラクターモデルシート。9つの表情と、側面・正面・背面の三面図':'Pyonpy’s character model sheet, with nine expressions and side, front and back views.',
     '宇宙に浮かぶラーメン屋台の宇宙船':'A ramen-stall spaceship floating in space', '3Dアニメ劇場':'3D Anime Theater'
   });
   function resolveLanguage(saved, languages, requested) {
