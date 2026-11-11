@@ -305,6 +305,77 @@
   addEventListener('resize', () => { if (!scrollFrame) scrollFrame = requestAnimationFrame(onScroll); }, {passive:true});
   onScroll();
 
+  /* ── orbit scene: scrolling scrubs through a frame sequence ──
+     Frames load only when the section is near the viewport. Without motion the
+     section stays a normal block with its first frame as a still image. */
+  const orbit = document.querySelector('.orbit-scene');
+  if (orbit && motionOn()) {
+    const total = Number(orbit.dataset.frames);
+    const small = innerWidth < 700 || (navigator.connection && navigator.connection.saveData);
+    const stride = small ? 2 : 1;
+    const indexes = [];
+    for (let i = 1; i <= total; i += stride) indexes.push(i);
+    const frames = new Array(indexes.length);
+    const view = orbit.querySelector('.orbit-canvas').getContext('2d');
+    const glow = orbit.querySelector('.orbit-bg').getContext('2d');
+    const steps = [...orbit.querySelectorAll('.orbit-step')];
+    const angleLabel = orbit.querySelector('.orbit-angle');
+    const frameLabel = orbit.querySelector('.orbit-frame');
+    const bar = orbit.querySelector('.orbit-bar');
+    let loading = false, current = 0, shown = -1, orbitFrame = 0, orbitVisible = false, activeStep = 0;
+    orbit.classList.add('is-scrub');
+    function loadFrames() {
+      if (loading) return;
+      loading = true;
+      let next = 0;
+      const pump = () => {
+        if (next >= indexes.length) return;
+        const slot = next++;
+        const image = new Image();
+        image.decoding = 'async';
+        image.onload = () => { frames[slot] = image; if (slot === 0) orbit.classList.add('is-ready'); shown = -1; pump(); };
+        image.onerror = pump;
+        image.src = `${orbit.dataset.path}${String(indexes[slot]).padStart(3, '0')}.webp`;
+      };
+      for (let i = 0; i < 6; i++) pump();
+    }
+    function nearestLoaded(slot) {
+      for (let distance = 0; distance < frames.length; distance++) {
+        if (frames[slot - distance]) return slot - distance;
+        if (frames[slot + distance]) return slot + distance;
+      }
+      return -1;
+    }
+    function renderOrbit() {
+      orbitFrame = 0;
+      if (!motionOn()) { orbit.classList.remove('is-scrub', 'is-ready'); return; }
+      const box = orbit.getBoundingClientRect();
+      const progress = Math.max(0, Math.min(1, -box.top / Math.max(1, box.height - innerHeight)));
+      const target = progress * (frames.length - 1);
+      current += (target - current) * .16;
+      if (Math.abs(target - current) < .02) current = target;
+      const slot = nearestLoaded(Math.round(current));
+      if (slot >= 0 && slot !== shown) {
+        shown = slot;
+        view.drawImage(frames[slot], 0, 0, 640, 1138);
+        glow.drawImage(frames[slot], 0, 0, 64, 114);
+      }
+      const eased = current / Math.max(1, frames.length - 1);
+      bar.style.setProperty('--orbit', eased.toFixed(3));
+      angleLabel.textContent = `ORBIT ${String(Math.round(eased * 60)).padStart(3, '0')}°`;
+      frameLabel.textContent = `F ${String(indexes[Math.round(current)] || 1).padStart(3, '0')} / ${total}`;
+      const step = progress < .36 ? 0 : progress < .7 ? 1 : 2;
+      if (step !== activeStep) { activeStep = step; steps.forEach((el, index) => el.classList.toggle('is-active', index === step)); }
+      if (orbitVisible && (current !== target || slot !== Math.round(current))) orbitFrame = requestAnimationFrame(renderOrbit);
+    }
+    const kickOrbit = () => { if (orbitVisible && !orbitFrame) orbitFrame = requestAnimationFrame(renderOrbit); };
+    new IntersectionObserver(entries => { if (entries[0].isIntersecting) loadFrames(); }, {rootMargin:'150% 0px'}).observe(orbit);
+    new IntersectionObserver(entries => { orbitVisible = entries[0].isIntersecting; kickOrbit(); }).observe(orbit);
+    addEventListener('scroll', kickOrbit, {passive:true});
+    addEventListener('resize', kickOrbit, {passive:true});
+    setInterval(kickOrbit, 400);
+  }
+
   /* ── easter egg: type “moon”, or tap the giant footer logo three times ── */
   let typed = '', gravityTimer = 0, taps = 0, tapTimer = 0;
   function lowGravity() {

@@ -104,6 +104,11 @@
     'らんぴょんのキャラクターモデルシート。ホログラムの衣装を前・横・後ろから見た三面図':'Ranpyon’s character model sheet, showing the holographic outfit from the front, side and back.',
     'ぴょんぴーのキャラクターモデルシート。9つの表情と、側面・正面・背面の三面図':'Pyonpy’s character model sheet, with nine expressions and side, front and back views.',
     'ムーニアンズ らんぴょんのサイン':'Signature of Ranpyon from Moonians',
+    '月面のコックピット':'The lunar cockpit', '月面のコックピット。':'the lunar cockpit.',
+    '窓の外には、月の大地と星の海。':'Outside the windows: the lunar plains and a sea of stars.', '二人の一日は、ここからはじまる。':'Every day for the two of them starts right here.',
+    '今日も、':'Today, too,', '地球と交信中。':'we’re talking to Earth.', 'ホログラムの向こうに、きみの街。':'Beyond the holograms is your city.', '笑いの電波を、月から地球へ。':'Sending laughs from the Moon to Earth.',
+    'さあ、':'Now,', '月の内側へ。':'into the inner Moon.', 'この先に、二人が暮らす街がある。':'Just ahead is the city where they live.', 'そのままスクロールして、進んでな。':'Keep scrolling and come on in.',
+    '月面のコックピットに座るらんぴょんと、ひざの上のぴょんぴー。まわりにホログラムの画面が浮かんでいる':'Ranpyon seated in the lunar cockpit with Pyonpy on his lap, surrounded by floating holographic screens.',
     '宇宙に浮かぶラーメン屋台の宇宙船':'A ramen-stall spaceship floating in space', '3Dアニメ劇場':'3D Anime Theater'
   });
   function resolveLanguage(saved, languages, requested) {

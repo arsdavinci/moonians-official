@@ -17,11 +17,11 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DotGothic16&family=M+PLUS+Rounded+1c:wght@700;800;900&family=Noto+Sans+JP:wght@400;500;600;700;800;900&family=Unbounded:wght@700;900&display=swap" rel="stylesheet">
   <style>@import url("style.css?v=20261110-2") layer(legacy);@import url("experience.css?v=20261110-18") layer(legacy);@import url("music.css?v=20261110-17") layer(legacy);@import url("language.css?v=20261110-12") layer(legacy);@import url("tv.css?v=20261110-21") layer(legacy);</style>
-  <link rel="stylesheet" href="cyber.css?v=20261111-3">
-  <script src="language.js?v=20261111-3"></script>
+  <link rel="stylesheet" href="cyber.css?v=20261111-6">
+  <script src="language.js?v=20261111-5"></script>
   <script src="app.js?v=20261110-6" defer></script>
   <script src="experience.js?v=20261111-1" defer></script>
-  <script src="cyber.js?v=20261111-4" defer></script>
+  <script src="cyber.js?v=20261111-5" defer></script>
   <script src="music.js?v=20261111-1" defer></script>
   <script src="tv.js?v=20261110-20" defer></script>
 </head>
@@ -56,6 +56,28 @@
       <div class="scene-console"><div class="scene-console-label"><span class="console-cross" aria-hidden="true">⌖</span><span>WINDOW TO OUR WORLD<small id="scene-name" aria-live="polite">月の内部都市</small></span></div><div class="scene-switcher" role="group" aria-label="眺める風景を選ぶ"><button type="button" data-scene="moon" aria-pressed="true"><span>01</span> 月の内部都市</button><button type="button" data-scene="earth" aria-pressed="false"><span>02</span> 歌舞月町</button><button type="button" data-scene="studio" aria-pressed="false"><span>03</span> 月のスタジオ</button><button type="button" data-scene="cockpit" aria-pressed="false"><span>04</span> 宇宙船コックピット</button></div><a class="scene-next" href="#world" aria-label="この世界のことへ進む">↓</a></div>
     </section>
     <div class="marquee" aria-hidden="true"><div>MOON PEOPLE, EARTH FRIENDS. <span>✦</span> 地球を愛で満たそう <span>☾</span> MOON PEOPLE, EARTH FRIENDS. <span>✦</span> 地球を愛で満たそう <span>☾</span></div></div>
+
+    <section class="orbit-scene" id="orbit" aria-label="月面のコックピット" data-frames="121" data-path="assets/orbit/f">
+      <div class="orbit-sticky">
+        <canvas class="orbit-bg" width="64" height="114" aria-hidden="true"></canvas>
+        <div class="section-wrap orbit-layout">
+          <div class="orbit-copy">
+            <p class="eyebrow">LUNAR COCKPIT / ORBIT CAM</p>
+            <div class="orbit-steps">
+              <div class="orbit-step is-active"><h2 class="orbit-title">ここは、<span>月面のコックピット。</span></h2><p>窓の外には、月の大地と星の海。<br>二人の一日は、ここからはじまる。</p></div>
+              <div class="orbit-step"><p class="orbit-title">今日も、<span>地球と交信中。</span></p><p>ホログラムの向こうに、きみの街。<br>笑いの電波を、月から地球へ。</p></div>
+              <div class="orbit-step"><p class="orbit-title">さあ、<span>月の内側へ。</span></p><p>この先に、二人が暮らす街がある。<br>そのままスクロールして、進んでな。</p></div>
+            </div>
+            <p class="orbit-hint" aria-hidden="true"><span>SCROLL TO ORBIT</span><i></i></p>
+          </div>
+          <div class="orbit-screen">
+            <img class="orbit-poster" src="assets/orbit/f001.webp" alt="月面のコックピットに座るらんぴょんと、ひざの上のぴょんぴー。まわりにホログラムの画面が浮かんでいる" width="640" height="1138" loading="lazy">
+            <canvas class="orbit-canvas" width="640" height="1138" aria-hidden="true"></canvas>
+            <div class="orbit-hud" aria-hidden="true"><span class="orbit-rec"><i></i>LUNAR CAM 01</span><span class="orbit-angle">ORBIT 000°</span><span class="orbit-frame">F 001 / 121</span><span class="orbit-bar"><i></i></span></div>
+          </div>
+        </div>
+      </div>
+    </section>
 
     <section class="world-section section-wrap section-space" id="world">
       <div class="section-heading"><div><p class="eyebrow">01 / OUR LITTLE UNIVERSE</p><h2>ここは、<span>ムーニアンズの世界。</span></h2></div><span class="section-glyph" aria-hidden="true">✳</span></div>
