@@ -162,3 +162,11 @@ SNS欄の締めのメッセージ「これからも、よろしゅうな。」�
 ## ゲーム紹介ページ（game.html）
 
 アクションゲーム「ぴょんぴーの大冒険 〜ワライスターをとりもどせ〜」（公開先：https://arsdavinci.github.io/pyon-p-adventure/ 、リポジトリ `pyon-p-adventure`）の紹介ページです。物語・ワールド名・ボス名・操作方法はゲーム本体（`story.js`、README）に合わせています。画像は `assets/game/` にゲームのリポジトリから変換して置いています。登場キャラクターは `.game-cast` の `.friend` カード、6つの星は `.world-card` です。
+
+## 制作ラボ（lab.html）
+
+工作系の記録をまとめたページです（旧 `karakuri.html` は `lab.html#karakuri` へ転送）。
+
+- **PROJECT 01 翻訳酸素カプセル01**：本人提供の作業動画15本（各6〜13秒）を、音なしの360×640のMP4にして `assets/capsule/clip-01.mp4`〜`clip-15.mp4` に置き、章（CHAPTER）ごとの横スクロールのリールで見せています。画面に入った動画だけ無音で再生します。続きを足すときは、`.reel-rail` に `<figure class="reel">` を追加するか、「CHAPTER 05」の枠を新しい章に置き換えます。
+- **PROJECT 02 からくりぴょんぴー**：分解図と制作記録（従来どおり）。
+- 章の分け方と順番は、動画の内容からの仮の並びです。
