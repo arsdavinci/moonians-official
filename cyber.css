@@ -774,3 +774,5 @@ body:not(.motion-paused) .crawl-text{position:absolute;left:0;right:0;top:100%;p
 @media(max-width:1100px){.friend-grid{grid-template-columns:1fr 1fr}}
 @media(max-width:760px){.friend-lead{flex-direction:column}.friend-lead .friend-image{flex:none;min-height:0;aspect-ratio:1}.friend-lead .friend-body{padding:24px 22px 26px}}
 @media(max-width:560px){.friends{margin-top:50px}.friend-grid{grid-template-columns:1fr;gap:18px}.friends-head>p:last-child br{display:none}}
+/* The Kabukicho photo is portrait: frame the two of them in the wide hero. */
+@media(min-width:561px){.panorama>img[src*="kabukicho-duo"]{object-position:50% 66%}}

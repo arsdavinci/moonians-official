@@ -190,7 +190,7 @@
 
   const scenes = {
     moon:{src:'assets/moon-city.png',alt:'ムーニアンズが暮らす月の内部都市。パステルの建物とうさぎのロボットが並ぶ街',name:'月の内部都市',coordinate:'01 / MOON CITY'},
-    earth:{src:'assets/city.png',alt:'歌舞月町。ピンクとミントのネオンがきらめく街',name:'歌舞月町',coordinate:'02 / NEON STREET'},
+    earth:{src:'assets/kabukicho-duo.jpg',alt:'歌舞月町。ピンクとミントのネオンがきらめく街',name:'歌舞月町',coordinate:'02 / NEON STREET'},
     studio:{src:'assets/lunar-studio.jpeg',alt:'月面を見渡す窓とホログラムの端末がある月のスタジオ',name:'月のスタジオ',coordinate:'03 / LUNAR STUDIO'},
     cockpit:{src:'assets/scene-cockpit.jpg',alt:'窓の外に銀河と惑星が広がる、パステルカラーの宇宙船コックピット',name:'宇宙船コックピット',coordinate:'04 / STAR COCKPIT'}
   };

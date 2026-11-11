@@ -353,7 +353,7 @@
   // Depth carousel of the four scenes in the world section.
   const worldLayout = document.querySelector('.world-layout');
   if (worldLayout) {
-    const sceneList = [['assets/moon-city.png', '月の内部都市'], ['assets/city.png', '歌舞月町'], ['assets/lunar-studio.jpeg', '月のスタジオ'], ['assets/scene-cockpit.jpg', '宇宙船コックピット']];
+    const sceneList = [['assets/moon-city.png', '月の内部都市'], ['assets/kabukicho-duo.jpg', '歌舞月町'], ['assets/lunar-studio.jpeg', '月のスタジオ'], ['assets/scene-cockpit.jpg', '宇宙船コックピット']];
     const carousel = document.createElement('div');
     carousel.className = 'scene-carousel';
     carousel.setAttribute('role', 'group');
