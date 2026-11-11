@@ -79,6 +79,27 @@
     'ぴょんぴー「ぼくらはム〜ニアンズ」配信ページ':'Pyonpy: “We Are Moonians” streaming page', '— テーマ曲への案内。歌詞は転載していません。':'— Link to the theme song. Lyrics are not reproduced.', '写真・ビジュアル':'Photos & visuals',
     'ムーニアンズ本人から提供されたロゴ、キャラクタービジュアル、写真・世界観画像を使用しています。月の内部都市の画像と「ムーニアンズが暮らす月の内部の都市」という説明は、本人からの提供に基づきます。':'The logos, character visuals, photos and worldbuilding images were supplied by Moonians. The image of the inner lunar city and its description as the Moonians’ home were also supplied directly.', '資料確認日：2026年11月10日':'Sources checked: November 10, 2026'
   });
+  Object.assign(copy, {
+    '3Dアニメ':'3D Anime', '宇宙船コックピット':'Star cockpit', 'セクション':'Sections',
+    '窓の外に銀河と惑星が広がる、パステルカラーの宇宙船コックピット':'A pastel spaceship cockpit with a galaxy and planets outside the window.',
+    '新月':'New Moon', '三日月':'Waxing Crescent', '上弦の月':'First Quarter', '十三夜月':'Waxing Gibbous', '満月':'Full Moon', '居待月':'Waning Gibbous', '下弦の月':'Last Quarter', '有明月':'Waning Crescent',
+    '低重力モード、発動！月の重力は、地球の6分の1やで。':'Low-gravity mode on! The Moon has one sixth of Earth’s gravity.',
+    '宇宙船のコックピットでラーメンを食べる、3Dアニメのらんぴょんとぴょんぴー':'Ranpyon and Pyonpy in 3D, eating ramen in their spaceship cockpit.',
+    'ムーニアンズ、':'Moonians,', '3Dアニメになる。':'now in 3D anime.', '第1話「宇宙ラーメン」公開中。':'Episode 1, “Space Ramen”, is out now.', 'つづきのお話も、準備中。':'More stories are on the way.',
+    'ムーニアンズ 3Dアニメ｜月の内側から、宇宙のお話を。':'Moonians 3D Anime | Space stories from inside the Moon.',
+    '街へ戻る':'Back to the city', 'ムーニアンズの':'Moonians', '3Dアニメ劇場。':'3D Anime Theater.',
+    'らんぴょんとぴょんぴーが、3Dアニメになりました。':'Ranpyon and Pyonpy are now 3D-animated.', '月と宇宙の、ちいさなお話を少しずつ。':'Little stories from the Moon and beyond, one at a time.',
+    '第1話を観る':'Watch episode 1', '公開中のお話':'Now playing', '宇宙ラーメン':'Space Ramen', '第1話':'Episode 1', '公開中':'Now showing', '準備中':'Coming soon',
+    '宇宙船のコックピットに流れてきた、あのメロディー。':'A familiar melody drifts into the cockpit.', '窓の外には、宇宙ラーメンの屋台。':'Outside the window: a space ramen stall.', '「やっぱ宇宙ラーメンがいちばんやで！」':'“Nothing beats space ramen!”',
+    '約18秒 ／ 音声あり':'About 18 sec / with sound', '第1話「宇宙ラーメン」を再生する':'Play episode 1, “Space Ramen”', '第1話「宇宙ラーメン」':'Episode 1, “Space Ramen”',
+    'これからのお話':'Coming up next', '次のお話を、月でつくっています。':'The next stories are being made on the Moon.', '公開したら、ここに並びます。':'They’ll appear here once they’re out.',
+    '第2話':'Episode 2', '第3話':'Episode 3', '第4話':'Episode 4', 'タイトル未定':'Title to be announced', '制作中のお話。もう少し待っててな。':'In production. Hang tight a little longer.',
+    'キャスト':'Cast', '3Dのふたり':'The duo in 3D', '3Dアニメのらんぴょん。銀色の帽子とうさぎ耳、紫の瞳':'Ranpyon in 3D, with a silver cap, rabbit ears and purple eyes.', '3Dアニメのぴょんぴー。銀色の帽子をかぶった白いうさぎ':'Pyonpy in 3D, a white rabbit in a silver cap.',
+    '新しいお話は、YouTubeとSNSでもお知らせします。':'New episodes will also be announced on YouTube and social media.',
+    '公開中の':'Now', 'エピソード':'showing', 'これからの':'Coming', 'お話':'soon', '3Dの':'The duo', 'ふたり':'in 3D', 'YouTubeチャンネルを開く ↗':'Open our YouTube channel ↗',
+    'らんぴょんとぴょんぴーの3Dアニメ劇場。第1話「宇宙ラーメン」公開中。つづきのお話も準備中です。':'The Ranpyon and Pyonpy 3D anime theater. Episode 1, “Space Ramen”, is out now, with more on the way.',
+    '宇宙に浮かぶラーメン屋台の宇宙船':'A ramen-stall spaceship floating in space', '3Dアニメ劇場':'3D Anime Theater'
+  });
   function resolveLanguage(saved, languages, requested) {
     if (requested === 'ja' || requested === 'en') return requested;
     if (saved === 'ja' || saved === 'en') return saved;

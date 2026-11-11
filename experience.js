@@ -10,7 +10,7 @@
     set(key, value) { try { localStorage.setItem(`moonians.${key}`, JSON.stringify(value)); } catch { /* The experience also works without storage. */ } }
   };
   let motion = store.get('motion', !reduceQuery.matches);
-  let night = store.get('night', false);
+  let night = store.get('night', true);
   const progress = document.createElement('div');
   progress.className = 'page-progress';
   progress.setAttribute('aria-hidden', 'true');
@@ -158,7 +158,7 @@
     button.setAttribute('aria-label', night?'昼の街に切り替える':'夜の街に切り替える');
     button.querySelector('.theme-label').textContent=night?'昼の街へ':'夜の街へ';
     button.querySelector('.dock-symbol').textContent=night?'☼':'☾';
-    document.querySelector('meta[name="theme-color"]').content=night?'#241a33':'#f1eaff';
+    document.querySelector('meta[name="theme-color"]').content=night?'#080717':'#f3efff';
   }
   function applyMotion() {
     body.classList.toggle('motion-paused', !motion);
@@ -175,7 +175,15 @@
     }
     updateAnimation();
   }
-  dock.querySelector('[data-action="theme"]').addEventListener('click', () => { night=!night; store.set('night',night); applyTheme(); });
+  dock.querySelector('[data-action="theme"]').addEventListener('click', event => {
+    const flip = () => { night=!night; store.set('night',night); applyTheme(); };
+    if (!motion || !document.startViewTransition) { flip(); return; }
+    // The new theme opens as a circle from the dock button.
+    const box=event.currentTarget.getBoundingClientRect();
+    root.style.setProperty('--vt-x',`${box.left+box.width/2}px`);
+    root.style.setProperty('--vt-y',`${box.top+box.height/2}px`);
+    document.startViewTransition(flip);
+  });
   dock.querySelector('[data-action="motion"]').addEventListener('click', () => { motion=!motion; store.set('motion',motion); applyMotion(); });
   reduceQuery.addEventListener('change', () => { if(reduceQuery.matches) { motion=false; store.set('motion',false); applyMotion(); } });
   applyTheme();
@@ -183,7 +191,8 @@
   const scenes = {
     moon:{src:'assets/moon-city.png',alt:'ムーニアンズが暮らす月の内部都市。パステルの建物とうさぎのロボットが並ぶ街',name:'月の内部都市',coordinate:'01 / MOON CITY'},
     earth:{src:'assets/city.png',alt:'歌舞月町。ピンクとミントのネオンがきらめく街',name:'歌舞月町',coordinate:'02 / NEON STREET'},
-    studio:{src:'assets/lunar-studio.jpeg',alt:'月面を見渡す窓とホログラムの端末がある月のスタジオ',name:'月のスタジオ',coordinate:'03 / LUNAR STUDIO'}
+    studio:{src:'assets/lunar-studio.jpeg',alt:'月面を見渡す窓とホログラムの端末がある月のスタジオ',name:'月のスタジオ',coordinate:'03 / LUNAR STUDIO'},
+    cockpit:{src:'assets/scene-cockpit.jpg',alt:'窓の外に銀河と惑星が広がる、パステルカラーの宇宙船コックピット',name:'宇宙船コックピット',coordinate:'04 / STAR COCKPIT'}
   };
   const sceneImage=document.getElementById('scene-image');
   const panorama=document.getElementById('panorama');
@@ -197,7 +206,10 @@
       sceneImage.classList.add('changing');
       panorama.setAttribute('aria-busy','true');
       const preload=new Image();
-      preload.onload=() => {
+      const requested=performance.now();
+      preload.onload=async () => {
+        // Keep the glitch transition visible even when the image is cached.
+        if(motion) await new Promise(resolve=>setTimeout(resolve,Math.max(0,420-(performance.now()-requested))));
         if(sequence!==sceneSequence) return;
         currentScene=button.dataset.scene;
         sceneImage.src=scene.src; sceneImage.alt=scene.alt;

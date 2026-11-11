@@ -293,6 +293,8 @@
   });
   updateVolume();
   render();
-  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', ask, {once:true});
-  else ask();
+  // The question waits for the opening sequence (cyber.js) when there is one.
+  const askAfterBoot = () => (window.MoonBootDone || Promise.resolve()).then(ask);
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', askAfterBoot, {once:true});
+  else askAfterBoot();
 })();
