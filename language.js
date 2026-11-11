@@ -148,6 +148,7 @@
     '月と地球の風景':'Scenes from the Moon and Earth', '前の風景':'Previous scene', '次の風景':'Next scene',
     'これまでのお話':'The story so far', '月の内側には、街がある。':'Inside the Moon, there is a city.', '三日月大使館で出会った、':'Ranpyon and Pyonpy', 'らんぴょんとぴょんぴー。':'met at the Crescent Embassy.',
     '笑いと愛で、':'To link the Moon and Earth', '月と地球をつなぐために。':'with laughter and love,', '二人は、地球へやってきた。':'the two of them came to Earth.',
+    'つづきができたら、ここに書きます。もう少し待っててな。':'We’ll write here when there’s more to show. Hang tight.',
     '宇宙に浮かぶラーメン屋台の宇宙船':'A ramen-stall spaceship floating in space', '3Dアニメ劇場':'3D Anime Theater'
   });
   function resolveLanguage(saved, languages, requested) {
