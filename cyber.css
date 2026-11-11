@@ -776,3 +776,16 @@ body:not(.motion-paused) .crawl-text{position:absolute;left:0;right:0;top:100%;p
 @media(max-width:560px){.friends{margin-top:50px}.friend-grid{grid-template-columns:1fr;gap:18px}.friends-head>p:last-child br{display:none}}
 /* The Kabukicho photo is portrait: frame the two of them in the wide hero. */
 @media(min-width:561px){.panorama>img[src*="kabukicho-duo"]{object-position:50% 66%}}
+
+/* A friend whose only picture is small: show it at a modest size on a grid backdrop. */
+.friend-grid{grid-template-columns:repeat(auto-fit,minmax(215px,1fr))}
+.friend-image-mini{display:grid;place-items:center;background:repeating-linear-gradient(0deg,transparent 0 23px,var(--c-border) 23px 24px),repeating-linear-gradient(90deg,transparent 0 23px,var(--c-border) 23px 24px),var(--c-bg-2)}
+.friend-image-mini>img{width:62%;height:auto;object-fit:contain;border-radius:18px;border:1px solid var(--c-border-strong);box-shadow:0 0 50px -12px var(--c-accent)}
+@media(max-width:1100px){.friend-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:560px){.friend-grid{grid-template-columns:1fr}}
+.friend-grid .model-sheet{gap:10px;padding:8px 10px 8px 8px}
+.friend-grid .model-sheet img{width:60px;height:44px}
+.friend-grid .model-sheet::after{left:8px;top:8px;width:60px}
+.friend-grid .model-sheet small{font-size:8px;letter-spacing:1.5px}
+.friend-grid .model-sheet b{font-size:11px;margin-top:2px}
+.friend-grid .model-sheet i{display:none}

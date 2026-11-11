@@ -174,6 +174,8 @@
     'ミントグリーンの毛並みに、つぎはぎと光るパーツをつけた、舌を出すゾンビバニー':'Zombie Bunny, with mint-green fur, stitches and glowing parts, sticking out its tongue.',
     '名前は調査中':'Name under investigation', 'ゾンビバニー':'Zombie Bunny',
     'ミントグリーンの毛並みに、つぎはぎと舌ぺろ。耳には宇宙人のチャーム、体には光るパーツ。ちょっとこわいけど、どこかにくめないやつ。':'Mint-green fur, stitches and a cheeky tongue. Alien charms on the ears, glowing parts on the body. A little scary, but hard to dislike.',
+    'うさ耳のついた丸い頭に、にっこり顔の画面がある小さなロボット、ヤナビス':'Yanabisu, a small robot with rabbit ears and a smiling face on its screen.', '人工知能':'Artificial intelligence', 'ヤナビス':'Yanabisu',
+    '月の人工知能。ムーニアン語を地球の言葉に訳してくれる、二人のたよれる通訳です。うさ耳と、にっこり顔の画面がめじるし。':'The Moon’s AI. It turns the Moonian language into Earth’s words, a reliable interpreter for the two. Look for the rabbit ears and the smiling screen.',
     '宇宙に浮かぶラーメン屋台の宇宙船':'A ramen-stall spaceship floating in space', '3Dアニメ劇場':'3D Anime Theater'
   });
   function resolveLanguage(saved, languages, requested) {
