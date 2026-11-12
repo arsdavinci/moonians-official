@@ -371,8 +371,22 @@
       });
       dots.forEach((dot, index) => dot.classList.toggle('is-on', index === front));
     };
-    sceneCards.forEach((cardEl, index) => cardEl.addEventListener('click', () => { front = index === front ? (front + 1) % sceneCards.length : index; place(); }));
-    carousel.querySelectorAll('[data-turn]').forEach(button => button.addEventListener('click', () => { front = (front + Number(button.dataset.turn) + sceneCards.length) % sceneCards.length; place(); }));
+    const turn = step => { front = (front + step + sceneCards.length) % sceneCards.length; place(); };
+    let swiped = false;
+    sceneCards.forEach((cardEl, index) => cardEl.addEventListener('click', () => { if (swiped) { swiped = false; return; } front = index === front ? (front + 1) % sceneCards.length : index; place(); }));
+    carousel.querySelectorAll('[data-turn]').forEach(button => button.addEventListener('click', () => turn(Number(button.dataset.turn))));
+    // Swipe left/right (touch, pen or mouse drag) to turn the carousel.
+    const deck = carousel.querySelector('.scene-cards');
+    let startX = 0, startY = 0, tracking = false;
+    deck.addEventListener('pointerdown', event => { if (event.button > 0) return; tracking = true; swiped = false; startX = event.clientX; startY = event.clientY; }, {passive:true});
+    deck.addEventListener('pointerup', event => {
+      if (!tracking) return;
+      tracking = false;
+      const dx = event.clientX - startX, dy = event.clientY - startY;
+      if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy) * 1.2) { swiped = true; turn(dx < 0 ? 1 : -1); setTimeout(() => { swiped = false; }, 400); }
+    });
+    deck.addEventListener('pointercancel', () => { tracking = false; });
+    deck.addEventListener('dragstart', event => event.preventDefault());
     place();
   }
 
