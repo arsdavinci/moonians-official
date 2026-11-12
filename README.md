@@ -163,6 +163,8 @@ SNS欄の締めのメッセージ「これからも、よろしゅうな。」�
 
 アクションゲーム「ぴょんぴーの大冒険 〜ワライスターをとりもどせ〜」（公開先：https://arsdavinci.github.io/pyon-p-adventure/ 、リポジトリ `pyon-p-adventure`）の紹介ページです。物語・ワールド名・ボス名・操作方法はゲーム本体（`story.js`、README）に合わせています。画像は `assets/game/` にゲームのリポジトリから変換して置いています。登場キャラクターは `.game-cast` の `.friend` カード、6つの星は `.world-card` です。
 
+「ものがたり」の楽屋の絵には、らんぴょん（右）とぴょんぴー（左）が立っています。どちらかをタップすると、ゲームのオープニングと同じネタ合わせのかけあいが下の吹き出しで流れ、タップで次へ進みます。セリフは `game.html` 末尾のスクリプト（`LINES`）にあり、ゲーム本体の `story.js` の `SCRIPTS.opening` から取っています。らんぴょんの表情差分は `assets/game/ran-face-*.webp`（ゲームのリポジトリから複製）です。
+
 ## 制作ラボ（lab.html）
 
 工作系の記録をまとめたページです（旧 `karakuri.html` は `lab.html#karakuri` へ転送）。

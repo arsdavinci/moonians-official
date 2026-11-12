@@ -16,8 +16,8 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DotGothic16&family=M+PLUS+Rounded+1c:wght@700;800;900&family=Noto+Sans+JP:wght@400;500;600;700;800;900&family=Unbounded:wght@700;900&display=swap" rel="stylesheet">
   <style>@import url("style.css?v=20261110-2") layer(legacy);@import url("experience.css?v=20261110-18") layer(legacy);@import url("language.css?v=20261110-12") layer(legacy);</style>
-  <link rel="stylesheet" href="cyber.css?v=20261112-13">
-  <script src="language.js?v=20261112-13"></script>
+  <link rel="stylesheet" href="cyber.css?v=20261112-14">
+  <script src="language.js?v=20261112-14"></script>
   <script src="cyber.js?v=20261112-13" defer></script>
 </head>
 <body class="anime-page game-page">
@@ -51,7 +51,20 @@
     <section class="section-wrap section-space" id="story">
       <div class="section-heading"><div><p class="eyebrow">01 / STORY</p><h2>ものがたり<span>。</span></h2></div><img class="game-star" src="assets/game/item-warai-star.webp?v=2" alt="" width="300" height="285" loading="lazy"></div>
       <div class="game-story">
-        <figure class="game-story-art"><img src="assets/game/cg-opening-duo.jpg" alt="ネタ合わせをする、らんぴょんとぴょんぴー" width="1400" height="788" loading="lazy"></figure>
+        <figure class="game-story-art duo-scene" data-duo>
+          <div class="duo-stage">
+            <img src="assets/game/cg-opening-duo.jpg" alt="フェス前の楽屋。ネタ合わせをする、らんぴょんとぴょんぴー" width="1400" height="788" loading="lazy">
+            <button class="duo-actor duo-pyon" type="button" data-actor="pyon" aria-label="ぴょんぴーに話しかける"><img src="assets/game/portrait-pyonpy.webp?v=2" alt="" width="493" height="680" loading="lazy"></button>
+            <button class="duo-actor duo-ran" type="button" data-actor="ran" aria-label="らんぴょんに話しかける"><img src="assets/game/ran-face-normal.webp" alt="" width="480" height="720" loading="lazy"></button>
+            <span class="duo-hint" aria-hidden="true">タップで話しかけてな</span>
+          </div>
+          <div class="duo-box" hidden>
+            <p class="duo-name"></p>
+            <p class="duo-text" aria-live="polite"></p>
+            <div class="duo-end" hidden><a class="duo-play" href="https://arsdavinci.github.io/pyon-p-adventure/" target="_blank" rel="noopener noreferrer">つづきはゲームで ↗</a><button type="button" class="duo-again">もう一回きく</button></div>
+            <span class="duo-next" aria-hidden="true">▼</span>
+          </div>
+        </figure>
         <div class="game-story-text">
           <p>お笑いコンビ「ムーニアンズ」は、宇宙最大の舞台『銀河お笑いフェス』を3日後にひかえていた。</p>
           <p>そのとき、夜空がまっくろにそまる。魔王が、宇宙じゅうの“笑い”をうばってしまったのだ。笑いのエネルギー『ワライスター』は6つにくだかれ、6つの星へ。</p>
@@ -133,6 +146,72 @@
         if (entries[0].isIntersecting && moving) { var p = video.play(); if (p && p.catch) p.catch(function () {}); }
         else video.pause();
       }, {threshold:.3}).observe(video);
+    })();
+  </script>
+  <script>
+    (function () {
+      // 楽屋のネタ合わせ — ゲームのオープニングと同じかけあい。タップで進む。
+      var scene = document.querySelector('[data-duo]');
+      if (!scene) return;
+      var LINES = [
+        { s: 'narr', ja: '銀河お笑いフェスまで、あと3日。楽屋では、ネタ合わせの真っ最中——。', en: 'Three days until the Galaxy Comedy Fest. In the dressing room, rehearsal is in full swing...' },
+        { s: 'pyon', ja: 'らんぴょん、フェスのネタ合わせしよか！ まずは新ギャグな。『月見バーガー、月で見たら……ただのバーガー！』', en: 'Ranpyon, let\'s rehearse for the Fest! New gag first: "A moon-viewing burger, viewed ON the moon... is just a burger!"' },
+        { s: 'ran', face: 'trouble', ja: '…………。', en: '............' },
+        { s: 'pyon', ja: 'えっ、ツッコミは！？ 『なんでやねん』は！？', en: 'Huh? Where\'s the comeback!? Where\'s my "No way!"?' },
+        { s: 'ran', face: 'trouble', ja: 'あかん……。どうツッコんだらええんか、ぜんぜん思い出されへん……。', en: 'I can\'t... I\'ve completely forgotten how to do a comeback...' },
+        { s: 'narr', ja: 'そのとき、夜空がまっくろにそまった。宇宙じゅうの“笑い”が、空のかなたへ吸い上げられていく——。', en: 'At that moment the night sky turned pitch black. All the laughter in the universe was being sucked away...' },
+        { s: 'ran', face: 'surprise', ja: 'ぴょんぴー……たのむ。うちの『なんでやねん』、取り返してきて。', en: 'Pyon-P... please. Bring my "No way!" back.' },
+        { s: 'pyon', ja: 'まかしとき！ 柿ピー食べたら百人力や。ほな、ちょっと宇宙すくってくるわ！', en: 'Leave it to me! A handful of kaki-pea snacks and I\'m unstoppable. Be right back, just gotta save the universe!' }
+      ];
+      var NAMES = { pyon: ['ぴょんぴー', 'Pyon-P', '#b9a5ff'], ran: ['らんぴょん', 'Ranpyon', '#ff9be0'] };
+      var stage = scene.querySelector('.duo-stage'), box = scene.querySelector('.duo-box');
+      var nameEl = box.querySelector('.duo-name'), textEl = box.querySelector('.duo-text'), endEl = box.querySelector('.duo-end');
+      var ranImg = scene.querySelector('.duo-ran img'), actors = scene.querySelectorAll('.duo-actor');
+      var still = matchMedia('(prefers-reduced-motion: reduce)').matches;
+      var index = -1, shown = 0, full = '', timer = 0;
+      ['smile', 'surprise', 'trouble'].forEach(function (f) { new Image().src = 'assets/game/ran-face-' + f + '.webp'; });
+      function en() { return (document.documentElement.lang || '').indexOf('en') === 0; }
+      function show(i) {
+        index = i;
+        var line = LINES[i];
+        full = en() ? line.en : line.ja;
+        scene.classList.add('is-talking');
+        scene.classList.toggle('is-narration', line.s === 'narr');
+        box.hidden = false; endEl.hidden = true; box.classList.remove('is-done');
+        var who = NAMES[line.s];
+        nameEl.textContent = who ? who[en() ? 1 : 0] : '';
+        box.style.setProperty('--speaker', who ? who[2] : '#c8b2ff');
+        actors.forEach(function (a) { a.classList.toggle('is-speaking', a.dataset.actor === line.s); });
+        ranImg.src = 'assets/game/ran-face-' + (line.s === 'ran' ? (line.face || 'normal') : (i >= 2 ? 'trouble' : 'normal')) + '.webp';
+        clearInterval(timer);
+        if (still) { textEl.textContent = full; finish(); return; }
+        shown = 0; textEl.textContent = '';
+        var chars = Array.from(full);
+        timer = setInterval(function () {
+          textEl.textContent += chars[shown++];
+          if (shown >= chars.length) finish();
+        }, 38);
+      }
+      function finish() {
+        clearInterval(timer); timer = 0;
+        textEl.textContent = full;
+        box.classList.add('is-done');
+        if (index === LINES.length - 1) { endEl.hidden = false; box.classList.add('is-last'); }
+      }
+      function advance() {
+        if (timer) { finish(); return; }
+        if (index < LINES.length - 1) show(index + 1);
+      }
+      function reset() {
+        clearInterval(timer); timer = 0; index = -1;
+        box.hidden = true; box.classList.remove('is-last');
+        scene.classList.remove('is-talking', 'is-narration');
+        actors.forEach(function (a) { a.classList.remove('is-speaking'); });
+        ranImg.src = 'assets/game/ran-face-normal.webp';
+      }
+      stage.addEventListener('click', function () { if (index < 0) show(0); else advance(); });
+      box.addEventListener('click', function (e) { if (!e.target.closest('a,button')) advance(); });
+      box.querySelector('.duo-again').addEventListener('click', function () { reset(); show(0); });
     })();
   </script>
 </body>
