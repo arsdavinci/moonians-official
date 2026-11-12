@@ -184,7 +184,7 @@
   }
   // A timeline on every track card: drag anywhere to play that track from there.
   const pageSeeks = [...document.querySelectorAll('[data-track-seek]')].map(input => {
-    const box = input.closest('.track');
+    const box = input.closest('.track, .bgm-row');
     const button = box?.querySelector('[data-music-page-play]');
     return {input, box, info: button ? trackOf(button) : themeTrack, elapsed: box?.querySelector('[data-track-elapsed]'), held: false};
   });
@@ -291,7 +291,7 @@
     pagePlay.forEach(button => {
       const mine = playing && trackOf(button).src === track.src;
       button.setAttribute('aria-label', mine ? '音楽を一時停止する' : '音楽を再生する');
-      button.closest('.track')?.classList.toggle('is-current-track', mine && !waiting);
+      button.closest('.track, .bgm-row')?.classList.toggle('is-current-track', mine && !waiting);
       const icon = button.querySelector('[data-music-play-icon]'); if (icon) icon.textContent = mine ? 'Ⅱ' : '▶';
       const label = button.querySelector('[data-music-play-label]'); if (label) label.textContent = mine ? '一時停止' : '再生する';
     });
