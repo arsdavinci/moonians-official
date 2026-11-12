@@ -1206,3 +1206,6 @@ body.character-open-lock{overflow:hidden}
 .duo-stage::after{content:"";position:absolute;inset:12px;z-index:3;pointer-events:none;background:var(--corners)}
 @media(max-width:560px){.duo-box{min-height:104px;padding:12px 14px 16px}.duo-text{font-size:13px;line-height:1.8}.duo-name{font-size:12px}.duo-hint{font-size:10px;padding:5px 11px}.duo-pyon{left:8%}.duo-ran{right:8%}}
 @media(prefers-reduced-motion:reduce){.duo-actor,.duo-hint,.duo-scene.is-talking .duo-actor.is-speaking{animation:none}}
+
+/* Phones: the logo in the Moon City picture sits a little right of the image centre, so shift the crop to centre it. */
+@media(max-width:560px){.panorama>img[src*="moon-city"]{object-position:54.5% 15%}}
