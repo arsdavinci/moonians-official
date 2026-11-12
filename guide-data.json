@@ -1,0 +1,673 @@
+{
+  "_note": "ぴょんぴーの大冒険 図鑑・攻略ページ（guide.html）のデータ。ここを書きかえると、カードがかわります。絵は assets/guide/ にある長い辺 512px 以下の WebP。",
+  "play": "https://arsdavinci.github.io/pyon-p-adventure/",
+  "weapons": [
+    {
+      "kind": "moon",
+      "lv": 1,
+      "name": "ムーンポッパー",
+      "en": "Moon Popper",
+      "img": "weapon-moon-01-moon-popper",
+      "atk": 1,
+      "range": 220,
+      "rate": 2.4,
+      "shots": 1,
+      "pattern": "まっすぐ"
+    },
+    {
+      "kind": "moon",
+      "lv": 2,
+      "name": "ツインムーンシューター",
+      "en": "Twinmoon Shooter",
+      "img": "weapon-moon-02-twinmoon-shooter",
+      "atk": 2,
+      "range": 360,
+      "rate": 2.8,
+      "shots": 2,
+      "pattern": "前と後ろ"
+    },
+    {
+      "kind": "moon",
+      "lv": 3,
+      "name": "ミルキーウェイキャノン",
+      "en": "Milkyway Cannon",
+      "img": "weapon-moon-03-milkyway-cannon",
+      "atk": 3,
+      "range": 500,
+      "rate": 3.1,
+      "shots": 3,
+      "pattern": "前に広がる"
+    },
+    {
+      "kind": "moon",
+      "lv": 4,
+      "name": "オービットリング",
+      "en": "Orbit Ring",
+      "img": "weapon-moon-04-orbit-ring",
+      "atk": 4,
+      "range": 640,
+      "rate": 3.3,
+      "shots": 5,
+      "pattern": "まわり全体"
+    },
+    {
+      "kind": "moon",
+      "lv": 5,
+      "name": "リボンレーザー",
+      "en": "Ribbon Laser",
+      "img": "weapon-moon-05-ribbon-laser",
+      "atk": 5,
+      "range": 780,
+      "rate": 3.7,
+      "shots": 5,
+      "pattern": "おうぎ形"
+    },
+    {
+      "kind": "moon",
+      "lv": 6,
+      "name": "ネビュラファン",
+      "en": "Nebula Fan",
+      "img": "weapon-moon-06-nebula-fan",
+      "atk": 6,
+      "range": 920,
+      "rate": 4.0,
+      "shots": 7,
+      "pattern": "おうぎ形"
+    },
+    {
+      "kind": "moon",
+      "lv": 7,
+      "name": "コメットリバース",
+      "en": "Comet Reverse",
+      "img": "weapon-moon-07-comet-reverse",
+      "atk": 7,
+      "range": 1060,
+      "rate": 4.3,
+      "shots": 7,
+      "pattern": "前後に2発ずつ"
+    },
+    {
+      "kind": "moon",
+      "lv": 8,
+      "name": "ムーニアンノヴァ",
+      "en": "Moonian Nova",
+      "img": "weapon-moon-08-moonian-nova",
+      "atk": 8,
+      "range": 1200,
+      "rate": 4.8,
+      "shots": 9,
+      "pattern": "前に広がる"
+    },
+    {
+      "kind": "star",
+      "lv": 1,
+      "name": "サターンスプリッター",
+      "en": "Saturn Splitter",
+      "img": "weapon-star-01-saturn-splitter",
+      "atk": 1,
+      "range": 240,
+      "rate": 2.4,
+      "shots": 4,
+      "pattern": "十字とななめ"
+    },
+    {
+      "kind": "star",
+      "lv": 2,
+      "name": "アクアリウムスピア",
+      "en": "Aquarium Spear",
+      "img": "weapon-star-02-aquarium-spear",
+      "atk": 2,
+      "range": 380,
+      "rate": 2.8,
+      "shots": 2,
+      "pattern": "波うつ"
+    },
+    {
+      "kind": "star",
+      "lv": 3,
+      "name": "クエーサードライブ",
+      "en": "Quasar Drive",
+      "img": "weapon-star-03-quasar-drive",
+      "atk": 3,
+      "range": 520,
+      "rate": 3.1,
+      "shots": 3,
+      "pattern": "おうぎ形"
+    },
+    {
+      "kind": "star",
+      "lv": 4,
+      "name": "ギャラクシーブーメラン",
+      "en": "Galaxy Boomerang",
+      "img": "weapon-star-04-galaxy-boomerang",
+      "atk": 4,
+      "range": 660,
+      "rate": 3.3,
+      "shots": 4,
+      "pattern": "前後に2発ずつ"
+    },
+    {
+      "kind": "star",
+      "lv": 5,
+      "name": "ブラックホールパルス",
+      "en": "Black Hole Pulse",
+      "img": "weapon-star-05-black-hole-pulse",
+      "atk": 5,
+      "range": 800,
+      "rate": 3.7,
+      "shots": 6,
+      "pattern": "まわり全体・つらぬく"
+    },
+    {
+      "kind": "star",
+      "lv": 6,
+      "name": "コスモクラウン",
+      "en": "Cosmo Crown",
+      "img": "weapon-star-06-cosmo-crown",
+      "atk": 6,
+      "range": 940,
+      "rate": 4.0,
+      "shots": 7,
+      "pattern": "王冠の形"
+    },
+    {
+      "kind": "star",
+      "lv": 7,
+      "name": "スーパーノヴァ360",
+      "en": "Supernova 360",
+      "img": "weapon-star-07-supernova-360",
+      "atk": 7,
+      "range": 1080,
+      "rate": 4.3,
+      "shots": 10,
+      "pattern": "まわり全体・つらぬく"
+    },
+    {
+      "kind": "star",
+      "lv": 8,
+      "name": "ステラガーディアンキャノン",
+      "en": "Stellar Guardian Cannon",
+      "img": "weapon-star-08-stellar-guardian-cannon",
+      "atk": 8,
+      "range": 1220,
+      "rate": 4.8,
+      "shots": 8,
+      "pattern": "追いかけるミサイル（ばくはつ）"
+    }
+  ],
+  "vehicles": [
+    {
+      "name": "ムーニアン・メカ（ロボット）",
+      "en": "Moonian Mecha",
+      "img": "mech-idle",
+      "alt": "mech-shoot",
+      "icon": "weapon-mech-icon",
+      "recipe": "🌙Lv8 ムーニアンノヴァ ＋ ⭐Lv8 ステラガーディアンキャノン",
+      "text": "ぴょんぴーが乗りこむロボット。ボタンを押すたびに、敵を追いかけるミサイルを1発（攻撃27）。高くジャンプでき、空中でもう1回ジャンプ。落ちるときは足から逆噴射してゆっくり着地。雷が効かず、敵に武器をうばわれない。"
+    },
+    {
+      "name": "ムーニアン・ファイター（戦闘機）",
+      "en": "Moonian Fighter",
+      "img": "fighter-fly",
+      "alt": "fighter-shoot",
+      "icon": "weapon-fighter-icon",
+      "recipe": "ロボット ＋ ロボット",
+      "text": "空を自由に飛べる戦闘機。十字キーで上下左右に飛び、追いかけるミサイル（攻撃60）。"
+    }
+  ],
+  "fusion": {
+    "how": [
+      "そうび画面（SELECT ボタン）で、武器を A ボタンでおしたまま つかみ、同じ武器の上ではなす と合成。2つが1つになって、1つ上のレベルになる。",
+      "合成できるのは 同じ種類・同じ武器どうし だけ。月🌙と星⭐は、別の種類なので合成できない。",
+      "とくべつ：🌙Lv8 ＋ ⭐Lv8 → ロボット、ロボット ＋ ロボット → 戦闘機。",
+      "「ずかん」：手に入れた武器・合成した武器が記録される（月8・星8・ロボット・戦闘機の 18 しゅるい）。"
+    ],
+    "ladder": [
+      {
+        "lv": 3,
+        "need": 4
+      },
+      {
+        "lv": 5,
+        "need": 16
+      },
+      {
+        "lv": 8,
+        "need": 128
+      }
+    ],
+    "drops": [
+      {
+        "world": 1,
+        "drop": "Lv1 だけ",
+        "goal": "Lv3"
+      },
+      {
+        "world": 2,
+        "drop": "〜Lv3",
+        "goal": "Lv5"
+      },
+      {
+        "world": 3,
+        "drop": "〜Lv5",
+        "goal": "Lv7"
+      },
+      {
+        "world": 4,
+        "drop": "〜Lv7",
+        "goal": "月の Lv8"
+      },
+      {
+        "world": 5,
+        "drop": "月〜Lv8・星〜Lv7",
+        "goal": "星の Lv8 → ロボット"
+      },
+      {
+        "world": 6,
+        "drop": "〜Lv8",
+        "goal": "ロボット2台 → 戦闘機"
+      }
+    ],
+    "rules": [
+      "ワールドごとに、出てくるレベルに上限がある。",
+      "Lv2 より上は「一度合成して作ったことのある武器」だけが出てくる。レベルが高いほど出にくい。",
+      "持っている武器と同じものが出やすい。",
+      "レアな武器が出ると「レア！」と光る。"
+    ]
+  },
+  "shop": {
+    "notes": [
+      "お金は「柿の種」と「ピーナッツ」。値段は「それぞれ何こ」（たとえば「各 60」＝柿の種60こ＋ピーナッツ60こ）。",
+      "お店は、ワールドマップの「よろず屋 つきのわ」（1-2 をクリアすると開店）と、どのステージにもある「よろず屋」の扉。",
+      "武器を売ることもできる。売ると、柿の種とピーナッツが同じ数ずつもらえる。月は Lv×3 こ、星は Lv×6 こ、ロボット 200 こ、戦闘機 3000 こ。"
+    ],
+    "keeper": {
+      "name": "モチまる",
+      "img": "shop-keeper"
+    },
+    "items": [
+      {
+        "name": "月見バーガー",
+        "price": 10,
+        "text": "その場でライフとHPが全回復。何度でも買える。",
+        "img": "shop-item-burger"
+      },
+      {
+        "name": "ふわふわクッション",
+        "price": 40,
+        "text": "ダメージを受けたあとの無敵時間が2倍。",
+        "img": "shop-item-cushion"
+      },
+      {
+        "name": "柿ピーじしゃく",
+        "price": 60,
+        "text": "近くの柿の種とピーナッツが勝手に集まってくる。",
+        "img": "shop-item-magnet"
+      },
+      {
+        "name": "ぜったいはなさんストラップ",
+        "price": 80,
+        "text": "敵に光線銃をうばわれなくなる。",
+        "img": "shop-item-strap"
+      },
+      {
+        "name": "あいかぎ",
+        "price": 100,
+        "text": "どのステージも、カギを1本持った状態で始まる。",
+        "img": "shop-item-key"
+      },
+      {
+        "name": "ふつうのゲームのくつ",
+        "price": 150,
+        "text": "ふむだけで敵を倒せる。そう、ふつうのゲームみたいに。",
+        "img": "shop-item-boots"
+      },
+      {
+        "name": "2段ジャンプシューズ",
+        "price": 250,
+        "text": "空中でもう1回ジャンプできる。",
+        "img": "shop-item-double"
+      },
+      {
+        "name": "黄金の柿ピー像",
+        "price": 999,
+        "text": "とくに効果はない。でも、すごい。",
+        "img": "shop-item-statue"
+      }
+    ],
+    "limited": [
+      {
+        "world": 1,
+        "name": "月あめジャンプ",
+        "price": 60,
+        "text": "ジャンプが少し高くなる。",
+        "mark": "☾",
+        "color": "#fff3a4"
+      },
+      {
+        "world": 1,
+        "name": "うさみみお守り",
+        "price": 150,
+        "text": "ステージで1回だけ、やられてもその場で復活。",
+        "mark": "♥",
+        "color": "#ffd1ed"
+      },
+      {
+        "world": 2,
+        "name": "たいねつマント",
+        "price": 100,
+        "text": "マグマとふん石のダメージが半分。",
+        "mark": "♨",
+        "color": "#ff9a6b"
+      },
+      {
+        "world": 2,
+        "name": "火星ドリル",
+        "price": 200,
+        "text": "アイテムブロックの中身が2つ出てくる。",
+        "mark": "⚒",
+        "color": "#ffcf73"
+      },
+      {
+        "world": 3,
+        "name": "スパイクシューズ",
+        "price": 120,
+        "text": "氷の上でもすべらない。",
+        "mark": "❄",
+        "color": "#c6fff4"
+      },
+      {
+        "world": 3,
+        "name": "こおりのたて",
+        "price": 220,
+        "text": "ステージで1回だけ、敵の弾をふせぐ。",
+        "mark": "◇",
+        "color": "#9ee8ff"
+      },
+      {
+        "world": 4,
+        "name": "大きな酸素タンク",
+        "price": 150,
+        "text": "水の中で、酸素が2倍長もち。",
+        "mark": "O₂",
+        "color": "#bff8ff"
+      },
+      {
+        "world": 4,
+        "name": "ひれ",
+        "price": 250,
+        "text": "泳ぐのが速くなる。",
+        "mark": "≈",
+        "color": "#7fd8ff"
+      },
+      {
+        "world": 5,
+        "name": "ヘルメット",
+        "price": 180,
+        "text": "トロッコの頭の上のはりに当たってもへいき。",
+        "mark": "⛑",
+        "color": "#ffc67a"
+      },
+      {
+        "world": 5,
+        "name": "ロケットブースター",
+        "price": 300,
+        "text": "ダッシュが速くなる。",
+        "mark": "»",
+        "color": "#ff8db7"
+      },
+      {
+        "world": 6,
+        "name": "ひらいしん",
+        "price": 250,
+        "text": "雷が当たらなくなる。",
+        "mark": "ϟ",
+        "color": "#d7c8ff"
+      },
+      {
+        "world": 6,
+        "name": "王さまのマント",
+        "price": 400,
+        "text": "受けるダメージが半分。",
+        "mark": "♛",
+        "color": "#ff3d7f"
+      }
+    ]
+  },
+  "worlds": [
+    {
+      "no": 1,
+      "name": "月あめ平原",
+      "en": "Moon Candy Field",
+      "bg": "pastel-space-background",
+      "text": "月の重力でふわっと高くジャンプできる。はじめての冒険にぴったり。"
+    },
+    {
+      "no": 2,
+      "name": "火星ネオンコロニー",
+      "en": "Mars Neon Colony",
+      "bg": "stage-mars-bg",
+      "text": "地面からマグマがふき出し、ふん石が落ちてくる。地面が光ったら、はなれよう。"
+    },
+    {
+      "no": 3,
+      "name": "クリスタル氷星",
+      "en": "Crystal Ice Planet",
+      "bg": "stage-crystal-bg",
+      "text": "地面がつるつるすべる。止まりたいところの手前で、ボタンをはなそう。"
+    },
+    {
+      "no": 4,
+      "name": "星の海",
+      "en": "Star Ocean",
+      "bg": "stage-ocean-bg",
+      "text": "水の中を泳ぐ。酸素がへるので、丸い「O2バブル」で補給。開いたりとじたりする岩の門もある。"
+    },
+    {
+      "no": 5,
+      "name": "リングメカ工場",
+      "en": "Ring Mecha Factory",
+      "bg": "stage-ring-bg",
+      "text": "ベルトコンベア、動く足場、それにトロッコ。頭の上のはりは、ふせてくぐる。"
+    },
+    {
+      "no": 6,
+      "name": "魔王星",
+      "en": "Demon Star",
+      "bg": "stage-demon-bg",
+      "text": "重力が波のようにゆれ、空から雷が落ちてくる。光がさしこんだら、すぐはなれよう。"
+    }
+  ],
+  "worldNotes": [
+    "ステージは、外の道 → 形のちがう部屋（くねくねトンネル・たて穴・迷路・ほら穴・たたかいの部屋）→ ゴールの道、と扉でつながっている。",
+    "各ステージに★が3つ。全部集めるのが目標。"
+  ],
+  "bosses": [
+    {
+      "world": 1,
+      "name": "月あめキング",
+      "en": "MOON CANDY KING",
+      "img": "boss-moon-candy-king",
+      "title": "ふわふわ月あめ王国の王さま",
+      "home": "月あめ平原",
+      "look": "クリーム色のまんまるな体に、三日月の王冠とふわふわのマント。星の出るラッパ銃を持っている。",
+      "nature": "あまえんぼうで、よくばり。でも根はやさしく、国民（月あめ）を大事にしている。",
+      "like": "月あめ、おひるね、ほめられること",
+      "dislike": "歯みがき、半分こ",
+      "line": "ふわふわ月あめは、ぜんぶぼくの王国だよ！"
+    },
+    {
+      "world": 2,
+      "name": "ドーム司令官",
+      "en": "DOME COMMANDER",
+      "img": "boss-mars-dome-commander",
+      "title": "火星ネオンコロニーの司令官",
+      "home": "火星のドーム基地",
+      "look": "赤い岩のようなごつい体に、ガラスドームのヘルメット。両うでは大きなエネルギー砲。頭の上のドームには小さな副官が乗っている。",
+      "nature": "まじめで、がんこ。効率が大好きで、むだなことがゆるせない。",
+      "like": "ネオンの点検、時間どおりの行進、節電",
+      "dislike": "ひまな時間、アドリブ",
+      "line": "笑いなど、ネオンのこやしで十分だ！"
+    },
+    {
+      "world": 3,
+      "name": "クリスタルイエティ",
+      "en": "CRYSTAL YETI",
+      "img": "boss-crystal-yeti",
+      "title": "クリスタル氷星の守り神",
+      "home": "水晶の洞くつ",
+      "look": "白くてもこもこの大きな体に、水色の水晶の角。両手は雪の結晶のような氷のこぶし。胸に青いハートの宝石。",
+      "nature": "無口で、はずかしがりや。きれいなものを見つけると、こおらせて取っておきたくなる。",
+      "like": "きらきらしたもの、しずかな夜、かき氷",
+      "dislike": "あつい場所、大きな音",
+      "line": "きみも、キラキラに固めてあげる。"
+    },
+    {
+      "world": 4,
+      "name": "マンタクイーン",
+      "en": "MANTA QUEEN",
+      "img": "boss-ocean-manta-queen",
+      "title": "星の海の女王",
+      "home": "星の海の底、サンゴの宮殿",
+      "look": "水色とピンクの大きなマンタ。背中にサンゴと真珠の王冠、長いしっぽの先に宝石。頭の上の泡の中に小さな女王が乗っている。",
+      "nature": "気品があって、おっとり。じつは、さみしがりや。",
+      "like": "真珠、泡の音楽、お客さま",
+      "dislike": "かわいた場所、いそがされること",
+      "line": "泡にして、しずめてあげるわ。"
+    },
+    {
+      "world": 5,
+      "name": "ロボットキング",
+      "en": "ROBOT KING",
+      "img": "boss-mecha-robot-king",
+      "title": "リングメカ工場の工場長",
+      "home": "リングメカ工場の中央制御室",
+      "look": "紫と金の重装ロボット。キャタピラの足、4門の砲、胸にピンクの星のエンブレム、頭に歯車の王冠。",
+      "nature": "計算どおりが大好き。「笑い」というデータを持っていなかった。",
+      "like": "歯車、定時、アップデート",
+      "dislike": "水、想定外",
+      "line": "ワライ、フヨウ。ハグルマニ マキコマレナ！"
+    },
+    {
+      "world": 6,
+      "name": "魔王スターオーバーロード",
+      "en": "STAR OVERLORD",
+      "img": "boss-demon-star-overlord",
+      "title": "魔王星の大魔王",
+      "home": "魔王星の城",
+      "look": "星のもようが入った黒紫のまんまるな体。ピンクの水晶の大きな角、星の王冠、星空のマント。まわりにトゲつきの鉄球が浮いている。",
+      "nature": "いばっているが、じつはとても傷つきやすい。",
+      "like": "ひとりの夜",
+      "dislike": "しーんとした空気",
+      "line": "笑いなど、宇宙から消えてしまえばよいのだ！"
+    }
+  ],
+  "enemies": [
+    {
+      "world": 1,
+      "name": "ムーンゼリー",
+      "en": "MOON JELLY",
+      "img": "enemy-moon-jelly",
+      "look": "月のようなクレーターもようの、ぷるぷるしたゼリー。頭にアンテナが1本。",
+      "nature": "好奇心いっぱいで、動くものを見ると追いかけてしまう。",
+      "line": "ぷるっ？　それ、ちょうだい！",
+      "game": "最初に出会う敵。近づくと走ってきて、光線銃をうばおうとする。"
+    },
+    {
+      "world": 2,
+      "name": "サボテンドーム",
+      "en": "CACTUS DOME",
+      "img": "enemy-mars-cactus",
+      "look": "オレンジ色のトゲトゲの丸いサボテン。ガラスドームのヘルメットをかぶっている。",
+      "nature": "短気だけど、すぐ忘れる。司令官にあこがれている。",
+      "line": "止まれー！　ここは火星ドームだぞ！",
+      "game": "マグマのふき出す道をパトロールしている。"
+    },
+    {
+      "world": 3,
+      "name": "クリスタルフラッフ",
+      "en": "CRYSTAL FLUFF",
+      "img": "enemy-crystal-fluff",
+      "look": "白いふわふわの毛玉。水晶の耳としっぽ、紫のブーツ。",
+      "nature": "すばしっこくて、いたずら好き。すべる氷の上が大得意。",
+      "line": "つるつるーっ！　つかまえてみな！",
+      "game": "すべる床の上をすばやく動く。"
+    },
+    {
+      "world": 4,
+      "name": "マンタっこ",
+      "en": "BABY MANTA",
+      "img": "enemy-ocean-manta",
+      "look": "水色の小さなマンタ。泡のヘルメットをかぶり、ひれに星のもよう。",
+      "nature": "人なつっこい。あそんでいるつもりで、ついてくる。",
+      "line": "ぷくぷく〜、あそぼ〜！",
+      "game": "水の中を上下左右に泳いで追いかけてくる。"
+    },
+    {
+      "world": 5,
+      "name": "メカボット",
+      "en": "MECHA BOT",
+      "img": "enemy-mecha-bot",
+      "look": "紫と金の丸いロボット。キャタピラの足、両うでは小さな砲。",
+      "nature": "まじめな働きもの。命令には忠実だが、たまにフリーズする。",
+      "line": "シンニュウシャ、ハッケン。ピピッ。",
+      "game": "ベルトコンベアの上で待ちかまえ、光線銃を撃ってくる。"
+    },
+    {
+      "world": 6,
+      "name": "デモインプ",
+      "en": "DEMON IMP",
+      "img": "enemy-demon-imp",
+      "look": "黒紫の小さな悪魔。ピンクの角、星のついたしっぽ、小さなマント。",
+      "nature": "なまいきだけど、こわがり。",
+      "line": "へへーん、魔王さまに言いつけるぞ！",
+      "game": "魔王城で一番手ごわいザコ。強い光線銃を持っていることが多い。"
+    }
+  ],
+  "tips": [
+    {
+      "title": "ふむ",
+      "text": "敵を上からふむと、ピヨってしばらく動けなくなる。そのすきに光線銃で倒そう。"
+    },
+    {
+      "title": "武器どろぼう",
+      "text": "敵に光線銃をうばわれることがある。ふむと取り返せる。水の中では、武器がないとき X ボタンの「空気鉄砲」でピヨらせて取り返す（酸素を少しつかう）。"
+    },
+    {
+      "title": "しゃがむ・ほふく前進",
+      "text": "地面で ↓ を押すとふせる。ふせたまま ←→ で、ほふく前進。敵の弾は、ふせると頭の上を通る。ほふく前進でしか通れないせまいすき間もある。"
+    },
+    {
+      "title": "ダッシュジャンプ",
+      "text": "B を押しながら走ってジャンプすると、いつもより高くとべる。←→ を2回すばやく押してもダッシュになる。"
+    },
+    {
+      "title": "8方向に撃てる",
+      "text": "十字キーの上下をおしながら撃つと、上やななめ、空中なら真下にも撃てる。"
+    },
+    {
+      "title": "たたかいの部屋",
+      "text": "敵をぜんぶ倒すまで、出口の扉はあかない。"
+    },
+    {
+      "title": "カギつきの扉",
+      "text": "部屋のどこかにあるカギを取ってから。"
+    },
+    {
+      "title": "三日月タクシー",
+      "text": "やられると、三日月にのって復活。好きなところにおりられる。"
+    },
+    {
+      "title": "酸素",
+      "text": "水の中で酸素が少なくなると、画面が赤く光って音が鳴る。O2バブルをさがそう。"
+    },
+    {
+      "title": "時間",
+      "text": "残り60秒になると、曲が速くなる。"
+    },
+    {
+      "title": "せってい",
+      "text": "タイトルの「せってい」で、BGM・セリフ・効果音の大きさや、A/B/X/Y ボタンの役目を変えられる。"
+    }
+  ]
+}

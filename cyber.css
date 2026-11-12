@@ -1223,3 +1223,4 @@ body.character-open-lock{overflow:hidden}
   .game-title{display:flex;justify-content:center;margin:10px 0 18px!important}
   .game-title img{width:min(88%,440px)}
 }
+.game-guide-link{flex-basis:100%;color:var(--c-accent);font-size:13px;font-weight:800;text-decoration:none}

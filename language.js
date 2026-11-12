@@ -65,7 +65,8 @@
     '愉快な仲間たち':'Moon friends', 'ムーニアンズの、愉快な仲間たち':'The Moonians’ merry friends', 'DJらむね、ピーティープティ、グルーパーたちに会いに行く':'Meet DJ Ramune, PT, Grouper and the gang',
     '← らんぴょんとぴょんぴーに会いに戻る':'← Back to Ranpyon and Pyonpy', 'ムーニアンズの愉快な仲間たち｜三日月大使館のまわりの人たち':'Moonians’ merry friends | Around the Crescent Embassy',
     'タップで話しかけてな':'Tap to say hi', 'つづきはゲームで ↗':'Continue in the game ↗', 'もう一回きく':'Hear it again', 'フェス前の楽屋。ネタ合わせをする、らんぴょんとぴょんぴー':'The dressing room before the Fest: Ranpyon and Pyonpy rehearsing',
-    'ぴょんぴーの大冒険 〜ワライスターをとりもどせ〜':'Pyonpy’s Big Adventure: Take Back the Laugh Stars'
+    'ぴょんぴーの大冒険 〜ワライスターをとりもどせ〜':'Pyonpy’s Big Adventure: Take Back the Laugh Stars',
+    '図鑑・攻略':'Field guide', '図鑑・攻略を見る →':'Open the field guide →'
   };
   Object.assign(copy, {
     'ムーニアンズTV。らんぴょんとぴょんぴー':'Moonians TV — Ranpyon and Pyonpy', 'ホバーで音なしプレビュー':'Hover for a silent preview', '最新動画を音声付きで再生する':'Play the latest video with sound', '再生ボタンで音を出す':'Press Play for sound', 'ムーニアンズTVの最新動画':'The latest from Moonians TV', 'YouTubeで最新動画を見る ↗':'Watch the latest videos on YouTube ↗', '音なしでプレビュー中':'Previewing without sound', 'プレビューを準備中…':'Getting the preview ready…', '動画を読み込めませんでした。YouTubeでご覧ください。':'The video couldn’t load. Please watch on YouTube.', '再生ボタンで動画をご覧ください。':'Press Play to watch the video.',
@@ -451,7 +452,7 @@
   window.MoonLanguage = {t, resolveLanguage, get current() { return language; }};
   const trackedAttributes = ['aria-label','alt','placeholder','title','data-caption','content'];
   function localizeText(node) {
-    if (!node.parentElement || node.parentElement.closest('script,style,[data-language-switch]')) return;
+    if (!node.parentElement || node.parentElement.closest('script,style,[data-language-switch],[translate=no]')) return;
     const raw = node.nodeValue;
     const text = raw.trim();
     let record = originals.get(node);
@@ -468,7 +469,7 @@
     if (raw !== record[language]) node.nodeValue = record[language];
   }
   function localizeElement(el) {
-    if (el.closest('[data-language-switch]')) return;
+    if (el.closest('[data-language-switch],[translate=no]')) return;
     let records = attributes.get(el);
     if (!records) { records = {}; attributes.set(el, records); }
     for (const key of trackedAttributes) {
