@@ -390,6 +390,63 @@
     place();
   }
 
+  // Home character cards: compact cards, tap one to open the full profile.
+  const characterGrid = document.querySelector('.character-grid');
+  if (characterGrid && characterGrid.querySelector('.character-detail')) {
+    characterGrid.classList.add('is-cards');
+    characterGrid.querySelectorAll('.character').forEach(card => {
+      const detail = card.querySelector('.character-detail');
+      const info = card.querySelector('.character-info');
+      const name = card.classList.contains('ranpyon') ? 'らんぴょん' : 'ぴょんぴー';
+      const open = document.createElement('button');
+      open.type = 'button';
+      open.className = 'character-open';
+      open.innerHTML = 'くわしく見る <span aria-hidden="true">＋</span>';
+      open.setAttribute('aria-haspopup', 'dialog');
+      info.append(open);
+      const sheet = document.createElement('dialog');
+      sheet.className = 'character-dialog';
+      sheet.setAttribute('aria-label', `${name}のプロフィール`);
+      const close = document.createElement('button');
+      close.type = 'button';
+      close.className = 'character-dialog-close';
+      close.setAttribute('aria-label', 'プロフィールを閉じる');
+      close.textContent = '×';
+      const article = document.createElement('article');
+      article.className = card.className.replace(/\b(reveal-wait|revealed)\b/g, '');
+      article.append(card.querySelector('.character-image').cloneNode(true));
+      const body = document.createElement('div');
+      body.className = 'character-info';
+      info.querySelectorAll(':scope>.english-name,:scope>h3,:scope>p').forEach(el => body.append(el.cloneNode(true)));
+      body.append(detail);   // moved, not copied, so its buttons keep working
+      article.append(body);
+      const scroller = document.createElement('div');
+      scroller.className = 'character-dialog-scroll';
+      scroller.append(article);
+      sheet.append(close, scroller);
+      document.body.append(sheet);
+      const more = detail.querySelector(':scope>details');
+      if (more) more.open = true;
+      open.addEventListener('click', event => {
+        event.stopPropagation();
+        sheet.showModal();
+        scroller.scrollTop = 0;
+        close.focus({preventScroll:true});
+        document.body.classList.add('character-open-lock');
+      });
+      close.addEventListener('click', () => sheet.close());
+      sheet.addEventListener('click', event => { if (event.target === sheet) sheet.close(); });
+      sheet.addEventListener('close', () => {
+        document.body.classList.remove('character-open-lock');
+        open.focus({preventScroll:true});
+      });
+    });
+  }
+
+  // Keep the current page visible in the sideways-scrolling sub-page nav.
+  const pageNav = document.querySelector('.page-nav'), currentLink = pageNav && pageNav.querySelector('[aria-current=page]');
+  if (currentLink && pageNav.scrollWidth > pageNav.clientWidth) pageNav.scrollLeft = currentLink.offsetLeft - (pageNav.clientWidth - currentLink.offsetWidth) / 2;
+
   // Star trail across the closing section.
   const trailArea = document.querySelector('.connect-section');
   if (trailArea && fine) {

@@ -17,12 +17,12 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DotGothic16&family=M+PLUS+Rounded+1c:wght@700;800;900&family=Noto+Sans+JP:wght@400;500;600;700;800;900&family=Unbounded:wght@700;900&display=swap" rel="stylesheet">
   <style>@import url("style.css?v=20261110-2") layer(legacy);@import url("experience.css?v=20261110-18") layer(legacy);@import url("music.css?v=20261110-17") layer(legacy);@import url("language.css?v=20261110-12") layer(legacy);@import url("tv.css?v=20261110-21") layer(legacy);</style>
-  <link rel="stylesheet" href="cyber.css?v=20261112-12">
+  <link rel="stylesheet" href="cyber.css?v=20261112-13">
   <script type="importmap">{"imports":{"three":"./vendor/three/three.module.min.js"}}</script>
-  <script src="language.js?v=20261112-11"></script>
+  <script src="language.js?v=20261112-13"></script>
   <script src="app.js?v=20261110-6" defer></script>
   <script src="experience.js?v=20261111-13" defer></script>
-  <script src="cyber.js?v=20261112-12" defer></script>
+  <script src="cyber.js?v=20261112-13" defer></script>
   <script src="music-lyrics.js?v=20261112-12" defer></script>
   <script src="music.js?v=20261112-10" defer></script>
   <script src="tv.js?v=20261110-20" defer></script>
@@ -34,7 +34,7 @@
   <header class="site-header">
     <a class="brand" href="#home" aria-label="ムーニアンズ ホーム"><img src="assets/logo.png?v=20261110-11" alt="ムーニアンズ" width="2421" height="833"></a>
     <button class="menu-toggle" type="button" aria-controls="main-nav" aria-expanded="false"><span>MENU</span><span class="menu-lines" aria-hidden="true">☰</span></button>
-    <nav id="main-nav" aria-label="メインナビゲーション"><a href="#world">この世界のこと</a><a href="#characters">仲間たち</a><a href="#journal">街のおたより</a><a href="anime.html" data-language-link>3Dアニメ</a><a href="game.html" data-language-link>ゲーム</a><a href="music.html" data-language-link>音楽</a><a href="lab.html" data-language-link>制作ラボ</a><a href="#history">活動の記録</a><a class="nav-social" href="#connect">SNSで会おう <span>↗</span></a></nav>
+    <nav id="main-nav" aria-label="メインナビゲーション"><a href="#world">この世界のこと</a><a href="#characters">仲間たち</a><a href="friends.html" data-language-link>愉快な仲間たち</a><a href="#journal">街のおたより</a><a href="anime.html" data-language-link>3Dアニメ</a><a href="game.html" data-language-link>ゲーム</a><a href="music.html" data-language-link>音楽</a><a href="lab.html" data-language-link>制作ラボ</a><a href="#history">活動の記録</a><a class="nav-social" href="#connect">SNSで会おう <span>↗</span></a></nav>
     <div class="language-switch" data-language-switch role="group" aria-label="Language / 言語"><button type="button" data-language="ja" lang="ja" aria-pressed="true">日本語</button><button type="button" data-language="en" lang="en" aria-pressed="false">EN</button></div>
   </header>
   <main id="main">
@@ -94,7 +94,7 @@
         <article class="character ranpyon">
           <div class="character-image"><img src="assets/ranpyon-portrait.jpg" alt="シルバーの衣装と、うさぎ耳の帽子を着けたらんぴょん" width="1280" height="800" loading="lazy"><span class="character-logo"><img src="assets/logo-ranpyon.webp" alt="RANPYON" width="900" height="265" loading="lazy"></span><span class="character-number">MOONIAN / 01</span><span class="character-role">ツッコミ担当</span></div>
           <div class="character-info"><span class="english-name">RANPYON</span><h3>らんぴょん <span>✧</span></h3><p>地球人とムーニアンのハーフ。<br>自分の「好き」を形にする、クリエイターなツッコミ担当。</p>
-            <dl><div><dt>BIRTHDAY</dt><dd>7月21日</dd></div><div><dt>CREATE</dt><dd>造形・3DCG・映像・デザイン</dd></div></dl><button class="model-sheet" type="button" data-photo="assets/sheet-ranpyon.jpg" data-caption="らんぴょんのキャラクターモデルシート。衣装の三面図と、ディテールの解説。"><img src="assets/sheet-ranpyon-thumb.jpg" alt="らんぴょんのキャラクターモデルシート。ホログラムの衣装を前・横・後ろから見た三面図" width="520" height="368" loading="lazy"><span><small>MODEL SHEET</small><b>らんぴょんの設定資料を見る</b></span><i aria-hidden="true">＋</i></button>
+            <div class="character-detail"><dl><div><dt>BIRTHDAY</dt><dd>7月21日</dd></div><div><dt>CREATE</dt><dd>造形・3DCG・映像・デザイン</dd></div></dl><button class="model-sheet" type="button" data-photo="assets/sheet-ranpyon.jpg" data-caption="らんぴょんのキャラクターモデルシート。衣装の三面図と、ディテールの解説。"><img src="assets/sheet-ranpyon-thumb.jpg" alt="らんぴょんのキャラクターモデルシート。ホログラムの衣装を前・横・後ろから見た三面図" width="520" height="368" loading="lazy"><span><small>MODEL SHEET</small><b>らんぴょんの設定資料を見る</b></span><i aria-hidden="true">＋</i></button>
             <details><summary>らんぴょんをもっと知る <span>＋</span></summary>
               <div class="profile-more profile-dossier">
                 <h4>好きなこと・得意なこと</h4><ul class="profile-tags"><li>コスプレ</li><li>造形</li><li>3DCG</li><li>映像クリエイト</li><li>絵</li><li>デザイン</li><li>英会話</li></ul>
@@ -103,12 +103,12 @@
                 <h4>地球でのプロフィール</h4><p>吉本興業所属・東京NSC27期。阿波弁と関西弁を交えた言葉で、地球のみんなと交流しています。</p><a class="text-link" href="https://profile.yoshimoto.co.jp/talent/detail?id=12554" target="_blank" rel="noopener noreferrer">吉本公式プロフィール ↗</a>
               </div>
             </details>
-          </div>
+          </div></div>
         </article>
         <article class="character pyonpy">
           <div class="character-image"><img src="assets/pyonpy-portrait.jpg" alt="未来の街で笑顔を見せるぴょんぴー" width="1280" height="800" loading="lazy"><span class="character-logo"><img src="assets/logo-pyonpy.webp" alt="PYONPY" width="900" height="296" loading="lazy"></span><span class="character-number">MOONIAN / 02</span><span class="character-role">ボケ担当</span></div>
           <div class="character-info"><span class="english-name">PYONPY</span><h3>ぴょんぴー <span>♡</span></h3><p>超ポジティブで、みんなの兄貴分。<br>月と地球を笑いでつなぐ、もふもふのボケ担当。</p>
-            <dl><div><dt>BIRTHDAY</dt><dd>4月22日</dd></div><div><dt>FROM</dt><dd>シルバーバレー / Silver Valley</dd></div><div><dt>NOW</dt><dd>東京・新宿</dd></div><div><dt>DREAM</dt><dd>ムーニアンズで地球のM-1を獲る！</dd></div></dl><button class="model-sheet" type="button" data-photo="assets/sheet-pyonpy.jpg" data-caption="ぴょんぴーのキャラクターモデルシート。9つの表情と、三面図。"><img src="assets/sheet-pyonpy-thumb.jpg" alt="ぴょんぴーのキャラクターモデルシート。9つの表情と、側面・正面・背面の三面図" width="520" height="368" loading="lazy"><span><small>MODEL SHEET</small><b>ぴょんぴーの設定資料を見る</b></span><i aria-hidden="true">＋</i></button>
+            <div class="character-detail"><dl><div><dt>BIRTHDAY</dt><dd>4月22日</dd></div><div><dt>FROM</dt><dd>シルバーバレー / Silver Valley</dd></div><div><dt>NOW</dt><dd>東京・新宿</dd></div><div><dt>DREAM</dt><dd>ムーニアンズで地球のM-1を獲る！</dd></div></dl><button class="model-sheet" type="button" data-photo="assets/sheet-pyonpy.jpg" data-caption="ぴょんぴーのキャラクターモデルシート。9つの表情と、三面図。"><img src="assets/sheet-pyonpy-thumb.jpg" alt="ぴょんぴーのキャラクターモデルシート。9つの表情と、側面・正面・背面の三面図" width="520" height="368" loading="lazy"><span><small>MODEL SHEET</small><b>ぴょんぴーの設定資料を見る</b></span><i aria-hidden="true">＋</i></button>
             <details><summary>ぴょんぴーをもっと知る <span>＋</span></summary>
               <div class="profile-more profile-dossier">
                 <h4>月から、地球へ</h4><p>月面都市「シルバーバレー」（Silver Valley）出身。現在は東京・新宿を拠点に、相方のらんぴょんとムーニアンズとして芸人活動中。</p>
@@ -128,7 +128,7 @@
                 <a class="text-link" href="https://www.instagram.com/pyonpy_moonians/" target="_blank" rel="noopener noreferrer">Instagramで会う ↗</a>
               </div>
             </details>
-          </div>
+          </div></div>
         </article>
       </div><div class="pyonpy-stage" id="pyonpy-3d" hidden data-error="3Dモデルを読み込めなかったみたい。ページを開き直してみてね。">
         <div class="pyonpy-view" role="img" aria-label="3Dのぴょんぴー。ドラッグで回転できます"><p class="pyonpy-status" role="status">3Dモデルを読み込み中…</p></div>
@@ -145,49 +145,10 @@
             <button type="button" data-motion="Attack" aria-pressed="false" disabled>ツッコミ</button>
           </div>
         </div>
-      </div><div class="friends" id="friends">
-        <div class="friends-head"><p class="eyebrow">MOON FRIENDS / CRESCENT EMBASSY</p><h3>ムーニアンズの、<span>愉快な仲間たち。</span></h3><p>らんぴょんとぴょんぴーは、三日月大使館の大使。<br>月と地球のかけ橋になるために、みんなを笑顔にできる芸人の道を選びました。<br>そんな二人のまわりには、こんな仲間たちがいます。</p></div>
-        <article class="friend friend-lead">
-          <div class="friend-image"><img src="assets/friends/ramune.jpg" alt="うさ耳つきのホログラムのキャップとヘッドホンを着けた、ピンクの髪のDJらむね" width="1000" height="1000" loading="lazy"><span class="friend-role">らんぴょんの妹</span></div>
-          <div class="friend-body"><span class="english-name">DJ RAMUNE</span><h4>DJらむね</h4>
-            <p>らんぴょんの妹。月でDJをしています。<br>事務所は、歌とダンスのアイドルとして売り出したい。でも本人が歌いたいのは、かっこいいラップだけ。しぶしぶ踊りながら、地球でのデビューを夢見ています。</p>
-            <dl><div><dt>AGENCY</dt><dd>Vocaria Planet Agency</dd></div><div><dt>ROLE</dt><dd>歌手 / DJ</dd></div><div><dt>FROM</dt><dd>月生まれ・月育ち</dd></div><div><dt>HEIGHT</dt><dd>156cm</dd></div></dl>
-            <button class="model-sheet" type="button" data-photo="assets/friends/ramune-sheet.jpg" data-caption="DJらむねのキャラクターモデルシート。三面図と、6つの表情。"><img src="assets/friends/ramune-sheet.jpg" alt="DJらむねのキャラクターモデルシート。正面・横・後ろの三面図と表情の一覧" width="1492" height="1054" loading="lazy"><span><small>MODEL SHEET</small><b>DJらむねの設定資料を見る</b></span><i aria-hidden="true">＋</i></button>
-          </div>
-        </article>
-        <div class="friend-grid">
-          <article class="friend">
-            <div class="friend-image"><img src="assets/friends/ptputy.jpg" alt="ホログラムのキャップと上着を着た、大きなたれ耳のピンクのうさぎ、ピーティープティ" width="825" height="1100" loading="lazy"><span class="friend-role">らむねの相方</span></div>
-            <div class="friend-body"><span class="english-name">PTPUTY / PT</span><h4>ピーティープティ</h4><p>ニックネームは「PT」。DJらむねの相方で、親友。好きなのは、ぴょんぴー。身長はおよそ45cm。</p>
-              <button class="model-sheet" type="button" data-photo="assets/friends/ptputy-sheet.jpg" data-caption="ピーティープティのキャラクターモデルシート。四面図と、ディテール。"><img src="assets/friends/ptputy-sheet.jpg" alt="ピーティープティのキャラクターモデルシート。正面・斜め・横・後ろの図とディテール" width="2000" height="1381" loading="lazy"><span><small>MODEL SHEET</small><b>設定資料を見る</b></span><i aria-hidden="true">＋</i></button>
-            </div>
-          </article>
-          <article class="friend">
-            <div class="friend-image"><img src="assets/friends/zaluva.jpg" alt="星空のようなローブを着て、三日月の飾りをつけ、マイクを持って微笑むザ・ルーヴァ・セレス" width="733" height="1100" loading="lazy"><span class="friend-role">二人の上司</span></div>
-            <div class="friend-body"><span class="english-name">ZA-LUVA SELES</span><h4>ザ・ルーヴァ・セレス</h4><p>三日月大使館（クレッセントエンバシー）の偉い人。らんぴょんとぴょんぴーの上司です。胸には三日月、手にはマイク。二人の地球での活動を、おだやかな笑顔で見守っています。</p></div>
-          </article>
-          <article class="friend">
-            <div class="friend-image"><img src="assets/friends/mogera.jpg" alt="ホログラムの長い手足と大きな前歯をもつ、薄紫のぬいぐるみ、もげら" width="1156" height="1200" loading="lazy"><span class="friend-role">なぞの仲間</span></div>
-            <div class="friend-body"><span class="english-name">MOGERA</span><h4>もげら</h4><p>ホログラムの長い手足と、大きな前歯がトレードマーク。いつも両手をあげて、ごきげん。くわしいことは、まだ謎に包まれています。</p></div>
-          </article>
-          <article class="friend">
-            <div class="friend-image"><img src="assets/friends/zombie-bunny.jpg" alt="ミントグリーンの毛並みに、つぎはぎと光るパーツをつけた、舌を出すゾンビバニー" width="880" height="1100" loading="lazy"><span class="friend-role">名前は調査中</span></div>
-            <div class="friend-body"><span class="english-name">ZOMBIE BUNNY</span><h4>ゾンビバニー</h4><p>ミントグリーンの毛並みに、つぎはぎと舌ぺろ。耳には宇宙人のチャーム、体には光るパーツ。ちょっとこわいけど、どこかにくめないやつ。</p></div>
-          </article>
-          <article class="friend">
-            <div class="friend-image"><img src="assets/friends/yanabisu.jpg?v=2" alt="うさ耳のついた丸い頭に、にっこり顔の画面がある小さなロボット、ヤナビス" width="825" height="1100" loading="lazy"><span class="friend-role">人工知能</span></div>
-            <div class="friend-body"><span class="english-name">Y.A.N.A.V.I.S</span><h4>ヤナビス</h4><p>翻訳酸素カプセルから聞こえる声の主。ぴょんぴーのムーニアン語を、日本語に同時翻訳してくれる人工知能です。</p><p class="friend-note"><b>名前の由来</b>開発者に「You Are Not A Very Intelligent System（あんまり賢くないシステムやな）」と言われたのを、自分の名前だと勘違い。その頭文字が、正式名称「Y.A.N.A.V.I.S」になりました。</p><button class="model-sheet" type="button" data-photo="assets/friends/yanabisu-sheet.jpg" data-caption="ヤナビスのキャラクターモデルシート。四面図と、6つの表情。"><img src="assets/friends/yanabisu-sheet.jpg" alt="ヤナビスのキャラクターモデルシート。正面・横・後ろ・斜めの図と、6種類の表情" width="1536" height="1024" loading="lazy"><span><small>MODEL SHEET</small><b>設定資料を見る</b></span><i aria-hidden="true">＋</i></button></div>
-          </article>
-          <article class="friend">
-            <div class="friend-image"><img src="assets/friends/grouper.jpg" alt="ラジカセの頭に紫のキャップ、サーモンピンクのベストを着た機械の体のエイリアン、グルーパー" width="825" height="1242" loading="lazy"><span class="friend-role">音楽の星のエイリアン</span></div>
-            <div class="friend-body"><span class="english-name">GROUPER</span><h4>グルーパー</h4><p>音楽の星「グルーヴィア星」から来た、機械の体のエイリアン。「地球の音楽はクソすぎる！」と地球を破壊しに来たけれど、ぴょんぴーとのラップバトルでそのバイブスに感化され、まさかの友達に。地球滅亡は、ギリギリで回避されました。</p>
-              <dl><div><dt>FROM</dt><dd>グルーヴィア星 / Planet Groovia</dd></div><div><dt>HEAD</dt><dd>CDプレーヤー内蔵のラジカセ</dd></div><div><dt>DEBUT</dt><dd>ネタ動画「I'm Grouper」</dd></div><div><dt>SONG</dt><dd><a href="music.html#grouper" data-language-link>友情と条約 ♪</a></dd></div></dl>
-              <p class="friend-note"><b>グルーヴィア星って？</b>星じゅうがひとつの巨大なスピーカーになっている、音楽の星。あいさつはビートボックス、ケンカはラップバトルで決着をつけるのがルール。グルーパーは胸のスピーカーと両目のスピーカーで、いつでもどこでもライブができます。</p>
-              <button class="model-sheet" type="button" data-photo="assets/friends/grouper-sheet.jpg" data-caption="グルーパーのキャラクターモデルシート。三面図と、頭部CDプレーヤーのディテール。"><img src="assets/friends/grouper-sheet.jpg" alt="グルーパーのキャラクターモデルシート。正面・側面・背面の三面図と、フタが開く頭部CDプレーヤーの解説" width="1536" height="1024" loading="lazy"><span><small>MODEL SHEET</small><b>設定資料を見る</b></span><i aria-hidden="true">＋</i></button>
-            </div>
-          </article>
-        </div>
-      </div>
+      </div><a class="friends-teaser" href="friends.html" data-language-link>
+        <span class="friends-teaser-faces" aria-hidden="true"><img src="assets/friends/ramune.jpg" alt="" width="1000" height="1000" loading="lazy"><img src="assets/friends/ptputy.jpg" alt="" width="825" height="1100" loading="lazy"><img src="assets/friends/grouper.jpg" alt="" width="825" height="1242" loading="lazy"></span>
+        <span class="friends-teaser-copy"><small>MOON FRIENDS / CRESCENT EMBASSY</small><b>ムーニアンズの、愉快な仲間たち</b><span>DJらむね、ピーティープティ、グルーパーたちに会いに行く</span></span><i aria-hidden="true">→</i>
+      </a>
       <p class="character-footnote">☾ 月でのプロフィールと、地球での活動。それぞれの物語を楽しんでね。</p>
     </div></section>
 

@@ -1097,3 +1097,76 @@ body .hero-transmission.music-card.music-float{animation:none;opacity:1;transfor
 .bgm-download:hover{border-color:var(--c-accent)}
 .bgm-download small{font-size:9px;color:var(--c-muted)}
 @media(max-width:560px){.bgm-row{grid-template-columns:auto minmax(0,1fr);padding:12px}.bgm-download{grid-column:2;justify-self:start}}
+
+/* ── home: compact character cards, tap for the full profile ── */
+.character-grid.is-cards{grid-template-columns:repeat(2,minmax(0,1fr));gap:22px}
+.is-cards .character{position:relative;cursor:pointer}
+.is-cards .character-image{height:auto;aspect-ratio:16/10}
+.is-cards .character-info{padding:20px 22px 22px}
+.is-cards .character-info h3{font-size:clamp(20px,2.4vw,28px);margin-bottom:8px}
+.is-cards .character-info>p{font-size:12px;line-height:1.9}
+.character-open{display:inline-flex;align-items:center;gap:10px;margin-top:14px;padding:8px 16px;border:1px solid var(--c-border-strong);border-radius:30px;background:color-mix(in srgb,var(--c-bg) 50%,transparent);color:var(--c-text);font:inherit;font-size:12px;font-weight:700;cursor:pointer;transition:background .2s,box-shadow .2s}
+.character-open span{color:var(--c-mint);font-size:15px;line-height:1}
+.character-open::after{content:'';position:absolute;inset:0;z-index:4;border-radius:var(--radius)}
+.character:hover .character-open,.character-open:focus-visible{background:var(--lavender);box-shadow:0 0 22px -6px var(--c-accent)}
+.is-cards .character-detail{display:none}
+.character-dialog{width:min(760px,calc(100% - 24px));max-height:calc(100dvh - 32px);padding:0;border:1px solid var(--c-border-strong);border-radius:var(--radius);background:var(--c-bg-2,#120f26);color:var(--c-text);overflow:hidden}
+.character-dialog[open]{display:flex;flex-direction:column}
+.character-dialog-scroll{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
+.character-dialog::backdrop{background:rgba(6,5,20,.7);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
+.character-dialog[open]{animation:character-pop .35s cubic-bezier(.2,.9,.2,1)}
+@keyframes character-pop{from{opacity:0;translate:0 24px;scale:.97}}
+.character-dialog .character{border:0;border-radius:0;background:transparent;box-shadow:none;cursor:auto}
+.character-dialog .character:hover{box-shadow:none}
+.character-dialog .character-image{height:auto;aspect-ratio:16/9}
+.character-dialog .character-detail{display:block}
+.character-dialog-close{position:absolute;top:12px;right:12px;z-index:6;width:40px;height:40px;border:1px solid var(--c-border-strong);border-radius:50%;background:color-mix(in srgb,var(--c-bg) 80%,transparent);color:var(--c-text);font-size:18px;cursor:pointer;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+body.character-open-lock{overflow:hidden}
+@media(max-width:560px){
+  .character-grid.is-cards{grid-template-columns:1fr 1fr;gap:12px}
+  .is-cards .character-image{aspect-ratio:4/5}
+  .is-cards.character-grid .ranpyon .character-image>img{object-position:42% 30%}
+  .is-cards.character-grid .pyonpy .character-image>img{object-position:44% 50%}
+  .is-cards .character-logo{width:78%;left:8%;bottom:4%}
+  .is-cards .character-number{font-size:7px;top:10px;left:10px;padding:3px 6px}
+  .is-cards .character-role{font-size:9px;right:8px;top:10px;bottom:auto;padding:4px 8px}
+  .is-cards .character-info{padding:14px 12px 14px}
+  .is-cards .english-name{font-size:9px;letter-spacing:1px}
+  .is-cards .character-info h3{font-size:19px}
+  .is-cards .character-info>p{font-size:10px;line-height:1.8}
+  .is-cards .character-info>p br{display:none}
+  .character-open{width:100%;justify-content:center;padding:8px 10px;font-size:11px}
+  .character-dialog{width:100%;max-width:none;max-height:92dvh;margin:auto 0 0;border-radius:var(--radius) var(--radius) 0 0;border-bottom:0}
+  .character-dialog[open]{animation-name:character-sheet}
+  .character-dialog .character-info{padding:22px 20px 30px}
+}
+@keyframes character-sheet{from{translate:0 100%}}
+@media(prefers-reduced-motion:reduce){.character-dialog[open]{animation:none}}
+
+/* ── home: link to the friends page ── */
+.friends-teaser{position:relative;display:flex;align-items:center;gap:22px;margin-top:40px;padding:18px 22px;border:1px solid var(--c-border-strong);border-radius:var(--radius);background:var(--c-surface);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);color:var(--c-text);text-decoration:none;transition:border-color .3s,box-shadow .3s,translate .3s}
+.friends-teaser:hover{border-color:var(--c-accent);box-shadow:0 0 0 1px var(--c-accent),0 30px 70px -36px var(--c-glow);translate:0 -3px}
+.friends-teaser-faces{display:flex;flex:none}
+.friends-teaser-faces img{width:64px;height:64px;border-radius:50%;object-fit:cover;object-position:center 20%;border:2px solid var(--c-bg-2,#120f26);box-shadow:0 0 0 1px var(--c-border-strong)}
+.friends-teaser-faces img+img{margin-left:-18px}
+.friends-teaser-copy{display:flex;flex-direction:column;gap:4px;min-width:0}
+.friends-teaser-copy small{font:10px var(--mono);letter-spacing:1.5px;color:var(--c-accent)}
+.friends-teaser-copy b{font-size:clamp(16px,2vw,22px);font-weight:900}
+.friends-teaser-copy>span{font-size:12px;color:var(--c-muted)}
+.friends-teaser>i{margin-left:auto;font-style:normal;font-size:22px;color:var(--c-mint)}
+@media(max-width:560px){.friends-teaser{gap:14px;padding:14px 16px;margin-top:28px}.friends-teaser-faces img{width:44px;height:44px}.friends-teaser-faces img+img{margin-left:-14px}.friends-teaser-copy>span{font-size:10px}}
+
+/* ── friends page ── */
+.friends-page-section{padding-top:clamp(40px,7vw,90px)}
+.friends-page-section .friends{margin-top:0}
+.friends-page-section .friends-head h1{font-size:clamp(28px,4.4vw,52px);font-weight:900;line-height:1.35}
+.friends-page-section .friends-head h1>span{background:var(--holo-text);background-size:220% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;animation:holo-pan 9s linear infinite}
+
+/* ── sub-page nav: scroll sideways on phones instead of squeezing ── */
+@media(max-width:760px){
+  .friends-page .site-header{flex-wrap:wrap;row-gap:10px}
+  .page-nav{justify-content:flex-start;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+  .page-nav::-webkit-scrollbar{display:none}
+  .page-nav a{flex:0 0 auto;padding:7px 13px}
+}
+.character-dialog .character{animation:none!important;translate:none!important}
