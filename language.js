@@ -427,6 +427,7 @@
     '準備中。':'on the way.',
     '新しい曲ができたら、ここに並べていきます。':'New songs will be added here as they are finished.',
     '・インスト':' / Instrumentals', '歌のない曲は、ここにまとめています。':'Songs without vocals are gathered here.', 'どれも自由にダウンロードできます。':'All of them are free to download.', 'ぴょんスターハンター オープニングテーマ':'Pyonster Hunter Opening Theme', 'ぴょんスターハンター 戦闘シーン':'Pyonster Hunter Battle Theme',
+    'ぴょんぴーの大冒険のプレイ動画':'Pyonpy’s Big Adventure gameplay video',
     '宇宙に浮かぶラーメン屋台の宇宙船':'A ramen-stall spaceship floating in space', '3Dアニメ劇場':'3D Anime Theater'
   });
   function resolveLanguage(saved, languages, requested) {
