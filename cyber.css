@@ -1224,3 +1224,12 @@ body.character-open-lock{overflow:hidden}
   .game-title img{width:min(88%,440px)}
 }
 .game-guide-link{flex-basis:100%;color:var(--c-accent);font-size:13px;font-weight:800;text-decoration:none}
+
+/* Phones: title logo sits small in the empty sky, left of Pyonpy, so he stays visible. */
+@media(max-width:860px){
+  .game-hero{padding-top:calc(min(86vw,580px) - 24px)}
+  .game-hero .section-wrap,.game-hero .game-hero-grid,.game-hero .game-hero-text{position:static;transform:none;translate:none;filter:none}
+  .anime-page .game-hero .game-hero-grid>.game-hero-text{animation:none}
+  .game-hero .game-title{position:absolute;z-index:2;top:calc(min(86vw,580px) * .07);left:5%;width:62%;max-width:380px;margin:0!important;justify-content:flex-start}
+  .game-hero .game-title img{width:100%}
+}

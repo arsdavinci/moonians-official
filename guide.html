@@ -1,72 +1,12 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ja">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <meta name="theme-color" content="#080717">
-  <title>ぴょんぴーの大冒険 図鑑・攻略｜武器・アイテム・敵・ワールド</title>
-  <meta name="description" content="ブラウザゲーム「ぴょんぴーの大冒険」の図鑑・攻略ページ。月と星の武器16しゅるい、合成のしかた、よろず屋のアイテム、敵とボス、6つのワールド、攻略のコツをまとめました。">
-  <meta property="og:type" content="website">
-  <meta property="og:title" content="ぴょんぴーの大冒険 図鑑・攻略">
-  <meta property="og:image" content="https://arsdavinci.github.io/moonians-official/assets/game/title-thumb.jpg">
-  <meta name="twitter:card" content="summary_large_image">
-  <link rel="canonical" href="https://arsdavinci.github.io/moonians-official/guide.html">
-  <link rel="icon" href="assets/embassy.png" type="image/png">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=DotGothic16&family=M+PLUS+Rounded+1c:wght@700;800;900&family=Noto+Sans+JP:wght@400;500;600;700;800;900&family=Unbounded:wght@700;900&display=swap" rel="stylesheet">
-  <style>@import url("style.css?v=20261110-2") layer(legacy);@import url("experience.css?v=20261110-18") layer(legacy);@import url("language.css?v=20261110-12") layer(legacy);</style>
-  <link rel="stylesheet" href="cyber.css?v=20261112-17">
-  <script src="language.js?v=20261112-17"></script>
-  <link rel="stylesheet" href="guide.css?v=20261112-2">
-  <script src="guide.js?v=20261112-2" defer></script>
-  <script src="cyber.js?v=20261112-13" defer></script>
+  <title>ぴょんぴーの大冒険 図鑑・攻略</title>
+  <meta name="robots" content="noindex">
+  <link rel="canonical" href="https://arsdavinci.github.io/moonians-official/game.html#guide">
+  <meta http-equiv="refresh" content="0; url=game.html#guide">
+  <script>location.replace('game.html' + (location.hash.length > 1 ? '#guide-' + location.hash.slice(1) : '#guide'));</script>
 </head>
-<body class="anime-page friends-page guide-page">
-  <script>(function(){var n=true;try{n=JSON.parse(localStorage.getItem("moonians.night"))!==false}catch(e){}if(n)document.body.classList.add("site-night")})()</script>
-  <a class="skip" href="#main">本文へ進む</a>
-  <div class="signal-bar"><span>MOONIANS GAME / FIELD GUIDE</span><span><i class="status-dot"></i> 今日も、地球と交信中。</span><span class="moon-age" data-moon-age>35° → ∞</span></div>
-  <header class="site-header">
-    <a class="brand" href="./" data-language-link aria-label="ムーニアンズ ホーム"><img src="assets/logo.png?v=20261110-11" alt="ムーニアンズ" width="2421" height="833"></a>
-    <nav class="page-nav" aria-label="ページ"><a href="./" data-language-link>ホーム</a><a href="friends.html" data-language-link>愉快な仲間たち</a><a href="anime.html" data-language-link>3Dアニメ</a><a href="game.html" data-language-link>ゲーム</a><a href="guide.html" data-language-link aria-current="page">図鑑・攻略</a><a href="music.html" data-language-link>音楽</a><a href="lab.html" data-language-link>制作ラボ</a></nav>
-    <div class="language-switch" data-language-switch role="group" aria-label="Language / 言語"><button type="button" data-language="ja" lang="ja" aria-pressed="true">日本語</button><button type="button" data-language="en" lang="en" aria-pressed="false">EN</button></div>
-  </header>
-  <main id="main">
-    <section class="guide-hero">
-      <img class="guide-hero-bg" src="assets/game/title-keyvisual.jpg?v=2" alt="" width="1672" height="941" fetchpriority="high">
-      <div class="section-wrap guide-hero-copy">
-        <p class="eyebrow">PYONPY'S BIG ADVENTURE / FIELD GUIDE</p>
-        <h1><img src="assets/game/title-logo.webp" alt="ぴょんぴーの大冒険" width="1100" height="698"><span>ずかん・こうりゃく</span></h1>
-        <p class="guide-lead">武器、アイテム、敵、ワールドのことがぜんぶわかる。<br>こまったときは、ここを見てな。</p>
-        <a class="button guide-play" href="https://arsdavinci.github.io/pyon-p-adventure/" target="_blank" rel="noopener noreferrer">いますぐあそぶ <span>▶</span></a>
-      </div>
-    </section>
-
-    <nav class="guide-tabs" aria-label="図鑑のもくじ"><div class="guide-tabs-inner" role="tablist">
-      <button type="button" role="tab" data-tab="weapons" aria-selected="true">武器</button>
-      <button type="button" role="tab" data-tab="fusion" aria-selected="false">合成</button>
-      <button type="button" role="tab" data-tab="shop" aria-selected="false">よろず屋</button>
-      <button type="button" role="tab" data-tab="foes" aria-selected="false">敵・ボス</button>
-      <button type="button" role="tab" data-tab="worlds" aria-selected="false">ワールド</button>
-      <button type="button" role="tab" data-tab="tips" aria-selected="false">攻略のコツ</button>
-    </div></nav>
-
-    <div class="section-wrap guide-body" id="guide-body">
-      <noscript><p class="guide-note">図鑑を見るには、JavaScript をオンにしてください。</p></noscript>
-      <section class="guide-panel" id="panel-weapons" role="tabpanel" data-panel="weapons"><h2 class="guide-h2"><small>WEAPONS</small>武器図鑑</h2><p class="guide-intro">武器は「月🌙」と「星⭐」の2種類で、それぞれ Lv1〜Lv8。同じ武器を2つ合成すると、1つ上のレベルの武器になる。</p><dl class="guide-legend"><div><dt>攻撃</dt><dd>1発のダメージ</dd></div><div><dt>とどく</dt><dd>弾がとどくきょり</dd></div><div><dt>連射</dt><dd>1秒に撃てる回数</dd></div><div><dt>弾の数</dt><dd>1回に出る弾の数</dd></div></dl><div data-slot="weapons"></div></section>
-      <section class="guide-panel" id="panel-fusion" role="tabpanel" data-panel="fusion" hidden><h2 class="guide-h2"><small>FUSION</small>合成のしかた</h2><div data-slot="fusion"></div></section>
-      <section class="guide-panel" id="panel-shop" role="tabpanel" data-panel="shop" hidden><h2 class="guide-h2"><small>GENERAL STORE</small>よろず屋のアイテム図鑑</h2><div data-slot="shop"></div></section>
-      <section class="guide-panel" id="panel-foes" role="tabpanel" data-panel="foes" hidden><h2 class="guide-h2"><small>ENEMIES &amp; BOSSES</small>敵・ボス図鑑</h2><p class="guide-intro">ボスは6人、ふつうの敵は6しゅるい（1ワールドに1しゅるい）。絵をさわると、攻撃の姿にかわるで。</p><div data-slot="foes"></div></section>
-      <section class="guide-panel" id="panel-worlds" role="tabpanel" data-panel="worlds" hidden><h2 class="guide-h2"><small>6 PLANETS</small>ワールド紹介</h2><div data-slot="worlds"></div></section>
-      <section class="guide-panel" id="panel-tips" role="tabpanel" data-panel="tips" hidden><h2 class="guide-h2"><small>HOW TO PLAY</small>攻略のコツ</h2><div data-slot="tips"></div></section>
-
-      <aside class="guide-more">
-        <p class="guide-more-title">キャラクターのこと、もっと知りたい？</p>
-        <div class="guide-more-links"><a href="./#characters" data-language-link>ぴょんぴー・らんぴょん</a><a href="friends.html" data-language-link>ヤナビス・ザ・ルーヴァ・セレスと、愉快な仲間たち</a><a href="game.html" data-language-link>ゲームのしょうかい</a></div>
-        <a class="button guide-play" href="https://arsdavinci.github.io/pyon-p-adventure/" target="_blank" rel="noopener noreferrer">いますぐあそぶ <span>▶</span></a>
-      </aside>
-    </div>
-  </main>
-  <footer><div class="section-wrap footer-top"><a class="brand" href="./" data-language-link aria-label="ムーニアンズ ホーム"><img src="assets/logo.png?v=20261110-11" alt="ムーニアンズ" width="2421" height="833" loading="lazy"></a><p>地球を愛で満たそう。<br><span>FROM THE MOON, WITH LOVE.</span></p><a class="back-top" href="#main" aria-label="ページの先頭へ戻る">↑</a></div><div class="section-wrap footer-bottom"><small>© 2026 MOONIANS</small><a data-language-link href="./">← ムーニアンズの街へ戻る</a><span>MADE ON EARTH. LOVED ON THE MOON.</span></div><div class="footer-giant" aria-hidden="true">MOONIANS</div></footer>
-</body>
+<body><p><a href="game.html#guide">ゲームのページの「図鑑と攻略」へ移動しました。</a></p></body>
 </html>

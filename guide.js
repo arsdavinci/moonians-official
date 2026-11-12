@@ -29,19 +29,24 @@
     var strip = active.parentElement;
     strip.scrollLeft = active.offsetLeft - (strip.clientWidth - active.offsetWidth) / 2;
     if (scroll) {
-      var top = document.querySelector('.guide-tabs').getBoundingClientRect().top + window.scrollY - 70;
-      if (window.scrollY > top) window.scrollTo({ top: top, behavior: 'smooth' });
+      var head = header && /sticky|fixed/.test(getComputedStyle(header).position) ? header.offsetHeight : 0;
+      var anchor = scroll === 'force' ? (document.getElementById('guide') || strip.parentElement) : strip.parentElement;
+      var top = anchor.getBoundingClientRect().top + window.scrollY - head - 8;
+      if (scroll === 'force' || window.scrollY > top) window.scrollTo({ top: top, behavior: scroll === 'force' ? 'auto' : 'smooth' });
     }
   }
   tabs.forEach(function (t) {
     t.id = 'tab-' + t.dataset.tab;
     t.setAttribute('aria-controls', 'panel-' + t.dataset.tab);
-    t.addEventListener('click', function () { openTab(t.dataset.tab, true); history.replaceState(null, '', '#' + t.dataset.tab); });
+    t.addEventListener('click', function () { openTab(t.dataset.tab, true); history.replaceState(null, '', '#guide-' + t.dataset.tab); });
   });
-  openTab(location.hash.slice(1), false);
-  window.addEventListener('hashchange', function () { openTab(location.hash.slice(1), true); });
+  // Links like game.html#guide-shop open that tab.
+  function fromHash() { var m = /^#guide-(\w+)$/.exec(location.hash); return m ? m[1] : null; }
+  openTab(fromHash() || 'weapons', false);
+  if (fromHash()) window.addEventListener('load', function () { setTimeout(function () { openTab(fromHash(), 'force'); }, 300); });
+  window.addEventListener('hashchange', function () { if (fromHash()) openTab(fromHash(), 'force'); });
 
-  fetch('guide-data.json?v=20261112-2').then(function (r) { return r.json(); }).then(render).catch(function () {
+  fetch('guide-data.json?v=20261112-3').then(function (r) { return r.json(); }).then(render).catch(function () {
     document.getElementById('guide-body').insertAdjacentHTML('afterbegin', '<p class="guide-note">図鑑のデータを読みこめませんでした。ページを読みなおしてみてな。</p>');
   });
 
@@ -84,8 +89,9 @@
     });
     html += '<h3 class="guide-h3 is-special"><small>SPECIAL VEHICLES</small>とくべつな乗り物</h3><div class="g-vehicles">' +
       d.vehicles.map(function (v) {
-        return '<article class="g-card g-vehicle"><button class="g-pic g-swap" type="button" data-swap="' + v.alt + '" aria-pressed="false" aria-label="' + esc(v.name) + 'の絵をきりかえる">' + img(v.img, v.name) + '<span class="g-tap" aria-hidden="true">さわってみて</span></button>' +
-          '<div class="g-vehicle-body"><span class="g-badge">' + img(v.icon, '', 'g-icon') + 'とくべつ</span><h4>' + esc(v.name) + '<small translate="no">' + esc(v.en) + '</small></h4>' +
+        // Secret: show only the silhouette.
+        return '<article class="g-card g-vehicle"><div class="g-pic g-secret-pic">' + img(v.img, v.name + 'のシルエット', 'g-secret') + '<span class="g-q" aria-hidden="true">？</span></div>' +
+          '<div class="g-vehicle-body"><span class="g-badge is-secret">SECRET ／ シークレット</span><h4>' + esc(v.name) + '<small translate="no">' + esc(v.en) + '</small></h4>' +
           '<p class="g-recipe"><span>作り方</span>' + esc(v.recipe) + '</p><p>' + esc(v.text) + '</p></div></article>';
       }).join('') + '</div>';
     slot('weapons').innerHTML = html;
@@ -95,8 +101,8 @@
   function renderFusion(f) {
     var html = '<ol class="g-steps">' + f.how.map(function (t) { return '<li>' + esc(t) + '</li>'; }).join('') + '</ol>';
     html += '<div class="g-card g-fuse-demo" aria-hidden="true"><span class="g-fuse-w">' + img('weapon-moon-01-moon-popper', '') + '<b>Lv1</b></span><em>＋</em><span class="g-fuse-w">' + img('weapon-moon-01-moon-popper', '') + '<b>Lv1</b></span><em>→</em><span class="g-fuse-w is-up">' + img('weapon-moon-02-twinmoon-shooter', '') + '<b>Lv2</b></span></div>';
-    html += '<div class="g-card g-fuse-special"><p><span>' + img('weapon-moon-08-moonian-nova', '') + '🌙Lv8</span><em>＋</em><span>' + img('weapon-star-08-stellar-guardian-cannon', '') + '⭐Lv8</span><em>→</em><span>' + img('weapon-mech-icon', '') + 'ロボット</span></p>' +
-      '<p><span>' + img('weapon-mech-icon', '') + 'ロボット</span><em>＋</em><span>' + img('weapon-mech-icon', '') + 'ロボット</span><em>→</em><span>' + img('weapon-fighter-icon', '') + '戦闘機</span></p></div>';
+    html += '<div class="g-card g-fuse-special"><p><span>' + img('weapon-moon-08-moonian-nova', '') + '🌙Lv8</span><em>＋</em><span>' + img('weapon-star-08-stellar-guardian-cannon', '') + '⭐Lv8</span><em>→</em><span>' + img('weapon-mech-icon', '', 'g-secret') + 'ロボット</span></p>' +
+      '<p><span>' + img('weapon-mech-icon', '', 'g-secret') + 'ロボット</span><em>＋</em><span>' + img('weapon-mech-icon', '', 'g-secret') + 'ロボット</span><em>→</em><span>' + img('weapon-fighter-icon', '', 'g-secret') + '戦闘機</span></p></div>';
     html += '<h3 class="guide-h3"><small>HOW MANY?</small>Lv1 だけで作ると、なんこいる？</h3><div class="g-ladder">' +
       f.ladder.map(function (l) { return '<div class="g-card g-rung"><p><b>Lv' + l.lv + '</b>には Lv1 が <strong>' + l.need + 'こ</strong></p><div class="g-dots n' + l.need + '" aria-hidden="true">' + dots(l.need) + '</div></div>'; }).join('') + '</div>';
     html += '<h3 class="guide-h3"><small>DROP RULES</small>出てくる武器のルール</h3><ul class="g-rules">' + f.rules.map(function (t) { return '<li>' + esc(t) + '</li>'; }).join('') + '</ul>' +
