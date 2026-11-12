@@ -115,7 +115,35 @@
   const players = [card, flyout];
   const pagePlay = [...document.querySelectorAll('[data-music-page-play]')];
   const lyricList = document.querySelector('[data-lyrics]');
-  const LYRICS = window.MoonLyrics || [];
+  const THEME_LYRICS = window.MoonLyrics || [];
+  // Page buttons may name their own track (data-track-src etc.); without one they play the theme song.
+  const titleEl = card.querySelector('.music-song-title');
+  const kickerEl = card.querySelector('.music-kicker');
+  const themeTrack = {src: audio.dataset.src, title: titleEl?.textContent || 'ぼくらはムーニアンズ', kicker: kickerEl?.textContent || '', length: 185.716757, lyrics: true};
+  const trackOf = button => button.dataset.trackSrc
+    ? {src: button.dataset.trackSrc, title: button.dataset.trackTitle || themeTrack.title, kicker: button.dataset.trackKicker || themeTrack.kicker, length: Number(button.dataset.trackLength) || 0, lyrics: false}
+    : themeTrack;
+  let track = themeTrack;
+  let LYRICS = THEME_LYRICS;
+  function mediaTitle() {
+    if (!('mediaSession' in navigator && 'MediaMetadata' in window)) return;
+    try { navigator.mediaSession.metadata = new MediaMetadata({title:window.MoonLanguage.t(track.title),artist:window.MoonLanguage.t('ムーニアンズ')}); } catch { /* Optional. */ }
+  }
+  function switchTrack(next) {
+    if (next.src === track.src) return;
+    track = next;
+    LYRICS = next.lyrics ? THEME_LYRICS : [];
+    lyricIndex = -2;
+    audio.pause();
+    audio.dataset.src = next.src;
+    audio.src = next.src;
+    stopped = true;
+    if (titleEl) titleEl.textContent = next.title;
+    if (kickerEl) kickerEl.textContent = next.kicker;
+    each('.music-song-title', el => { el.textContent = next.title; });
+    mediaTitle();
+    updateProgress();
+  }
   let lyricIndex = -2;
   if (lyricList) {
     lyricList.innerHTML = LYRICS.map(([time, text], index) => text
@@ -154,9 +182,44 @@
     if (audio.readyState >= 1) jump(); else audio.addEventListener('loadedmetadata', jump, {once:true});
     if (audio.paused) play();
   }
+  // A timeline on every track card: drag anywhere to play that track from there.
+  const pageSeeks = [...document.querySelectorAll('[data-track-seek]')].map(input => {
+    const box = input.closest('.track');
+    const button = box?.querySelector('[data-music-page-play]');
+    return {input, box, info: button ? trackOf(button) : themeTrack, elapsed: box?.querySelector('[data-track-elapsed]'), held: false};
+  });
+  function updatePageSeeks(time, length) {
+    pageSeeks.forEach(seek => {
+      const current = seek.info.src === track.src;
+      const max = current ? length : (seek.info.length || Number(seek.input.max) || 1);
+      const at = current ? Math.min(time, max) : 0;
+      seek.input.max = String(max);
+      if (!seek.held) seek.input.value = String(at);
+      const shown = seek.held ? Number(seek.input.value) : at;
+      seek.input.style.setProperty('--range-fill', `${Math.min(100, shown / max * 100)}%`);
+      seek.input.setAttribute('aria-valuetext', `${formatTime(shown)} / ${formatTime(Math.ceil(max))}`);
+      if (seek.elapsed) seek.elapsed.textContent = formatTime(shown);
+    });
+  }
+  pageSeeks.forEach(seek => {
+    seek.input.addEventListener('pointerdown', () => { seek.held = true; });
+    seek.input.addEventListener('input', () => {
+      const time = Number(seek.input.value);
+      if (seek.elapsed) seek.elapsed.textContent = formatTime(time);
+      seek.input.style.setProperty('--range-fill', `${Math.min(100, time / Number(seek.input.max) * 100)}%`);
+      if (seek.info.src !== track.src) { switchTrack(seek.info); setFloatHidden(false); }
+      seekTo(time);
+    });
+    const release = () => { seek.held = false; updateProgress(); };
+    seek.input.addEventListener('change', release);
+    seek.input.addEventListener('pointerup', release);
+    seek.input.addEventListener('pointercancel', release);
+  });
   const each = (selector, callback) => players.forEach(player => player.querySelectorAll(selector).forEach(callback));
+  // Volume controls live in the players and on every track card; they all share one volume.
+  const eachVolume = (selector, callback) => { each(selector, callback); document.querySelectorAll(`.track ${selector}`).forEach(callback); };
   let seekingInput = null;
-  const duration = () => Number.isFinite(audio.duration) && audio.duration > 0 ? audio.duration : 185.716757;
+  const duration = () => Number.isFinite(audio.duration) && audio.duration > 0 ? audio.duration : (track.length || 185.716757);
   const formatTime = seconds => {
     const time = Math.max(0, Math.floor(Number.isFinite(seconds) ? seconds : 0));
     return `${Math.floor(time / 60)}:${String(time % 60).padStart(2, '0')}`;
@@ -165,6 +228,7 @@
     const time = audio.currentTime || 0;
     const length = duration();
     updateLyrics(time);
+    updatePageSeeks(time, length);
     each('[data-music-elapsed]', el => { el.textContent = formatTime(time); });
     each('[data-music-duration]', el => { el.textContent = formatTime(Math.ceil(length)); });
     each('[data-music-seek]', input => {
@@ -182,13 +246,13 @@
     if (gain && context) gain.gain.setTargetAtTime(volume, context.currentTime, .03);
     else audio.volume = volume;
     const percent = Math.round(volume * 100);
-    each('[data-music-volume]', input => {
+    eachVolume('[data-music-volume]', input => {
       input.value = String(percent);
       input.setAttribute('aria-valuetext', `${percent}%`);
       input.style.setProperty('--range-fill', `${percent}%`);
     });
-    each('[data-music-volume-output]', output => { output.textContent = `${percent}%`; });
-    each('[data-music-mute]', button => {
+    eachVolume('[data-music-volume-output]', output => { output.textContent = `${percent}%`; });
+    eachVolume('[data-music-mute]', button => {
       button.setAttribute('aria-pressed', String(volume === 0));
       button.setAttribute('aria-label', volume === 0 ? 'ミュートを解除する' : 'ミュートする');
       button.classList.toggle('is-muted', volume === 0);
@@ -225,9 +289,11 @@
     bubble.classList.toggle('is-playing', playing);
     document.body.classList.toggle('music-playing', playing && !waiting);
     pagePlay.forEach(button => {
-      button.setAttribute('aria-label', playing ? '音楽を一時停止する' : '音楽を再生する');
-      const icon = button.querySelector('[data-music-play-icon]'); if (icon) icon.textContent = playing ? 'Ⅱ' : '▶';
-      const label = button.querySelector('[data-music-play-label]'); if (label) label.textContent = playing ? '一時停止' : '再生する';
+      const mine = playing && trackOf(button).src === track.src;
+      button.setAttribute('aria-label', mine ? '音楽を一時停止する' : '音楽を再生する');
+      button.closest('.track')?.classList.toggle('is-current-track', mine && !waiting);
+      const icon = button.querySelector('[data-music-play-icon]'); if (icon) icon.textContent = mine ? 'Ⅱ' : '▶';
+      const label = button.querySelector('[data-music-play-label]'); if (label) label.textContent = mine ? '一時停止' : '再生する';
     });
     dockButton.setAttribute('aria-label', playing ? '再生中の音楽プレーヤーを開く' : '音楽プレーヤーを開く');
     each('[data-music-play]', button => {
@@ -288,16 +354,18 @@
     else play();
   }));
   pagePlay.forEach(button => button.addEventListener('click', () => {
-    if (!audio.paused && !audio.ended) { waiting = false; audio.pause(); }
+    const next = trackOf(button);
+    if (next.src !== track.src) { switchTrack(next); setFloatHidden(false); play(); }
+    else if (!audio.paused && !audio.ended) { waiting = false; audio.pause(); }
     else { setFloatHidden(false); play(); }
   }));
   each('[data-music-stop]', button => button.addEventListener('click', stop));
-  each('[data-music-volume]', input => input.addEventListener('input', () => {
+  eachVolume('[data-music-volume]', input => input.addEventListener('input', () => {
     volume = Number(input.value) / 100;
     if (volume > 0) lastAudibleVolume = volume;
     updateVolume();
   }));
-  each('[data-music-mute]', button => button.addEventListener('click', () => {
+  eachVolume('[data-music-mute]', button => button.addEventListener('click', () => {
     if (volume > 0) { lastAudibleVolume = volume; volume = 0; }
     else volume = lastAudibleVolume;
     updateVolume();
@@ -367,7 +435,7 @@
 
   if ('mediaSession' in navigator && 'MediaMetadata' in window) {
     try {
-      navigator.mediaSession.metadata = new MediaMetadata({title:window.MoonLanguage.t('ぼくらはムーニアンズ'),artist:window.MoonLanguage.t('ムーニアンズ')});
+      mediaTitle();
       navigator.mediaSession.setActionHandler('play', play);
       navigator.mediaSession.setActionHandler('pause', () => audio.pause());
       navigator.mediaSession.setActionHandler('stop', stop);
@@ -376,9 +444,7 @@
   document.addEventListener('moonians:languagechange', () => {
     render();
     updateVolume();
-    if ('mediaSession' in navigator && 'MediaMetadata' in window) {
-      navigator.mediaSession.metadata = new MediaMetadata({title:window.MoonLanguage.t('ぼくらはムーニアンズ'),artist:window.MoonLanguage.t('ムーニアンズ')});
-    }
+    mediaTitle();
   });
   updateVolume();
   render();
