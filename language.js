@@ -434,6 +434,11 @@
     '新しい曲ができたら、ここに並べていきます。':'New songs will be added here as they are finished.',
     '・インスト':' / Instrumentals', '歌のない曲は、ここにまとめています。':'Songs without vocals are gathered here.', 'どれも自由にダウンロードできます。':'All of them are free to download.', 'ぴょんスターハンター オープニングテーマ':'Pyonster Hunter Opening Theme', 'ぴょんスターハンター 戦闘シーン':'Pyonster Hunter Battle Theme',
     'ぴょんぴーの大冒険のプレイ動画':'Pyonpy’s Great Adventure gameplay video',
+    'うさ耳と三日月の髪飾りに、紫と金の十二単のような衣装をまとい、扇を持って微笑むかぐや様。窓の外には月面と地球':'Princess Kaguya smiling with a fan, wearing bunny ears, a crescent hair ornament and layered purple-and-gold robes, with the lunar surface and Earth outside the window',
+    '月の宮の皇族':'Royal of the Moon Palace',
+    'かぐや様':'Princess Kaguya',
+    '月の宮に住む、皇族のお姫さま。三日月の髪飾りに、竹と月の模様の衣をまとい、手には扇。そして、ぴょんぴーの好きな人です。':'A princess of the royal family who lives in the Moon Palace. She wears a crescent hair ornament and robes patterned with bamboo and moons, and carries a fan. She is also the one Pyonpy has a crush on.',
+    '月の宮':'Moon Palace',
     '宇宙に浮かぶラーメン屋台の宇宙船':'A ramen-stall spaceship floating in space', '3Dアニメ劇場':'3D Anime Theater'
   });
   function resolveLanguage(saved, languages, requested) {
