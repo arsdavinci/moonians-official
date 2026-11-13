@@ -491,6 +491,12 @@
     for (const child of node.childNodes) walk(child);
   }
   function updateBrand() {
+    // Images with a separate English version: <img src="ja" data-src-en="en">
+    document.querySelectorAll('img[data-src-en]').forEach(img => {
+      if (!img.dataset.srcJa) img.dataset.srcJa = img.getAttribute('src');
+      const next = language === 'en' ? img.dataset.srcEn : img.dataset.srcJa;
+      if (img.getAttribute('src') !== next) img.setAttribute('src', next);
+    });
     document.querySelectorAll('.brand img').forEach(img => {
       img.src = language === 'en' ? 'assets/logo-english.png?v=20261110-12' : 'assets/logo.png?v=20261110-11';
       img.width = language === 'en' ? 1024 : 2421;
