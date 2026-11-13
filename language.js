@@ -65,7 +65,7 @@
     '愉快な仲間たち':'Moon friends', 'ムーニアンズの、愉快な仲間たち':'The Moonians’ merry friends', 'DJらむね、ピーティープティ、グルーパーたちに会いに行く':'Meet DJ Ramune, PT, Grouper and the gang',
     '← らんぴょんとぴょんぴーに会いに戻る':'← Back to Ranpyon and Pyonpy', 'ムーニアンズの愉快な仲間たち｜三日月大使館のまわりの人たち':'Moonians’ merry friends | Around the Crescent Embassy',
     'タップで話しかけてな':'Tap to say hi', 'つづきはゲームで ↗':'Continue in the game ↗', 'もう一回きく':'Hear it again', 'フェス前の楽屋。ネタ合わせをする、らんぴょんとぴょんぴー':'The dressing room before the Fest: Ranpyon and Pyonpy rehearsing',
-    'ぴょんぴーの大冒険 〜ワライスターをとりもどせ〜':'Pyonpy’s Big Adventure: Take Back the Laugh Stars',
+    'ぴょんぴーの大冒険 〜ワライスターをとりもどせ〜':'Pyonpy’s Great Adventure: Bring Back the Warai Star',
     '図鑑・攻略':'Field guide', '図鑑・攻略を見る →':'Open the field guide →'
   };
   Object.assign(copy, {
@@ -192,9 +192,9 @@
     'グルーヴィア星って？':'What is Planet Groovia?',
     '星じゅうがひとつの巨大なスピーカーになっている、音楽の星。あいさつはビートボックス、ケンカはラップバトルで決着をつけるのがルール。グルーパーは胸のスピーカーと両目のスピーカーで、いつでもどこでもライブができます。':'A music planet where the whole world is one giant speaker. Hellos are beatboxed, and fights are settled by rap battle. With the speaker in his chest and the speakers for eyes, Grouper can put on a live show anytime, anywhere.',
     'グルーパーのキャラクターモデルシート。三面図と、頭部CDプレーヤーのディテール。':'Grouper’s character model sheet: three views and a close-up of the CD player in his head.', 'グルーパーのキャラクターモデルシート。正面・側面・背面の三面図と、フタが開く頭部CDプレーヤーの解説':'Grouper’s character model sheet, with front, side and back views and the head’s flip-open CD player.',
-    'ぴょんぴーの大冒険｜ムーニアンズのゲーム':'Pyonpy’s Big Adventure | The Moonians Game',
-    'ムーニアンズのアクションゲーム「ぴょんぴーの大冒険 〜ワライスターをとりもどせ〜」。ブラウザで無料で遊べます。6つの星、全35ステージ。':'The Moonians action game “Pyonpy’s Big Adventure: Bring Back the Warai Star”. Free to play in your browser. Six planets, 35 stages.',
-    'ぴょんぴーの大冒険':'Pyonpy’s Big Adventure', '〜ワライスターをとりもどせ〜':'Bring Back the Warai Star', 'ぴょんぴーの大冒険のキービジュアル':'Key visual of Pyonpy’s Big Adventure',
+    'ぴょんぴーの大冒険｜ムーニアンズのゲーム':'Pyonpy’s Great Adventure | The Moonians Game',
+    'ムーニアンズのアクションゲーム「ぴょんぴーの大冒険 〜ワライスターをとりもどせ〜」。ブラウザで無料で遊べます。6つの星、全35ステージ。':'The Moonians action game “Pyonpy’s Great Adventure: Bring Back the Warai Star”. Free to play in your browser. Six planets, 35 stages.',
+    'ぴょんぴーの大冒険':'Pyonpy’s Great Adventure', '〜ワライスターをとりもどせ〜':'Bring Back the Warai Star', 'ぴょんぴーの大冒険のキービジュアル':'Key visual of Pyonpy’s Great Adventure',
     '宇宙じゅうの“笑い”をうばった魔王から、6つのかけらを取りもどせ。':'A Demon Lord has stolen the universe’s laughter. Win back the six shards.',
     'ムーニアンズのアクションゲームが、ブラウザで遊べます。':'The Moonians action game, playable in your browser.',
     'いますぐあそぶ':'Play now', '無料 ／ インストール不要':'Free / nothing to install', 'ゲームの概要':'Game overview',
@@ -222,7 +222,7 @@
     '同じ光線銃を2つ集めると、合体して強くなる。':'Collect two of the same ray gun and they merge into a stronger one.',
     '階段をのぼると「空ルート」。カギを取ると、ゴール前の宝箱が開く。':'Climb the stairs for the sky route. Grab the key to open the chest before the goal.',
     'iPhoneは、Safariで開いて「ホーム画面に追加」するとアプリのように遊べます。':'On iPhone, open it in Safari and choose “Add to Home Screen” to play it like an app.',
-    'ゲームをはじめる':'Start the game', 'ゲーム':'Game', 'ぴょんぴーの大冒険、':'Pyonpy’s Big Adventure', 'あそべます。':'is ready to play.',
+    'ゲームをはじめる':'Start the game', 'ゲーム':'Game', 'ぴょんぴーの大冒険、':'Pyonpy’s Great Adventure', 'あそべます。':'is ready to play.',
     'うばわれた“笑い”を取りもどせ。':'Win back the stolen laughter.', 'ブラウザで無料のアクションゲーム。':'A free action game in your browser.',
     '月あめ平原':'Moon Candy Field',
     '月あめキング':'Moon Candy King',
@@ -406,7 +406,7 @@
     '大型化 ＋ 音量アップ':'Larger body + more volume',
     'R-1グランプリ2022 予選':'R-1 Grand Prix 2022 preliminaries',
     '翻訳酸素カプセル02':'Translation Oxygen Capsule 02',
-    'ぴょんぴーの大冒険のタイトルロゴと、月面を跳ぶぴょんぴー':'The Pyonpy’s Big Adventure title logo, with Pyonpy leaping over the Moon',
+    'ぴょんぴーの大冒険のタイトルロゴと、月面を跳ぶぴょんぴー':'The Pyonpy’s Great Adventure title logo, with Pyonpy leaping over the Moon',
     '歌詞とダウンロード':'Lyrics & downloads',
     'プレーヤーをしまう':'Tuck the player away',
     '音楽プレーヤーを出す':'Show the music player',
@@ -433,7 +433,7 @@
     '準備中。':'on the way.',
     '新しい曲ができたら、ここに並べていきます。':'New songs will be added here as they are finished.',
     '・インスト':' / Instrumentals', '歌のない曲は、ここにまとめています。':'Songs without vocals are gathered here.', 'どれも自由にダウンロードできます。':'All of them are free to download.', 'ぴょんスターハンター オープニングテーマ':'Pyonster Hunter Opening Theme', 'ぴょんスターハンター 戦闘シーン':'Pyonster Hunter Battle Theme',
-    'ぴょんぴーの大冒険のプレイ動画':'Pyonpy’s Big Adventure gameplay video',
+    'ぴょんぴーの大冒険のプレイ動画':'Pyonpy’s Great Adventure gameplay video',
     '宇宙に浮かぶラーメン屋台の宇宙船':'A ramen-stall spaceship floating in space', '3Dアニメ劇場':'3D Anime Theater'
   });
   function resolveLanguage(saved, languages, requested) {
