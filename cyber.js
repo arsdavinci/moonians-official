@@ -447,14 +447,14 @@
   const pageNav = document.querySelector('.page-nav'), currentLink = pageNav && pageNav.querySelector('[aria-current=page]');
   if (currentLink && pageNav.scrollWidth > pageNav.clientWidth) pageNav.scrollLeft = currentLink.offsetLeft - (pageNav.clientWidth - currentLink.offsetWidth) / 2;
 
-  // Star trail across the closing section.
-  const trailArea = document.querySelector('.connect-section');
-  if (trailArea && fine) {
+  // Star trail that follows the mouse on every page.
+  const trailArea = document;
+  if (fine) {
     let lastSpark = 0;
     const marks = ['✦', '✧', '☾', '★'], tints = ['#ff9be0', '#8dffd9', '#b9a5ff', '#fff09a'];
     trailArea.addEventListener('pointermove', event => {
       const now = performance.now();
-      if (!motionOn() || event.pointerType !== 'mouse' || now - lastSpark < 55) return;
+      if (!motionOn() || event.pointerType !== 'mouse' || now - lastSpark < 65) return;
       lastSpark = now;
       const spark = document.createElement('i');
       spark.className = 'trail-spark';
