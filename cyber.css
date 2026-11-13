@@ -1233,3 +1233,27 @@ body.character-open-lock{overflow:hidden}
   .game-hero .game-title{position:absolute;z-index:2;top:calc(min(86vw,580px) * .07);left:5%;width:62%;max-width:380px;margin:0!important;justify-content:flex-start}
   .game-hero .game-title img{width:100%}
 }
+
+/* Home: swipeable friends deck */
+.friends-deck{margin-top:40px;padding:20px 0 6px;border:1px solid var(--c-border-strong);border-radius:var(--radius);background:var(--c-surface);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
+.friends-deck-head{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;padding:0 22px 14px}
+.friends-deck-head small{display:block;font:10px var(--mono);letter-spacing:1.5px;color:var(--c-accent);margin-bottom:4px}
+.friends-deck-head b{font-size:clamp(16px,2vw,22px);font-weight:900;color:var(--c-text)}
+.friends-deck-nav{display:flex;align-items:center;gap:8px;flex:none}
+.friends-deck-nav button{width:36px;height:36px;border-radius:50%;border:1px solid var(--c-border-strong);background:transparent;color:var(--c-text);cursor:pointer;transition:border-color .2s,background .2s}
+.friends-deck-nav button:hover{border-color:var(--c-accent);background:rgba(255,255,255,.06)}
+.friends-deck-nav .text-link{margin-left:6px;font-size:13px;white-space:nowrap}
+.friends-deck-track{display:flex;gap:16px;overflow-x:auto;scroll-snap-type:x mandatory;scroll-padding:0 22px;padding:10px 22px 18px;scrollbar-width:none;cursor:grab;-webkit-mask-image:linear-gradient(90deg,transparent,#000 22px,#000 calc(100% - 40px),transparent);mask-image:linear-gradient(90deg,transparent,#000 22px,#000 calc(100% - 40px),transparent)}
+.friends-deck-track::-webkit-scrollbar{display:none}
+.friends-deck-track.dragging{cursor:grabbing;scroll-snap-type:none;user-select:none}
+.deck-card{--rx:0deg;--ry:0deg;--mx:50%;--my:30%;position:relative;flex:0 0 clamp(138px,15vw,176px);aspect-ratio:3/4;border-radius:16px;overflow:hidden;scroll-snap-align:start;color:#fff;text-decoration:none;border:1px solid rgba(255,255,255,.18);box-shadow:0 18px 40px -24px rgba(0,0,0,.8);transform:perspective(700px) rotateX(var(--rx)) rotateY(var(--ry));transition:transform .25s ease,border-color .25s,box-shadow .25s}
+.deck-card:hover,.deck-card:focus-visible{border-color:var(--c-accent);box-shadow:0 0 0 1px var(--c-accent),0 24px 50px -24px var(--c-glow);transition:transform .08s linear,border-color .25s,box-shadow .25s}
+.deck-card img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 18%;pointer-events:none}
+.deck-shine{position:absolute;inset:0;background:radial-gradient(circle at var(--mx) var(--my),rgba(255,255,255,.35),transparent 45%),linear-gradient(115deg,transparent 30%,rgba(140,255,230,.18) 45%,rgba(220,160,255,.2) 55%,transparent 70%);mix-blend-mode:screen;opacity:0;transition:opacity .25s}
+.deck-card:hover .deck-shine{opacity:1}
+.deck-meta{position:absolute;left:0;right:0;bottom:0;display:flex;flex-direction:column;gap:2px;padding:28px 12px 11px;background:linear-gradient(transparent,rgba(10,6,28,.88))}
+.deck-meta small{font:9px var(--mono);letter-spacing:1.2px;color:var(--c-mint);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.deck-meta b{font-size:14px;font-weight:900;line-height:1.3}
+.deck-meta em{font-style:normal;font-size:10.5px;color:rgba(255,255,255,.72)}
+@media (max-width:640px){.friends-deck-nav button{display:none}.friends-deck-head{padding:0 16px 12px}.friends-deck-track{padding:8px 16px 16px;scroll-padding:0 16px;gap:12px}.deck-card{flex-basis:42vw}}
+@media (prefers-reduced-motion:reduce){.deck-card{transform:none!important}}

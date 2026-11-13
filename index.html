@@ -17,9 +17,9 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DotGothic16&family=M+PLUS+Rounded+1c:wght@700;800;900&family=Noto+Sans+JP:wght@400;500;600;700;800;900&family=Unbounded:wght@700;900&display=swap" rel="stylesheet">
   <style>@import url("style.css?v=20261110-2") layer(legacy);@import url("experience.css?v=20261110-18") layer(legacy);@import url("music.css?v=20261110-17") layer(legacy);@import url("language.css?v=20261110-12") layer(legacy);@import url("tv.css?v=20261110-21") layer(legacy);</style>
-  <link rel="stylesheet" href="cyber.css?v=20261112-18">
+  <link rel="stylesheet" href="cyber.css?v=20261114-1">
   <script type="importmap">{"imports":{"three":"./vendor/three/three.module.min.js"}}</script>
-  <script src="language.js?v=20261114-2"></script>
+  <script src="language.js?v=20261114-3"></script>
   <script src="app.js?v=20261110-6" defer></script>
   <script src="experience.js?v=20261111-13" defer></script>
   <script src="cyber.js?v=20261112-13" defer></script>
@@ -145,10 +145,19 @@
             <button type="button" data-motion="Attack" aria-pressed="false" disabled>ツッコミ</button>
           </div>
         </div>
-      </div><a class="friends-teaser" href="friends.html" data-language-link>
-        <span class="friends-teaser-faces" aria-hidden="true"><img src="assets/friends/ramune.jpg" alt="" width="1000" height="1000" loading="lazy"><img src="assets/friends/ptputy.jpg" alt="" width="825" height="1100" loading="lazy"><img src="assets/friends/grouper.jpg" alt="" width="825" height="1242" loading="lazy"></span>
-        <span class="friends-teaser-copy"><small>MOON FRIENDS / CRESCENT EMBASSY</small><b>ムーニアンズの、愉快な仲間たち</b><span>DJらむね、ピーティープティ、グルーパーたちに会いに行く</span></span><i aria-hidden="true">→</i>
-      </a>
+      </div><div class="friends-deck">
+        <div class="friends-deck-head"><div><small>MOON FRIENDS / CRESCENT EMBASSY</small><b>ムーニアンズの、愉快な仲間たち</b></div><div class="friends-deck-nav"><button type="button" data-deck="-1" aria-label="前の仲間">←</button><button type="button" data-deck="1" aria-label="次の仲間">→</button><a class="text-link" href="friends.html" data-language-link>全員に会う →</a></div></div>
+        <div class="friends-deck-track" tabindex="0" aria-label="仲間たちのカード。横にスワイプして見られます">
+<a class="deck-card" href="friends.html#ramune" data-language-link draggable="false"><img src="assets/friends/ramune.jpg" alt="" width="300" height="400" loading="lazy" draggable="false"><span class="deck-shine" aria-hidden="true"></span><span class="deck-meta"><small>DJ RAMUNE</small><b>DJらむね</b><em>らんぴょんの妹</em></span></a>
+<a class="deck-card" href="friends.html#ptputy" data-language-link draggable="false"><img src="assets/friends/ptputy.jpg" alt="" width="300" height="400" loading="lazy" draggable="false"><span class="deck-shine" aria-hidden="true"></span><span class="deck-meta"><small>PTPUTY / PT</small><b>ピーティープティ</b><em>らむねの相方</em></span></a>
+<a class="deck-card" href="friends.html#zaluva" data-language-link draggable="false"><img src="assets/friends/zaluva.jpg" alt="" width="300" height="400" loading="lazy" draggable="false"><span class="deck-shine" aria-hidden="true"></span><span class="deck-meta"><small>ZA-LUVA SELES</small><b>ザ・ルーヴァ・セレス</b><em>二人の上司</em></span></a>
+<a class="deck-card" href="friends.html#kaguya" data-language-link draggable="false"><img src="assets/friends/kaguya.jpg" alt="" width="300" height="400" loading="lazy" draggable="false"><span class="deck-shine" aria-hidden="true"></span><span class="deck-meta"><small>PRINCESS KAGUYA</small><b>かぐや様</b><em>月の宮の皇族</em></span></a>
+<a class="deck-card" href="friends.html#grouper" data-language-link draggable="false"><img src="assets/friends/grouper.jpg" alt="" width="300" height="400" loading="lazy" draggable="false"><span class="deck-shine" aria-hidden="true"></span><span class="deck-meta"><small>GROUPER</small><b>グルーパー</b><em>音楽の星のエイリアン</em></span></a>
+<a class="deck-card" href="friends.html#yanabisu" data-language-link draggable="false"><img src="assets/friends/yanabisu.jpg?v=2" alt="" width="300" height="400" loading="lazy" draggable="false"><span class="deck-shine" aria-hidden="true"></span><span class="deck-meta"><small>Y.A.N.A.V.I.S</small><b>ヤナビス</b><em>人工知能</em></span></a>
+<a class="deck-card" href="friends.html#mogera" data-language-link draggable="false"><img src="assets/friends/mogera.jpg" alt="" width="300" height="400" loading="lazy" draggable="false"><span class="deck-shine" aria-hidden="true"></span><span class="deck-meta"><small>MOGERA</small><b>もげら</b><em>なぞの仲間</em></span></a>
+<a class="deck-card" href="friends.html#zombie-bunny" data-language-link draggable="false"><img src="assets/friends/zombie-bunny.jpg" alt="" width="300" height="400" loading="lazy" draggable="false"><span class="deck-shine" aria-hidden="true"></span><span class="deck-meta"><small>ZOMBIE BUNNY</small><b>ゾンビバニー</b><em>名前は調査中</em></span></a>
+        </div>
+      </div>
       <p class="character-footnote">☾ 月でのプロフィールと、地球での活動。それぞれの物語を楽しんでね。</p>
     </div></section>
 
@@ -190,5 +199,6 @@
   <footer><div class="section-wrap footer-top"><a class="brand" href="#home" aria-label="ページの先頭へ"><img src="assets/logo.png?v=20261110-11" alt="ムーニアンズ" width="2421" height="833" loading="lazy"></a><p>地球を愛で満たそう。<br><span>FROM THE MOON, WITH LOVE.</span></p><a class="back-top" href="#home" aria-label="ページの先頭へ戻る">↑</a></div><div class="section-wrap footer-bottom"><small>© 2026 MOONIANS</small><a data-language-link href="game.html">ゲーム</a><a data-language-link href="lab.html">制作ラボ</a><a data-language-link href="sources.html">プロフィール・活動記録の参考資料</a><span>MADE ON EARTH. LOVED ON THE MOON.</span></div><div class="footer-giant" aria-hidden="true">MOONIANS</div></footer>
   <dialog id="photo-dialog" aria-label="フォトアルバム"><button class="dialog-close" type="button" aria-label="写真を閉じる">閉じる ×</button><button class="photo-prev" type="button" aria-label="前の写真">←</button><figure><img id="dialog-image" src="assets/friends.jpeg" alt=""><figcaption id="dialog-caption"></figcaption></figure><button class="photo-next" type="button" aria-label="次の写真">→</button><p class="photo-counter" aria-live="polite"></p></dialog>
 <script>(function(){var v=document.querySelector(".journal-game-video");if(!v||!("IntersectionObserver" in window))return;var calm=matchMedia("(prefers-reduced-motion: reduce)");new IntersectionObserver(function(e){e.forEach(function(x){if(x.isIntersecting&&!calm.matches&&!document.body.classList.contains("motion-paused")){var p=v.play();if(p&&p.catch)p.catch(function(){})}else v.pause()})},{threshold:.4}).observe(v)})()</script>
+<script>(function(){var t=document.querySelector(".friends-deck-track");if(!t)return;var step=function(){var c=t.querySelector(".deck-card");return c?c.getBoundingClientRect().width+16:200};document.querySelectorAll("[data-deck]").forEach(function(b){b.addEventListener("click",function(){t.scrollBy({left:step()*+b.dataset.deck,behavior:"smooth"})})});var down=false,moved=0,x0=0,s0=0;t.addEventListener("pointerdown",function(e){if(e.pointerType!=="mouse")return;down=true;moved=0;x0=e.clientX;s0=t.scrollLeft;t.classList.add("dragging")});window.addEventListener("pointermove",function(e){if(!down)return;var d=e.clientX-x0;moved=Math.max(moved,Math.abs(d));t.scrollLeft=s0-d});window.addEventListener("pointerup",function(){if(!down)return;down=false;t.classList.remove("dragging")});t.addEventListener("click",function(e){if(moved>6){e.preventDefault();moved=0}},true);t.querySelectorAll(".deck-card").forEach(function(c){c.addEventListener("pointermove",function(e){if(e.pointerType!=="mouse")return;var r=c.getBoundingClientRect(),px=(e.clientX-r.left)/r.width,py=(e.clientY-r.top)/r.height;c.style.setProperty("--rx",((.5-py)*14).toFixed(1)+"deg");c.style.setProperty("--ry",((px-.5)*16).toFixed(1)+"deg");c.style.setProperty("--mx",(px*100).toFixed(0)+"%");c.style.setProperty("--my",(py*100).toFixed(0)+"%")});c.addEventListener("pointerleave",function(){c.style.removeProperty("--rx");c.style.removeProperty("--ry")})})})()</script>
 </body>
 </html>

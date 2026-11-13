@@ -17,7 +17,7 @@
   <link href="https://fonts.googleapis.com/css2?family=DotGothic16&family=M+PLUS+Rounded+1c:wght@700;800;900&family=Noto+Sans+JP:wght@400;500;600;700;800;900&family=Unbounded:wght@700;900&display=swap" rel="stylesheet">
   <style>@import url("style.css?v=20261110-2") layer(legacy);@import url("experience.css?v=20261110-18") layer(legacy);@import url("language.css?v=20261110-12") layer(legacy);</style>
   <link rel="stylesheet" href="cyber.css?v=20261112-18">
-  <script src="language.js?v=20261114-2"></script>
+  <script src="language.js?v=20261114-3"></script>
   <script src="cyber.js?v=20261112-13" defer></script>
 </head>
 <body class="anime-page friends-page">
@@ -33,7 +33,7 @@
     <section class="characters-section section-space friends-page-section"><div class="section-wrap">
       <div class="friends" id="friends">
         <div class="friends-head"><p class="eyebrow">MOON FRIENDS / CRESCENT EMBASSY</p><h1>ムーニアンズの、<span>愉快な仲間たち。</span></h1><p>らんぴょんとぴょんぴーは、三日月大使館の大使。<br>月と地球のかけ橋になるために、みんなを笑顔にできる芸人の道を選びました。<br>そんな二人のまわりには、こんな仲間たちがいます。</p></div>
-        <article class="friend friend-lead">
+        <article class="friend friend-lead" id="ramune">
           <div class="friend-image"><img src="assets/friends/ramune.jpg" alt="うさ耳つきのホログラムのキャップとヘッドホンを着けた、ピンクの髪のDJらむね" width="1000" height="1000" loading="lazy"><span class="friend-role">らんぴょんの妹</span></div>
           <div class="friend-body"><span class="english-name">DJ RAMUNE</span><h4>DJらむね</h4>
             <p>らんぴょんの妹。月でDJをしています。<br>事務所は、歌とダンスのアイドルとして売り出したい。でも本人が歌いたいのは、かっこいいラップだけ。しぶしぶ踊りながら、地球でのデビューを夢見ています。</p>
@@ -42,29 +42,29 @@
           </div>
         </article>
         <div class="friend-grid">
-          <article class="friend">
+          <article class="friend" id="ptputy">
             <div class="friend-image"><img src="assets/friends/ptputy.jpg" alt="ホログラムのキャップと上着を着た、大きなたれ耳のピンクのうさぎ、ピーティープティ" width="825" height="1100" loading="lazy"><span class="friend-role">らむねの相方</span></div>
             <div class="friend-body"><span class="english-name">PTPUTY / PT</span><h4>ピーティープティ</h4><p>ニックネームは「PT」。DJらむねの相方で、親友。好きなのは、ぴょんぴー。身長はおよそ45cm。</p>
               <button class="model-sheet" type="button" data-photo="assets/friends/ptputy-sheet.jpg" data-caption="ピーティープティのキャラクターモデルシート。四面図と、ディテール。"><img src="assets/friends/ptputy-sheet.jpg" alt="ピーティープティのキャラクターモデルシート。正面・斜め・横・後ろの図とディテール" width="2000" height="1381" loading="lazy"><span><small>MODEL SHEET</small><b>設定資料を見る</b></span><i aria-hidden="true">＋</i></button>
             </div>
           </article>
-          <article class="friend">
+          <article class="friend" id="zaluva">
             <div class="friend-image"><img src="assets/friends/zaluva.jpg" alt="星空のようなローブを着て、三日月の飾りをつけ、マイクを持って微笑むザ・ルーヴァ・セレス" width="733" height="1100" loading="lazy"><span class="friend-role">二人の上司</span></div>
             <div class="friend-body"><span class="english-name">ZA-LUVA SELES</span><h4>ザ・ルーヴァ・セレス</h4><p>三日月大使館（クレッセントエンバシー）の偉い人。らんぴょんとぴょんぴーの上司です。胸には三日月、手にはマイク。二人の地球での活動を、おだやかな笑顔で見守っています。</p></div>
           </article>
-          <article class="friend">
+          <article class="friend" id="mogera">
             <div class="friend-image"><img src="assets/friends/mogera.jpg" alt="ホログラムの長い手足と大きな前歯をもつ、薄紫のぬいぐるみ、もげら" width="1156" height="1200" loading="lazy"><span class="friend-role">なぞの仲間</span></div>
             <div class="friend-body"><span class="english-name">MOGERA</span><h4>もげら</h4><p>ホログラムの長い手足と、大きな前歯がトレードマーク。いつも両手をあげて、ごきげん。くわしいことは、まだ謎に包まれています。</p></div>
           </article>
-          <article class="friend">
+          <article class="friend" id="zombie-bunny">
             <div class="friend-image"><img src="assets/friends/zombie-bunny.jpg" alt="ミントグリーンの毛並みに、つぎはぎと光るパーツをつけた、舌を出すゾンビバニー" width="880" height="1100" loading="lazy"><span class="friend-role">名前は調査中</span></div>
             <div class="friend-body"><span class="english-name">ZOMBIE BUNNY</span><h4>ゾンビバニー</h4><p>ミントグリーンの毛並みに、つぎはぎと舌ぺろ。耳には宇宙人のチャーム、体には光るパーツ。ちょっとこわいけど、どこかにくめないやつ。</p></div>
           </article>
-          <article class="friend">
+          <article class="friend" id="yanabisu">
             <div class="friend-image"><img src="assets/friends/yanabisu.jpg?v=2" alt="うさ耳のついた丸い頭に、にっこり顔の画面がある小さなロボット、ヤナビス" width="825" height="1100" loading="lazy"><span class="friend-role">人工知能</span></div>
             <div class="friend-body"><span class="english-name">Y.A.N.A.V.I.S</span><h4>ヤナビス</h4><p>翻訳酸素カプセルから聞こえる声の主。ぴょんぴーのムーニアン語を、日本語に同時翻訳してくれる人工知能です。</p><p class="friend-note"><b>名前の由来</b>開発者に「You Are Not A Very Intelligent System（あんまり賢くないシステムやな）」と言われたのを、自分の名前だと勘違い。その頭文字が、正式名称「Y.A.N.A.V.I.S」になりました。</p><button class="model-sheet" type="button" data-photo="assets/friends/yanabisu-sheet.jpg" data-caption="ヤナビスのキャラクターモデルシート。四面図と、6つの表情。"><img src="assets/friends/yanabisu-sheet.jpg" alt="ヤナビスのキャラクターモデルシート。正面・横・後ろ・斜めの図と、6種類の表情" width="1536" height="1024" loading="lazy"><span><small>MODEL SHEET</small><b>設定資料を見る</b></span><i aria-hidden="true">＋</i></button></div>
           </article>
-          <article class="friend">
+          <article class="friend" id="grouper">
             <div class="friend-image"><img src="assets/friends/grouper.jpg" alt="ラジカセの頭に紫のキャップ、サーモンピンクのベストを着た機械の体のエイリアン、グルーパー" width="825" height="1242" loading="lazy"><span class="friend-role">音楽の星のエイリアン</span></div>
             <div class="friend-body"><span class="english-name">GROUPER</span><h4>グルーパー</h4><p>音楽の星「グルーヴィア星」から来た、機械の体のエイリアン。「地球の音楽はクソすぎる！」と地球を破壊しに来たけれど、ぴょんぴーとのラップバトルでそのバイブスに感化され、まさかの友達に。地球滅亡は、ギリギリで回避されました。</p>
               <dl><div><dt>FROM</dt><dd>グルーヴィア星 / Planet Groovia</dd></div><div><dt>HEAD</dt><dd>CDプレーヤー内蔵のラジカセ</dd></div><div><dt>DEBUT</dt><dd>ネタ動画「I'm Grouper」</dd></div><div><dt>SONG</dt><dd><a href="music.html#grouper" data-language-link>友情と条約 ♪</a></dd></div></dl>
@@ -72,7 +72,7 @@
               <button class="model-sheet" type="button" data-photo="assets/friends/grouper-sheet.jpg" data-caption="グルーパーのキャラクターモデルシート。三面図と、頭部CDプレーヤーのディテール。"><img src="assets/friends/grouper-sheet.jpg" alt="グルーパーのキャラクターモデルシート。正面・側面・背面の三面図と、フタが開く頭部CDプレーヤーの解説" width="1536" height="1024" loading="lazy"><span><small>MODEL SHEET</small><b>設定資料を見る</b></span><i aria-hidden="true">＋</i></button>
             </div>
           </article>
-          <article class="friend">
+          <article class="friend" id="kaguya">
             <div class="friend-image"><img src="assets/friends/kaguya.jpg" alt="うさ耳と三日月の髪飾りに、紫と金の十二単のような衣装をまとい、扇を持って微笑むかぐや様。窓の外には月面と地球" width="733" height="1100" loading="lazy"><span class="friend-role">月の宮の皇族</span></div>
             <div class="friend-body"><span class="english-name">PRINCESS KAGUYA</span><h4>かぐや様</h4><p>月の宮に住む、皇族のお姫さま。三日月の髪飾りに、竹と月の模様の衣をまとい、手には扇。そして、ぴょんぴーの好きな人です。</p>
               <dl><div><dt>HOME</dt><dd>月の宮</dd></div><div><dt>TITLE</dt><dd>月の宮の第一皇女</dd></div><div><dt>LIKES</dt><dd>月見の宴、扇の舞、地球のお笑い番組</dd></div><div><dt>WEAK POINT</dt><dd>退屈な話</dd></div><div><dt>CATCHPHRASE</dt><dd>「おもしろき者は、近う寄れ」</dd></div><div><dt>LIKED BY</dt><dd>ぴょんぴー</dd></div></dl><p class="friend-note"><b>ぴょんぴーとの関係</b>いまのところ、ぴょんぴーの一方的な片思い。月の宮に呼ばれる日だけは、ぴょんぴーもボケを封印して正座で待っています。かぐや様のほうは……笑ってくれる日は、まだ来ていないようです。</p></div>

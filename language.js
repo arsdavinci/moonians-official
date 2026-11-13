@@ -445,6 +445,10 @@
     '「おもしろき者は、近う寄れ」':'“Those who amuse me may come closer.”',
     'ぴょんぴーとの関係':'Pyonpy and Kaguya',
     'いまのところ、ぴょんぴーの一方的な片思い。月の宮に呼ばれる日だけは、ぴょんぴーもボケを封印して正座で待っています。かぐや様のほうは……笑ってくれる日は、まだ来ていないようです。':'For now, it is Pyonpy’s one-sided crush. On days he is summoned to the Moon Palace, even Pyonpy holds back his jokes and waits politely on his knees. As for Kaguya… the day she laughs at him has not come yet.',
+    '全員に会う →':'Meet everyone →',
+    '前の仲間':'Previous friend',
+    '次の仲間':'Next friend',
+    '仲間たちのカード。横にスワイプして見られます':'Friend cards. Swipe sideways to browse',
     '宇宙に浮かぶラーメン屋台の宇宙船':'A ramen-stall spaceship floating in space', '3Dアニメ劇場':'3D Anime Theater'
   });
   function resolveLanguage(saved, languages, requested) {
