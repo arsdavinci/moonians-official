@@ -16,8 +16,8 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DotGothic16&family=M+PLUS+Rounded+1c:wght@700;800;900&family=Noto+Sans+JP:wght@400;500;600;700;800;900&family=Unbounded:wght@700;900&display=swap" rel="stylesheet">
   <style>@import url("style.css?v=20261110-2") layer(legacy);@import url("experience.css?v=20261110-18") layer(legacy);@import url("language.css?v=20261110-12") layer(legacy);</style>
-  <link rel="stylesheet" href="cyber.css?v=20261114-1">
-  <script src="language.js?v=20261114-5"></script>
+  <link rel="stylesheet" href="cyber.css?v=20261114-2">
+  <script src="language.js?v=20261114-2"></script>
   <link rel="stylesheet" href="guide.css?v=20261112-5">
   <script src="guide.js?v=20261112-5" defer></script>
   <script src="cyber.js?v=20261114-1" defer></script>
@@ -59,6 +59,7 @@
             <button class="duo-actor duo-pyon" type="button" data-actor="pyon" aria-label="ぴょんぴーに話しかける"><img src="assets/game/portrait-pyonpy.webp?v=2" alt="" width="493" height="680" loading="lazy"></button>
             <button class="duo-actor duo-ran" type="button" data-actor="ran" aria-label="らんぴょんに話しかける"><img src="assets/game/ran-face-normal.webp" alt="" width="480" height="720" loading="lazy"></button>
             <span class="duo-hint" aria-hidden="true">タップで話しかけてな</span>
+            <button class="duo-sound" type="button" aria-pressed="false" aria-label="サウンドをオンにする"><span aria-hidden="true">♪</span> サウンド <b>OFF</b></button>
           </div>
           <div class="duo-box" hidden>
             <p class="duo-name"></p>
@@ -181,39 +182,104 @@
   </script>
   <script>
     (function () {
-      // 楽屋のネタ合わせ — ゲームのオープニングと同じかけあい。タップで進む。
+      // 楽屋のかけあい — ゲーム本編のオープニング（story.js の SCRIPTS.opening）と同じセリフ。タップで進む。
+      // 声は assets/game/voice/opening-NN.mp3、曲は bgm-*.mp3。サウンドはボタンでオン／オフ（はじめはオフ）。
       var scene = document.querySelector('[data-duo]');
       if (!scene) return;
       var LINES = [
-        { s: 'narr', ja: '銀河お笑いフェスまで、あと3日。楽屋では、ネタ合わせの真っ最中——。', en: 'Three days until the Galaxy Comedy Fest. In the dressing room, rehearsal is in full swing...' },
-        { s: 'pyon', ja: 'らんぴょん、フェスのネタ合わせしよか！ まずは新ギャグな。『月見バーガー、月で見たら……ただのバーガー！』', en: 'Ranpyon, let\'s rehearse for the Fest! New gag first: "A moon-viewing burger, viewed ON the moon... is just a burger!"' },
-        { s: 'ran', face: 'trouble', ja: '…………。', en: '............' },
-        { s: 'pyon', ja: 'えっ、ツッコミは！？ 『なんでやねん』は！？', en: 'Huh? Where\'s the comeback!? Where\'s my "No way!"?' },
-        { s: 'ran', face: 'trouble', ja: 'あかん……。どうツッコんだらええんか、ぜんぜん思い出されへん……。', en: 'I can\'t... I\'ve completely forgotten how to do a comeback...' },
-        { s: 'narr', ja: 'そのとき、夜空がまっくろにそまった。宇宙じゅうの“笑い”が、空のかなたへ吸い上げられていく——。', en: 'At that moment the night sky turned pitch black. All the laughter in the universe was being sucked away...' },
-        { s: 'ran', face: 'surprise', ja: 'ぴょんぴー……たのむ。うちの『なんでやねん』、取り返してきて。', en: 'Pyon-P... please. Bring my "No way!" back.' },
-        { s: 'pyon', ja: 'まかしとき！ 柿ピー食べたら百人力や。ほな、ちょっと宇宙すくってくるわ！', en: 'Leave it to me! A handful of kaki-pea snacks and I\'m unstoppable. Be right back, just gotta save the universe!' }
+        {"s": "narr", "bg": "city", "ja": "月の内側に広がる、パステル色の街。\n月生まれ・月育ちのムーニアンたちは、今日も笑ってくらしていた。", "en": "Inside the Moon lies a pastel city.\nThe Moonians who live there spend every day laughing together.", "voice": "opening-01.mp3"},
+        {"s": "narr", "ja": "三日月大使館のお笑いコンビ『ムーニアンズ』は、\n宇宙最大の舞台『銀河お笑いフェス』を、3日後にひかえていた。", "en": "The comedy duo \"Moonians\" of the Crescent Embassy were\nthree days away from the biggest show in space: the Galaxy Comedy Fest.", "voice": "opening-02.mp3"},
+        {"s": "pyon", "bg": "duo", "ja": "らんぴょん、フェスのネタ合わせしょうか！ まずは新ギャグじゃ。『月見バーガー、月で見たら……ただのバーガー！』", "en": "Ranpyon, let's rehearse for the Fest! New gag first: \"A moon-viewing burger, viewed ON the moon... is just a burger!\"", "voice": "opening-03.mp3"},
+        {"s": "ran", "ja": "…………。", "en": "............"},
+        {"s": "pyon", "ja": "えっ、ツッコミは！？ 『なんでよっ！』は！？", "en": "Huh? Where's the comeback!? Where's my \"No way!\"?", "voice": "opening-05.mp3"},
+        {"s": "ran", "ja": "すみません、先輩……。どうツッコんだらええんか、ぜんぜん思い出せんのです……。", "en": "I can't... I've completely forgotten how to do a comeback...", "voice": "opening-06.mp3"},
+        {"s": "narr", "bg": "dark", "music": "bossAppear", "fx": "shake", "ja": "そのとき、夜空がまっくろにそまった。\n宇宙じゅうの“笑い”が、空のかなたへ吸い上げられていく——。", "en": "At that moment the night sky turned pitch black.\nAll the laughter in the universe was being sucked away into the distance...", "voice": "opening-07.mp3"},
+        {"s": "mystery", "fx": "flash", "ja": "フハハハ！ 宇宙の笑いは、この魔王星がぜんぶいただいた！ もうだれも、笑うことはない！", "en": "Mwahaha! The Demon Star has taken ALL the laughter in the universe! No one shall ever laugh again!", "voice": "opening-08.mp3"},
+        {"s": "luva", "bg": "duo", "face": "trouble", "ja": "緊急指令だ、ぴょんぴー。笑いのエネルギー『ワライスター』が6つにくだかれ、魔王の手下たちが6つの星へ持ち去った。", "en": "Emergency orders, Pyon-P. The \"Warai Star\", the energy of laughter itself, was shattered into six pieces, and the Demon Lord's followers carried them off to six planets.", "voice": "opening-09.mp3"},
+        {"s": "luva", "face": "trouble", "ja": "かけらがもどらなければ、宇宙から笑顔が消えてしまう。……だれも笑えないままでは、3日後のフェスも開けない。", "en": "Unless the shards return, smiles will vanish from the universe. ...And if no one can laugh, the Fest three days from now cannot be held.", "voice": "opening-10.mp3"},
+        {"s": "luva", "face": "trouble", "ja": "らんぴょんは笑いをうばわれて動けない。AGIの人工知能パートナー、ヤナビスが案内する。行けるのは、きみだけだ。", "en": "Ranpyon has lost his laughter and cannot go. Yanabisu, your AGI partner, will guide you. You are the only one who can do this.", "voice": "opening-11.mp3"},
+        {"s": "pyon", "ja": "なんで吾輩だけ平気なんじゃろ……。て、ちょっと待ってだ。そんな責任重大なこと、吾輩ひとりでせんとあかんの？", "en": "Why am I the only one who's fine... Wait, hold on. I have to handle something THAT important all by myself?", "voice": "opening-12.mp3"},
+        {"s": "pyon", "ja": "6つの星をまわるとか、めんどくさいじょ〜。吾輩、フェスのネタ考えるんでいそがしいけん、ほかの人にたのんでだ。", "en": "Touring six planets? What a hassle. I'm busy writing material for the Fest, so ask someone else.", "voice": "opening-13.mp3"},
+        {"s": "luva", "ja": "……そう言うと思っていたよ。ぴょんぴー、じつは、ある方からメッセージがとどいている。", "en": "...I thought you might say that. Pyon-P, there's a message for you from a certain someone.", "voice": "opening-14.mp3"},
+        {"s": "kaguya", "ja": "ぴょんぴー、聞こえていますか？ 月の宮の、かぐやです。", "en": "Pyon-P, can you hear me? This is Kaguya, of the Moon Palace.", "voice": "opening-15.mp3"},
+        {"s": "pyon", "face": "surprise", "ja": "か、か、か、かぐや様ぁ！？", "en": "P-P-P-Princess Kaguya!?", "voice": "opening-16.mp3"},
+        {"s": "kaguya", "ja": "宇宙から笑顔が消えてしまうなんて、わたくし、たえられません。……どうか、ワライスターを取りもどしてくださいませんか？", "en": "I cannot bear the thought of smiles vanishing from the universe. ...Won't you please bring back the Warai Star?", "voice": "opening-17.mp3"},
+        {"s": "kaguya", "ja": "フェスの日には、あなたたちの漫才を、いちばん前の席で楽しみにしていますね。", "en": "On the day of the Fest, I'll be in the front row, looking forward to your act.", "voice": "opening-18.mp3"},
+        {"s": "pyon", "ja": "はいっ！！ もちろんです！ このぴょんぴー、かぐや様のためなら、宇宙のはてでもどこまでも行ってまいりますっ！", "en": "Yes, Your Highness!! Of course! For you, I would go to the very edge of the universe!", "voice": "opening-19.mp3"},
+        {"s": "ran", "face": "surprise", "ja": "……手のひら返し、早！ さっきまで『めんどくさい』言うてましたやん。", "en": "...Pyon-P, isn't that a bit of a fast turnaround? A second ago you were saying it was a hassle.", "voice": "opening-20.mp3"},
+        {"s": "pyon", "ja": "な、なにを言うとんじゃ！ 吾輩は、はじめから行く気まんまんじゃったじょ！", "en": "Wh-what are you talking about! I was raring to go from the very start!", "voice": "opening-21.mp3"},
+        {"s": "ran", "face": "trouble", "ja": "ぴょんぴー先輩……お願いします。僕の『なんでよっ！』、取り返してきてください。", "en": "Pyon-P... please. Bring my \"No way!\" back.", "voice": "opening-22.mp3"},
+        {"s": "pyon", "bg": "depart", "ja": "まかしとき！ ぶどうまんじゅう食べたら百人力じゃ。ほな、ちょっと宇宙すくってくるけん！", "en": "Leave it to me! A handful of kaki-pea snacks and I'm unstoppable. Be right back, just gotta save the universe!", "voice": "opening-23.mp3"},
+        {"s": "narr", "ja": "こうして、ぴょんぴーの大冒険がはじまった。", "en": "And so, Pyon-P's great adventure began.", "voice": "opening-24.mp3"}
       ];
-      var NAMES = { pyon: ['ぴょんぴー', 'Pyon-P', '#b9a5ff'], ran: ['らんぴょん', 'Ranpyon', '#ff9be0'] };
+      var NAMES = {
+        pyon: ['ぴょんぴー', 'Pyon-P', '#b9a5ff'], ran: ['らんぴょん', 'Ranpyon', '#ff9be0'],
+        luva: ['ザ・ルーヴァ・セレス', 'Za-Luva Seles', '#a9a4ff'], kaguya: ['かぐや様', 'Princess Kaguya', '#d9b0ff'],
+        mystery: ['？？？', '???', '#c58cff']
+      };
+      var MUSIC = { opening: 'assets/game/voice/bgm-opening.mp3', bossAppear: 'assets/game/voice/bgm-boss-appear.mp3' };
       var stage = scene.querySelector('.duo-stage'), box = scene.querySelector('.duo-box');
       var nameEl = box.querySelector('.duo-name'), textEl = box.querySelector('.duo-text'), endEl = box.querySelector('.duo-end');
       var ranImg = scene.querySelector('.duo-ran img'), actors = scene.querySelectorAll('.duo-actor');
+      var soundBtn = scene.querySelector('.duo-sound');
       var still = matchMedia('(prefers-reduced-motion: reduce)').matches;
-      var index = -1, shown = 0, full = '', timer = 0;
+      var index = -1, shown = 0, full = '', timer = 0, ranFace = 'normal', song = '';
+      var soundOn = false;
+      try { soundOn = sessionStorage.getItem('moonians.duoSound') === 'on'; } catch (e) {}
+      var voice = new Audio(), bgm = new Audio();
+      voice.preload = 'none'; bgm.preload = 'none'; bgm.loop = true; bgm.volume = 0.35;
       ['smile', 'surprise', 'trouble'].forEach(function (f) { new Image().src = 'assets/game/ran-face-' + f + '.webp'; });
       function en() { return (document.documentElement.lang || '').indexOf('en') === 0; }
+      function paintSound() {
+        soundBtn.setAttribute('aria-pressed', String(soundOn));
+        soundBtn.querySelector('b').textContent = soundOn ? 'ON' : 'OFF';
+        soundBtn.setAttribute('aria-label', soundOn ? 'サウンドをオフにする' : 'サウンドをオンにする');
+      }
+      function playMusic(name) {
+        if (name) song = name;
+        if (!soundOn || !song) return;
+        var src = MUSIC[song];
+        if (bgm.getAttribute('src') !== src) { bgm.src = src; }
+        bgm.play().catch(function () {});
+      }
+      function playVoice(line) {
+        voice.pause();
+        if (!soundOn || !line.voice || en()) return;
+        voice.src = 'assets/game/voice/' + line.voice;
+        voice.currentTime = 0;
+        voice.play().catch(function () {});
+      }
+      function stopSound() { voice.pause(); bgm.pause(); }
+      soundBtn.addEventListener('click', function (e) {
+        e.stopPropagation();
+        soundOn = !soundOn;
+        try { sessionStorage.setItem('moonians.duoSound', soundOn ? 'on' : 'off'); } catch (err) {}
+        paintSound();
+        if (!soundOn) { stopSound(); return; }
+        playMusic(song || 'opening');
+        if (index >= 0 && timer) playVoice(LINES[index]);
+      });
+      paintSound();
       function show(i) {
         index = i;
         var line = LINES[i];
         full = en() ? line.en : line.ja;
         scene.classList.add('is-talking');
         scene.classList.toggle('is-narration', line.s === 'narr');
-        box.hidden = false; endEl.hidden = true; box.classList.remove('is-done');
+        if (line.bg === 'dark') scene.classList.add('is-dark');
+        else if (line.bg) scene.classList.remove('is-dark');
+        if (line.fx) { scene.classList.remove('fx-shake', 'fx-flash'); void scene.offsetWidth; scene.classList.add('fx-' + line.fx); }
+        if (line.music || i === 0) playMusic(line.music || 'opening');
+        if (line.bg === 'duo' && song === 'bossAppear') playMusic('opening');
+        box.hidden = false; endEl.hidden = true; box.classList.remove('is-done', 'is-last');
         var who = NAMES[line.s];
         nameEl.textContent = who ? who[en() ? 1 : 0] : '';
         box.style.setProperty('--speaker', who ? who[2] : '#c8b2ff');
         actors.forEach(function (a) { a.classList.toggle('is-speaking', a.dataset.actor === line.s); });
-        ranImg.src = 'assets/game/ran-face-' + (line.s === 'ran' ? (line.face || 'normal') : (i >= 2 ? 'trouble' : 'normal')) + '.webp';
+        if (line.s === 'ran') ranFace = line.face || 'normal';
+        else if (i >= 3 && ranFace === 'normal') ranFace = 'trouble';
+        ranImg.src = 'assets/game/ran-face-' + ranFace + '.webp';
+        playVoice(line);
         clearInterval(timer);
         if (still) { textEl.textContent = full; finish(); return; }
         shown = 0; textEl.textContent = '';
@@ -234,15 +300,18 @@
         if (index < LINES.length - 1) show(index + 1);
       }
       function reset() {
-        clearInterval(timer); timer = 0; index = -1;
+        clearInterval(timer); timer = 0; index = -1; ranFace = 'normal'; song = '';
+        voice.pause(); bgm.pause(); bgm.removeAttribute('src');
         box.hidden = true; box.classList.remove('is-last');
-        scene.classList.remove('is-talking', 'is-narration');
+        scene.classList.remove('is-talking', 'is-narration', 'is-dark');
         actors.forEach(function (a) { a.classList.remove('is-speaking'); });
         ranImg.src = 'assets/game/ran-face-normal.webp';
       }
       stage.addEventListener('click', function () { if (index < 0) show(0); else advance(); });
       box.addEventListener('click', function (e) { if (!e.target.closest('a,button')) advance(); });
       box.querySelector('.duo-again').addEventListener('click', function () { reset(); show(0); });
+      // Leaving the page (or switching tabs) stops the sound.
+      document.addEventListener('visibilitychange', function () { if (document.hidden) stopSound(); else if (index >= 0) playMusic(); });
     })();
   </script>
 </body>
