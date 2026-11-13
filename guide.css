@@ -211,3 +211,18 @@ button.g-pic{width:100%;padding:0;border:0;color:inherit;font:inherit;cursor:poi
 /* on the game page */
 .game-guide .guide-tabs{margin-top:8px}
 .game-guide .guide-body{padding-top:28px;padding-bottom:20px}
+
+/* foes: minions of a world in one card — tap an icon to switch */
+.g-mobs{padding:14px}
+.g-mobs-head{display:flex;align-items:center;gap:8px;margin:0 0 10px!important}
+.g-mobs-head .g-badge{margin:0}
+.g-mobs-count{font:12px var(--mono);color:var(--c-muted)}
+.g-mob-tabs{display:flex;gap:8px;margin-bottom:12px}
+.g-mob-tab{flex:1;display:flex;align-items:center;gap:8px;min-width:0;padding:6px 10px 6px 6px;border:1px solid var(--c-border-strong);border-radius:16px;background:transparent;color:var(--c-text);font:inherit;font-size:11px;font-weight:800;cursor:pointer;text-align:left}
+.g-mob-tab img{width:40px;height:40px;flex:none;object-fit:contain}
+.g-mob-tab span{min-width:0;line-height:1.35}
+.g-mob-tab[aria-selected=true]{border-color:var(--g-aqua);background:color-mix(in srgb,var(--g-aqua) 14%,transparent);box-shadow:0 0 18px -8px var(--g-aqua)}
+.g-mob-detail{animation:g-in .25s ease-out}
+.g-mob-detail .g-pic{width:110px;float:left;margin:0 12px 6px 0}
+.g-mob-detail .g-tap{font-size:8px;right:4px;bottom:4px;padding:2px 6px}
+@media(max-width:760px){.g-mob-tab{font-size:10px}.g-mob-tab img{width:34px;height:34px}}

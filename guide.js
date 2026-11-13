@@ -46,7 +46,7 @@
   if (fromHash()) window.addEventListener('load', function () { setTimeout(function () { openTab(fromHash(), 'force'); }, 300); });
   window.addEventListener('hashchange', function () { if (fromHash()) openTab(fromHash(), 'force'); });
 
-  fetch('guide-data.json?v=20261112-3').then(function (r) { return r.json(); }).then(render).catch(function () {
+  fetch('guide-data.json?v=20261114-1').then(function (r) { return r.json(); }).then(render).catch(function () {
     document.getElementById('guide-body').insertAdjacentHTML('afterbegin', '<p class="guide-note">図鑑のデータを読みこめませんでした。ページを読みなおしてみてな。</p>');
   });
 
@@ -57,16 +57,8 @@
     renderFoes(d);
     renderWorlds(d);
     renderTips(d.tips);
-    // Tap to swap a picture (enemy attack pose, vehicle action).
-    document.querySelectorAll('[data-swap]').forEach(function (b) {
-      var pic = b.querySelector('img'), a = pic.getAttribute('src'), z = IMG + b.dataset.swap + '.webp';
-      new Image().src = z;
-      b.addEventListener('click', function () {
-        var on = b.getAttribute('aria-pressed') !== 'true';
-        b.setAttribute('aria-pressed', String(on));
-        pic.src = on ? z : a;
-      });
-    });
+    // Tap to swap a picture (enemy attack / stunned pose).
+    bindSwaps(document);
   }
 
   function stat(label, key, w) {
@@ -107,7 +99,7 @@
       f.ladder.map(function (l) { return '<div class="g-card g-rung"><p><b>Lv' + l.lv + '</b>には Lv1 が <strong>' + l.need + 'こ</strong></p><div class="g-dots n' + l.need + '" aria-hidden="true">' + dots(l.need) + '</div></div>'; }).join('') + '</div>';
     html += '<h3 class="guide-h3"><small>DROP RULES</small>出てくる武器のルール</h3><ul class="g-rules">' + f.rules.map(function (t) { return '<li>' + esc(t) + '</li>'; }).join('') + '</ul>' +
       '<div class="g-table-wrap"><table class="g-table"><thead><tr><th>ワールド</th><th>出てくる武器</th><th>合成して作れる目標</th></tr></thead><tbody>' +
-      f.drops.map(function (r) { return '<tr><td><b>' + r.world + '</b> ' + WORLD_NAMES[r.world] + '</td><td>' + esc(r.drop) + '</td><td>' + esc(r.goal) + '</td></tr>'; }).join('') + '</tbody></table></div>';
+      f.drops.map(function (r) { return '<tr><td><b translate="no">' + r.world + '</b> ' + WORLD_NAMES[r.world] + '</td><td>' + esc(r.drop) + '</td><td>' + esc(r.goal) + '</td></tr>'; }).join('') + '</tbody></table></div>';
     slot('fusion').innerHTML = html;
   }
 
@@ -117,7 +109,7 @@
       s.items.map(function (it) { return '<article class="g-card g-item"><div class="g-pic">' + img(it.img, it.name) + '</div><h4>' + esc(it.name) + '</h4>' + price(it.price) + '<p>' + esc(it.text) + '</p></article>'; }).join('') + '</div>';
     html += '<h3 class="guide-h3"><small>WORLD LIMITED</small>ワールド限定</h3><p class="guide-intro">そのワールドのステージの中のお店だけで買える。</p>';
     for (var w = 1; w <= 6; w++) {
-      html += '<p class="g-world-tag"><b>' + w + '</b>' + WORLD_NAMES[w] + '</p><div class="g-grid">' +
+      html += '<p class="g-world-tag"><b translate="no">' + w + '</b>' + WORLD_NAMES[w] + '</p><div class="g-grid">' +
         s.limited.filter(function (it) { return it.world === w; }).map(function (it) {
           return '<article class="g-card g-item is-limited"><span class="g-only">ここだけ！</span><div class="g-pic"><span class="g-mark" style="--mark:' + it.color + '" aria-hidden="true">' + esc(it.mark) + '</span></div><h4>' + esc(it.name) + '</h4>' + price(it.price) + '<p>' + esc(it.text) + '</p></article>';
         }).join('') + '</div>';
@@ -125,20 +117,55 @@
     slot('shop').innerHTML = html;
   }
 
+  function swapButton(name, alt, label, swap, tapLabel) {
+    return '<button class="g-pic g-swap" type="button" data-swap="' + swap + '" aria-pressed="false" aria-label="' + esc(label) + '">' + img(name, alt) + '<span class="g-tap" aria-hidden="true">' + tapLabel + '</span></button>';
+  }
+  function mobDetail(e) {
+    var walk = e.kind === 'walk';
+    return swapButton(e.img, e.name, e.name + (walk ? 'の攻撃の姿を見る' : 'のやられた姿を見る'), e.swap, walk ? '攻撃の姿' : 'やられた姿') +
+      '<div class="g-foe-body"><span class="g-badge">' + (walk ? 'あるくザコ' : 'とぶザコ') + '</span><h4>' + esc(e.name) + '<small translate="no">' + esc(e.en) + '</small></h4><p class="g-line">「' + esc(e.line) + '」</p>' +
+      '<p>' + esc(e.look) + ' ' + esc(e.nature) + '</p><p class="g-ingame"><span>ゲームでは</span>' + esc(e.game) + '</p></div>';
+  }
+  function bindSwaps(root) {
+    root.querySelectorAll('[data-swap]').forEach(function (b) {
+      if (b.dataset.bound) return;
+      b.dataset.bound = '1';
+      var pic = b.querySelector('img'), a = pic.getAttribute('src'), z = IMG + b.dataset.swap + '.webp';
+      b.addEventListener('click', function () {
+        var on = b.getAttribute('aria-pressed') !== 'true';
+        if (on) new Image().src = z;
+        b.setAttribute('aria-pressed', String(on));
+        pic.src = on ? z : a;
+      });
+    });
+  }
   function renderFoes(d) {
     var html = '';
     for (var w = 1; w <= 6; w++) {
       var b = d.bosses.filter(function (x) { return x.world === w; })[0];
-      var e = d.enemies.filter(function (x) { return x.world === w; })[0];
-      html += '<div class="g-foe-world"><p class="g-world-tag"><b>' + w + '</b>' + WORLD_NAMES[w] + '</p>' +
-        '<article class="g-card g-boss"><button class="g-pic g-swap" type="button" data-swap="' + b.img + '-attack" aria-pressed="false" aria-label="' + esc(b.name) + 'の攻撃の姿を見る">' + img(b.img, b.name) + '<span class="g-tap" aria-hidden="true">さわってみて</span></button>' +
+      var mobs = d.enemies.filter(function (x) { return x.world === w; });
+      html += '<div class="g-foe-world"><p class="g-world-tag"><b translate="no">' + w + '</b>' + WORLD_NAMES[w] + '</p>' +
+        '<article class="g-card g-boss">' + swapButton(b.img, b.name, b.name + 'の攻撃の姿を見る', b.img + '-attack', 'さわってみて') +
         '<div class="g-foe-body"><span class="g-badge is-boss">BOSS</span><h4>' + esc(b.name) + '<small translate="no">' + esc(b.en) + '</small></h4><p class="g-title">' + esc(b.title) + ' ／ すみか：' + esc(b.home) + '</p>' +
-        '<p class="g-line">「' + esc(b.line) + '」</p><dl class="g-prof"><div><dt>見た目</dt><dd>' + esc(b.look) + '</dd></div><div><dt>せいかく</dt><dd>' + esc(b.nature) + '</dd></div><div><dt>好き</dt><dd>' + esc(b.like) + '</dd></div><div><dt>にがて</dt><dd>' + esc(b.dislike) + '</dd></div></dl></div></article>' +
-        '<article class="g-card g-enemy"><button class="g-pic g-swap" type="button" data-swap="' + e.img + '-attack" aria-pressed="false" aria-label="' + esc(e.name) + 'の攻撃の姿を見る">' + img(e.img, e.name) + '</button>' +
-        '<div class="g-foe-body"><span class="g-badge">ENEMY</span><h4>' + esc(e.name) + '<small translate="no">' + esc(e.en) + '</small></h4><p class="g-line">「' + esc(e.line) + '」</p>' +
-        '<p>' + esc(e.look) + ' ' + esc(e.nature) + '</p><p class="g-ingame"><span>ゲームでは</span>' + esc(e.game) + '</p></div></article></div>';
+        '<p class="g-line">「' + esc(b.line) + '」</p><div class="g-prof"><p><b>見た目</b>' + esc(b.look) + '</p><p><b>せいかく</b>' + esc(b.nature) + '</p><p><b>好き</b>' + esc(b.like) + '</p><p><b>にがて</b>' + esc(b.dislike) + '</p></div></div></article>' +
+        '<article class="g-card g-mobs" data-world="' + w + '"><p class="g-mobs-head"><span class="g-badge">ザコ</span><span class="g-mobs-count">×' + mobs.length + '</span></p>' +
+        '<div class="g-mob-tabs" role="tablist" aria-label="' + WORLD_NAMES[w] + 'のザコ">' + mobs.map(function (e, i) {
+          return '<button type="button" role="tab" class="g-mob-tab" data-mob="' + i + '" aria-selected="' + (i === 0) + '">' + img(e.img, '') + '<span>' + esc(e.name) + '</span></button>';
+        }).join('') + '</div><div class="g-mob-detail" role="tabpanel">' + mobDetail(mobs[0]) + '</div></article></div>';
     }
-    slot('foes').innerHTML = html;
+    var root = slot('foes');
+    root.innerHTML = html;
+    root.querySelectorAll('.g-mobs').forEach(function (card) {
+      var mobs = d.enemies.filter(function (x) { return x.world === Number(card.dataset.world); });
+      var detail = card.querySelector('.g-mob-detail');
+      card.querySelectorAll('.g-mob-tab').forEach(function (tab) {
+        tab.addEventListener('click', function () {
+          card.querySelectorAll('.g-mob-tab').forEach(function (t) { t.setAttribute('aria-selected', String(t === tab)); });
+          detail.innerHTML = mobDetail(mobs[Number(tab.dataset.mob)]);
+          bindSwaps(detail);
+        });
+      });
+    });
   }
 
   function renderWorlds(d) {

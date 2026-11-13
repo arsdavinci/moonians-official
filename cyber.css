@@ -1284,3 +1284,19 @@ html[lang=en] .g-card h4>small{display:none}
 @keyframes duo-flash{from{opacity:.9}to{opacity:0}}
 @media(max-width:560px){.duo-box{height:176px}.duo-sound{right:8px;top:8px;padding:5px 10px;font-size:10px}}
 @media(prefers-reduced-motion:reduce){.duo-scene.fx-shake .duo-stage,.duo-scene.fx-flash .duo-stage::before{animation:none}}
+
+/* game page: minions grouped by world (a walker and a flyer per planet) */
+.mob-worlds{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.mob-world{padding:14px 14px 16px;border:1px solid var(--c-border-strong);border-radius:var(--radius);background:var(--c-surface);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
+.mob-world-tag{display:flex;align-items:center;gap:8px;margin:0 0 10px;font-size:13px;font-weight:900;color:var(--c-text)}
+.mob-world-tag b{display:grid;place-items:center;width:24px;height:24px;border-radius:50%;background:var(--c-accent);color:var(--c-bg);font-size:12px}
+.mob-pair{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.mob{display:flex;flex-direction:column;align-items:center;text-align:center;padding:10px 6px 12px;border-radius:16px;background:color-mix(in srgb,var(--c-accent) 8%,transparent)}
+.mob img{width:100%;max-width:120px;aspect-ratio:1;object-fit:contain;filter:drop-shadow(0 8px 14px rgba(20,10,50,.35))}
+.mob .english-name{margin-top:6px;font-size:8px;letter-spacing:1px}
+.mob h3{margin:2px 0 4px;font-size:14px;line-height:1.35}
+.mob-kind{margin:0 0 6px;padding:2px 9px;border-radius:20px;background:color-mix(in srgb,var(--c-mint) 18%,transparent);color:var(--c-mint);font-size:9px;font-weight:800}
+.mob .world-quote{margin:0;font-size:11px;line-height:1.7}
+.mob-more{margin:18px 0 0;text-align:right}
+@media(max-width:900px){.mob-worlds{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:620px){.mob-worlds{grid-template-columns:1fr;gap:12px}.mob img{max-width:96px}.mob h3{font-size:13px}.mob .world-quote{font-size:10.5px}}
