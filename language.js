@@ -449,6 +449,9 @@
     '前の仲間':'Previous friend',
     '次の仲間':'Next friend',
     '仲間たちのカード。横にスワイプして見られます':'Friend cards. Swipe sideways to browse',
+    'ゲームに登場するかぐや様':'Princess Kaguya as she appears in the game',
+    '月の姫':'Moon princess',
+    '月の宮に住む皇族のお姫さま。ぴょんぴーの好きな人。三日月の扇を手に、笑いを取り戻す冒険のゆくえを見守っている。':'A royal princess of the Moon Palace and the one Pyonpy has a crush on. Fan in hand, she watches over the adventure to bring laughter back.',
     '宇宙に浮かぶラーメン屋台の宇宙船':'A ramen-stall spaceship floating in space', '3Dアニメ劇場':'3D Anime Theater'
   });
   function resolveLanguage(saved, languages, requested) {

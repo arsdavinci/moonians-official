@@ -815,7 +815,7 @@ body:not(.motion-paused) .crawl-text{position:absolute;left:0;right:0;top:100%;p
 .game-story-text p{font-size:14px;line-height:2.1;color:var(--c-muted)}
 .game-story-text p+p{margin-top:14px}
 .game-story-text .game-quote{margin-top:22px;font-family:var(--display);font-size:clamp(18px,2vw,24px);font-weight:900;color:var(--c-pink);text-shadow:0 0 22px var(--c-pink)}
-.game-cast{display:grid;grid-template-columns:repeat(4,1fr);gap:22px}
+.game-cast{display:grid;grid-template-columns:repeat(5,1fr);gap:18px}
 .game-cast .friend-image>img{object-position:center 10%}
 .game-worlds{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
 .world-card{position:relative;padding:18px 20px 22px;border:1px solid var(--c-border);border-radius:20px;background:radial-gradient(70% 60% at 50% 30%,var(--lavender),transparent 70%),var(--c-surface);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);overflow:hidden;transition:border-color .3s,box-shadow .3s,translate .3s}
