@@ -439,6 +439,12 @@
     'かぐや様':'Princess Kaguya',
     '月の宮に住む、皇族のお姫さま。三日月の髪飾りに、竹と月の模様の衣をまとい、手には扇。そして、ぴょんぴーの好きな人です。':'A princess of the royal family who lives in the Moon Palace. She wears a crescent hair ornament and robes patterned with bamboo and moons, and carries a fan. She is also the one Pyonpy has a crush on.',
     '月の宮':'Moon Palace',
+    '月の宮の第一皇女':'First Princess of the Moon Palace',
+    '月見の宴、扇の舞、地球のお笑い番組':'Moon-viewing banquets, fan dances and Earth comedy shows',
+    '退屈な話':'Boring stories',
+    '「おもしろき者は、近う寄れ」':'“Those who amuse me may come closer.”',
+    'ぴょんぴーとの関係':'Pyonpy and Kaguya',
+    'いまのところ、ぴょんぴーの一方的な片思い。月の宮に呼ばれる日だけは、ぴょんぴーもボケを封印して正座で待っています。かぐや様のほうは……笑ってくれる日は、まだ来ていないようです。':'For now, it is Pyonpy’s one-sided crush. On days he is summoned to the Moon Palace, even Pyonpy holds back his jokes and waits politely on his knees. As for Kaguya… the day she laughs at him has not come yet.',
     '宇宙に浮かぶラーメン屋台の宇宙船':'A ramen-stall spaceship floating in space', '3Dアニメ劇場':'3D Anime Theater'
   });
   function resolveLanguage(saved, languages, requested) {
