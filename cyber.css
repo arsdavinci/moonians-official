@@ -1257,3 +1257,6 @@ body.character-open-lock{overflow:hidden}
 .deck-meta em{font-style:normal;font-size:10.5px;color:rgba(255,255,255,.72)}
 @media (max-width:640px){.friends-deck-nav button{display:none}.friends-deck-head{padding:0 16px 12px}.friends-deck-track{padding:8px 16px 16px;scroll-padding:0 16px;gap:12px}.deck-card{flex-basis:42vw}}
 @media (prefers-reduced-motion:reduce){.deck-card{transform:none!important}}
+
+/* English: the guide shows the English name as the title, so hide the duplicate subtitle */
+html[lang=en] .g-card h4>small{display:none}
