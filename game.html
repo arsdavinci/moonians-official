@@ -16,7 +16,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DotGothic16&family=M+PLUS+Rounded+1c:wght@700;800;900&family=Noto+Sans+JP:wght@400;500;600;700;800;900&family=Unbounded:wght@700;900&display=swap" rel="stylesheet">
   <style>@import url("style.css?v=20261110-2") layer(legacy);@import url("experience.css?v=20261110-18") layer(legacy);@import url("language.css?v=20261110-12") layer(legacy);</style>
-  <link rel="stylesheet" href="cyber.css?v=20261114-5">
+  <link rel="stylesheet" href="cyber.css?v=20261114-6">
   <script src="language.js?v=20261114-6"></script>
   <link rel="stylesheet" href="guide.css?v=20261114-2">
   <script src="guide.js?v=20261114-3" defer></script>
@@ -55,7 +55,8 @@
       <div class="game-story">
         <figure class="game-story-art duo-scene" data-duo>
           <div class="duo-stage">
-            <img src="assets/game/cg-opening-duo.jpg" alt="フェス前の楽屋。ネタ合わせをする、らんぴょんとぴょんぴー" width="1400" height="788" loading="lazy">
+            <img class="duo-bg" src="assets/game/cg-opening-duo.jpg" alt="フェス前の楽屋。ネタ合わせをする、らんぴょんとぴょんぴー" width="1400" height="788" loading="lazy">
+            <span class="duo-guest" aria-hidden="true"><img alt="" width="455" height="680"></span>
             <button class="duo-actor duo-pyon" type="button" data-actor="pyon" aria-label="ぴょんぴーに話しかける"><img src="assets/game/portrait-pyonpy.webp?v=2" alt="" width="493" height="680" loading="lazy"></button>
             <button class="duo-actor duo-ran" type="button" data-actor="ran" aria-label="らんぴょんに話しかける"><img src="assets/game/ran-face-normal.webp" alt="" width="480" height="720" loading="lazy"></button>
             <span class="duo-hint" aria-hidden="true">タップで話しかけてな</span>
@@ -246,6 +247,27 @@
       var nameEl = box.querySelector('.duo-name'), textEl = box.querySelector('.duo-text'), endEl = box.querySelector('.duo-end');
       var ranImg = scene.querySelector('.duo-ran img'), actors = scene.querySelectorAll('.duo-actor');
       var soundBtn = scene.querySelector('.duo-sound');
+      // Same pictures as the game's opening (ぴょんぴーの大冒険 story.js): each "bg" swaps the CG,
+      // and Za-Luva / Princess Kaguya step in as portraits while they speak.
+      var bgImg = scene.querySelector('.duo-bg'), guest = scene.querySelector('.duo-guest'), guestImg = guest.querySelector('img');
+      var BG = { city: 'assets/game/opening/cg-opening-city.webp', duo: 'assets/game/cg-opening-duo.jpg', dark: 'assets/game/opening/cg-opening-dark.webp', depart: 'assets/game/opening/cg-opening-depart.webp' };
+      var GUEST = { luva: 'assets/game/opening/portrait-luva.webp', luva_trouble: 'assets/game/opening/portrait-luva-trouble.webp', kaguya: 'assets/game/portrait-kaguya.webp' };
+      var curBg = 'duo', guestWho = '';
+      function setBg(name) {
+        if (!BG[name] || name === curBg) return;
+        curBg = name;
+        scene.classList.add('bg-swap');
+        setTimeout(function () { bgImg.src = BG[name]; scene.classList.remove('bg-swap'); }, 180);
+        scene.classList.toggle('is-scenery', name !== 'duo');
+        if (name !== 'duo') setGuest('');
+      }
+      function setGuest(who, face) {
+        guestWho = who;
+        guest.classList.toggle('is-on', !!who);
+        guest.classList.toggle('is-holo', who === 'kaguya');
+        if (who) guestImg.src = GUEST[face && GUEST[who + '_' + face] ? who + '_' + face : who];
+      }
+      Object.keys(BG).forEach(function (k) { new Image().src = BG[k]; });
       var still = matchMedia('(prefers-reduced-motion: reduce)').matches;
       var index = -1, shown = 0, full = '', timer = 0, ranFace = 'normal', song = '';
       var soundOn = false;
@@ -290,8 +312,9 @@
         full = en() ? line.en : line.ja;
         scene.classList.add('is-talking');
         scene.classList.toggle('is-narration', line.s === 'narr');
-        if (line.bg === 'dark') scene.classList.add('is-dark');
-        else if (line.bg) scene.classList.remove('is-dark');
+        if (line.bg) setBg(line.bg);
+        if (line.s === 'luva' || line.s === 'kaguya') setGuest(line.s, line.face);
+        guest.classList.toggle('is-speaking', !!guestWho && line.s === guestWho);
         if (line.fx) { scene.classList.remove('fx-shake', 'fx-flash'); void scene.offsetWidth; scene.classList.add('fx-' + line.fx); }
         if (line.music || i === 0) playMusic(line.music || 'opening');
         if (line.bg === 'duo' && song === 'bossAppear') playMusic('opening');
@@ -327,7 +350,8 @@
         clearInterval(timer); timer = 0; index = -1; ranFace = 'normal'; song = '';
         voice.pause(); bgm.pause(); bgm.removeAttribute('src');
         box.hidden = true; box.classList.remove('is-last');
-        scene.classList.remove('is-talking', 'is-narration', 'is-dark');
+        scene.classList.remove('is-talking', 'is-narration', 'is-dark', 'is-scenery');
+        setGuest(''); curBg = ''; setBg('duo');
         actors.forEach(function (a) { a.classList.remove('is-speaking'); });
         ranImg.src = 'assets/game/ran-face-normal.webp';
       }
