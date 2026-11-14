@@ -1306,11 +1306,7 @@ html[lang=en] .g-card h4>small{display:none}
 /* game page duo scene: CG changes with the story, like the game's opening */
 .duo-stage>.duo-bg{transition:opacity .18s}
 .duo-scene.bg-swap .duo-bg{opacity:0}
-.duo-scene.is-scenery .duo-actor{opacity:0!important;pointer-events:none}
-.duo-guest{position:absolute;left:50%;bottom:4%;z-index:3;height:80%;translate:-50% 30px;opacity:0;pointer-events:none;transition:opacity .35s,translate .35s,filter .3s}
-.duo-guest img{display:block;height:100%;width:auto;filter:drop-shadow(0 10px 14px rgba(40,20,70,.35))}
-.duo-guest.is-on{opacity:.6;translate:-50% 0}
-.duo-guest.is-on.is-speaking{opacity:1}
-.duo-guest.is-holo img{filter:drop-shadow(0 0 14px rgba(150,230,255,.9)) saturate(.85) brightness(1.08)}
-.duo-guest.is-holo.is-on{opacity:.85}
-.duo-scene .duo-guest.is-on~.duo-actor:not(.is-speaking){opacity:.4}
+/* game page duo scene: hologram monitor / ??? silhouette canvas (ported from the game) */
+.duo-fx{position:absolute;inset:0;width:100%;height:100%;z-index:3;pointer-events:none}
+.duo-scene.right-hidden .duo-ran{opacity:0!important;pointer-events:none}
+.duo-scene.is-narration .duo-actor{opacity:0!important;pointer-events:none}

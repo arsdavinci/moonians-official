@@ -16,7 +16,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DotGothic16&family=M+PLUS+Rounded+1c:wght@700;800;900&family=Noto+Sans+JP:wght@400;500;600;700;800;900&family=Unbounded:wght@700;900&display=swap" rel="stylesheet">
   <style>@import url("style.css?v=20261110-2") layer(legacy);@import url("experience.css?v=20261110-18") layer(legacy);@import url("language.css?v=20261110-12") layer(legacy);</style>
-  <link rel="stylesheet" href="cyber.css?v=20261114-6">
+  <link rel="stylesheet" href="cyber.css?v=20261114-7">
   <script src="language.js?v=20261114-6"></script>
   <link rel="stylesheet" href="guide.css?v=20261114-2">
   <script src="guide.js?v=20261114-3" defer></script>
@@ -56,7 +56,7 @@
         <figure class="game-story-art duo-scene" data-duo>
           <div class="duo-stage">
             <img class="duo-bg" src="assets/game/cg-opening-duo.jpg" alt="フェス前の楽屋。ネタ合わせをする、らんぴょんとぴょんぴー" width="1400" height="788" loading="lazy">
-            <span class="duo-guest" aria-hidden="true"><img alt="" width="455" height="680"></span>
+            <canvas class="duo-fx" width="1280" height="720" aria-hidden="true"></canvas>
             <button class="duo-actor duo-pyon" type="button" data-actor="pyon" aria-label="ぴょんぴーに話しかける"><img src="assets/game/portrait-pyonpy.webp?v=2" alt="" width="493" height="680" loading="lazy"></button>
             <button class="duo-actor duo-ran" type="button" data-actor="ran" aria-label="らんぴょんに話しかける"><img src="assets/game/ran-face-normal.webp" alt="" width="480" height="720" loading="lazy"></button>
             <span class="duo-hint" aria-hidden="true">タップで話しかけてな</span>
@@ -226,12 +226,12 @@
         {"s": "pyon", "ja": "なんで吾輩だけ平気なんじゃろ……。て、ちょっと待ってだ。そんな責任重大なこと、吾輩ひとりでせんとあかんの？", "en": "Why am I the only one who's fine... Wait, hold on. I have to handle something THAT important all by myself?", "voice": "opening-12.mp3"},
         {"s": "pyon", "ja": "6つの星をまわるとか、めんどくさいじょ〜。吾輩、フェスのネタ考えるんでいそがしいけん、ほかの人にたのんでだ。", "en": "Touring six planets? What a hassle. I'm busy writing material for the Fest, so ask someone else.", "voice": "opening-13.mp3"},
         {"s": "luva", "ja": "……そう言うと思っていたよ。ぴょんぴー、じつは、ある方からメッセージがとどいている。", "en": "...I thought you might say that. Pyon-P, there's a message for you from a certain someone.", "voice": "opening-14.mp3"},
-        {"s": "kaguya", "ja": "ぴょんぴー、聞こえていますか？ 月の宮の、かぐやです。", "en": "Pyon-P, can you hear me? This is Kaguya, of the Moon Palace.", "voice": "opening-15.mp3"},
+        {"s": "kaguya", "holo": "on", "ja": "ぴょんぴー、聞こえていますか？ 月の宮の、かぐやです。", "en": "Pyon-P, can you hear me? This is Kaguya, of the Moon Palace.", "voice": "opening-15.mp3"},
         {"s": "pyon", "face": "surprise", "ja": "か、か、か、かぐや様ぁ！？", "en": "P-P-P-Princess Kaguya!?", "voice": "opening-16.mp3"},
         {"s": "kaguya", "ja": "宇宙から笑顔が消えてしまうなんて、わたくし、たえられません。……どうか、ワライスターを取りもどしてくださいませんか？", "en": "I cannot bear the thought of smiles vanishing from the universe. ...Won't you please bring back the Warai Star?", "voice": "opening-17.mp3"},
         {"s": "kaguya", "ja": "フェスの日には、あなたたちの漫才を、いちばん前の席で楽しみにしていますね。", "en": "On the day of the Fest, I'll be in the front row, looking forward to your act.", "voice": "opening-18.mp3"},
         {"s": "pyon", "ja": "はいっ！！ もちろんです！ このぴょんぴー、かぐや様のためなら、宇宙のはてでもどこまでも行ってまいりますっ！", "en": "Yes, Your Highness!! Of course! For you, I would go to the very edge of the universe!", "voice": "opening-19.mp3"},
-        {"s": "ran", "face": "surprise", "ja": "……手のひら返し、早！ さっきまで『めんどくさい』言うてましたやん。", "en": "...Pyon-P, isn't that a bit of a fast turnaround? A second ago you were saying it was a hassle.", "voice": "opening-20.mp3"},
+        {"s": "ran", "face": "surprise", "holo": "off", "ja": "……手のひら返し、早！ さっきまで『めんどくさい』言うてましたやん。", "en": "...Pyon-P, isn't that a bit of a fast turnaround? A second ago you were saying it was a hassle.", "voice": "opening-20.mp3"},
         {"s": "pyon", "ja": "な、なにを言うとんじゃ！ 吾輩は、はじめから行く気まんまんじゃったじょ！", "en": "Wh-what are you talking about! I was raring to go from the very start!", "voice": "opening-21.mp3"},
         {"s": "ran", "face": "trouble", "ja": "ぴょんぴー先輩……お願いします。僕の『なんでよっ！』、取り返してきてください。", "en": "Pyon-P... please. Bring my \"No way!\" back.", "voice": "opening-22.mp3"},
         {"s": "pyon", "bg": "depart", "ja": "まかしとき！ ぶどうまんじゅう食べたら百人力じゃ。ほな、ちょっと宇宙すくってくるけん！", "en": "Leave it to me! A handful of kaki-pea snacks and I'm unstoppable. Be right back, just gotta save the universe!", "voice": "opening-23.mp3"},
@@ -247,26 +247,116 @@
       var nameEl = box.querySelector('.duo-name'), textEl = box.querySelector('.duo-text'), endEl = box.querySelector('.duo-end');
       var ranImg = scene.querySelector('.duo-ran img'), actors = scene.querySelectorAll('.duo-actor');
       var soundBtn = scene.querySelector('.duo-sound');
-      // Same pictures as the game's opening (ぴょんぴーの大冒険 story.js): each "bg" swaps the CG,
-      // and Za-Luva / Princess Kaguya step in as portraits while they speak.
-      var bgImg = scene.querySelector('.duo-bg'), guest = scene.querySelector('.duo-guest'), guestImg = guest.querySelector('img');
+      // Same staging as the game's opening (ぴょんぴーの大冒険 story.js): each "bg" swaps the CG,
+      // the right-hand slot holds whoever spoke last there (Ranpyon / Za-Luva / the ??? silhouette),
+      // and Princess Kaguya appears on the hologram monitor, drawn like drawHoloMonitor in the game.
+      var bgImg = scene.querySelector('.duo-bg'), fx = scene.querySelector('.duo-fx'), fctx = fx.getContext('2d');
       var BG = { city: 'assets/game/opening/cg-opening-city.webp', duo: 'assets/game/cg-opening-duo.jpg', dark: 'assets/game/opening/cg-opening-dark.webp', depart: 'assets/game/opening/cg-opening-depart.webp' };
-      var GUEST = { luva: 'assets/game/opening/portrait-luva.webp', luva_trouble: 'assets/game/opening/portrait-luva-trouble.webp', kaguya: 'assets/game/portrait-kaguya.webp' };
-      var curBg = 'duo', guestWho = '';
+      var RIGHT = { ran: 'assets/game/ran-face-', luva: 'assets/game/opening/portrait-luva.webp', luva_trouble: 'assets/game/opening/portrait-luva-trouble.webp' };
+      var curBg = 'duo', right = 'ran', holo = null, fxFrame = 0, fxLast = 0, clock = 0;
+      function pic(src) { var im = new Image(); im.src = src; return im; }
+      var IMG = { kaguya: pic('assets/game/portrait-kaguya.webp'), frame: pic('assets/game/opening/holo-monitor-frame.webp'), base: pic('assets/game/opening/holo-projector.webp'), boss: pic('assets/game/opening/boss-demon-star-overlord.webp') };
+      pic(RIGHT.luva); pic(RIGHT.luva_trouble);
+      function ok(im) { return im && im.complete && im.naturalWidth > 0; }
       function setBg(name) {
         if (!BG[name] || name === curBg) return;
         curBg = name;
         scene.classList.add('bg-swap');
         setTimeout(function () { bgImg.src = BG[name]; scene.classList.remove('bg-swap'); }, 180);
-        scene.classList.toggle('is-scenery', name !== 'duo');
-        if (name !== 'duo') setGuest('');
       }
-      function setGuest(who, face) {
-        guestWho = who;
-        guest.classList.toggle('is-on', !!who);
-        guest.classList.toggle('is-holo', who === 'kaguya');
-        if (who) guestImg.src = GUEST[face && GUEST[who + '_' + face] ? who + '_' + face : who];
+      function glow(color) {
+        var c = document.createElement('canvas'); c.width = 64; c.height = 64;
+        var g = c.getContext('2d'), r = g.createRadialGradient(32, 32, 0, 32, 32, 32);
+        r.addColorStop(0, '#fff'); r.addColorStop(.3, color); r.addColorStop(1, 'rgba(0,0,0,0)');
+        g.fillStyle = r; g.fillRect(0, 0, 64, 64); return c;
       }
+      var eyeGlow = glow('#ff3d7f'), sil = null, holoBuf = document.createElement('canvas');
+      function silhouette() {
+        if (sil || !ok(IMG.boss)) return sil;
+        sil = document.createElement('canvas'); sil.width = IMG.boss.naturalWidth; sil.height = IMG.boss.naturalHeight;
+        var g = sil.getContext('2d'); g.drawImage(IMG.boss, 0, 0); g.globalCompositeOperation = 'source-in'; g.fillStyle = '#0d0618'; g.fillRect(0, 0, sil.width, sil.height);
+        return sil;
+      }
+      function ease(t) { return 1 - Math.pow(1 - t, 3); }
+      function drawMystery(ctx, time) {
+        var s = silhouette(); if (!s) return;
+        ctx.save(); ctx.translate(1280 - 236, 700); ctx.scale(1.2, 1.2);
+        var h = 410, w = h * (s.width / s.height);
+        ctx.drawImage(s, -w / 2, -h * .98, w, h);
+        ctx.globalCompositeOperation = 'lighter';
+        ctx.globalAlpha = .8 + Math.sin(time * 6) * .2;
+        ctx.drawImage(eyeGlow, -52, -300, 44, 30); ctx.drawImage(eyeGlow, 8, -300, 44, 30);
+        ctx.restore();
+      }
+      function drawHolo(ctx, time, speaking) {
+        var MW = 560, MH = 360;
+        var open = holo.on ? Math.min(1, holo.t / .45) : Math.max(0, 1 - holo.t / .35);
+        if (!holo.on && open <= 0) { holo = null; return; }
+        open = ease(open);
+        var h = Math.max(4, MH * open);
+        var blink = (Math.sin(time * 37) > .97 || Math.random() < .015) ? .55 : 1;
+        var alpha = (.82 + Math.sin(time * 9) * .05) * blink;
+        ctx.save(); ctx.translate(640, 272);
+        var baseY = MH / 2 + 70;
+        ctx.save(); ctx.globalCompositeOperation = 'lighter';
+        var beam = ctx.createLinearGradient(0, baseY, 0, -h / 2);
+        beam.addColorStop(0, 'rgba(120,255,240,' + (.28 * open) + ')'); beam.addColorStop(1, 'rgba(200,160,255,0)');
+        ctx.fillStyle = beam; ctx.beginPath(); ctx.moveTo(-70, baseY); ctx.lineTo(70, baseY); ctx.lineTo(MW / 2, h / 2); ctx.lineTo(-MW / 2, h / 2); ctx.closePath(); ctx.fill();
+        ctx.restore();
+        if (ok(IMG.base)) { var bw = 300, bh = bw * (IMG.base.naturalHeight / IMG.base.naturalWidth); ctx.drawImage(IMG.base, -bw / 2, baseY - bh * .45, bw, bh); }
+        ctx.globalAlpha = alpha;
+        ctx.beginPath(); ctx.roundRect(-MW / 2, -h / 2, MW, h, 22);
+        ctx.save(); ctx.clip();
+        var glass = ctx.createLinearGradient(0, -MH / 2, 0, MH / 2);
+        glass.addColorStop(0, 'rgba(90,60,170,.55)'); glass.addColorStop(1, 'rgba(40,120,160,.45)');
+        ctx.fillStyle = glass; ctx.fillRect(-MW / 2, -MH / 2, MW, MH);
+        var k = IMG.kaguya;
+        if (ok(k) && open > .3) {
+          var ph = MH * 1.55, pw = ph * (k.naturalWidth / k.naturalHeight);
+          holoBuf.width = Math.ceil(pw); holoBuf.height = Math.ceil(MH);
+          var g = holoBuf.getContext('2d');
+          g.clearRect(0, 0, holoBuf.width, holoBuf.height);
+          g.drawImage(k, 0, -ph * .08 + (speaking ? Math.sin(time * 3) * 3 : 0), pw, ph);
+          g.globalCompositeOperation = 'source-atop'; g.fillStyle = 'rgba(150,230,255,.16)'; g.fillRect(0, 0, holoBuf.width, holoBuf.height); g.globalCompositeOperation = 'source-over';
+          var glitch = Math.random() < .06 || holo.t < .6, strip = 6;
+          for (var y = 0; y < MH; y += strip) {
+            var dx = glitch && Math.random() < .25 ? (Math.random() - .5) * 26 : 0;
+            ctx.drawImage(holoBuf, 0, y, holoBuf.width, strip, -pw / 2 + dx, -MH / 2 + y, pw, strip);
+          }
+          ctx.save(); ctx.globalCompositeOperation = 'lighter'; ctx.globalAlpha = alpha * .12;
+          ctx.drawImage(holoBuf, -pw / 2 - 4, -MH / 2); ctx.drawImage(holoBuf, -pw / 2 + 4, -MH / 2); ctx.restore();
+        }
+        ctx.fillStyle = 'rgba(255,255,255,.07)';
+        var off = (time * 60) % 6;
+        for (var yy = -MH / 2 + off; yy < MH / 2; yy += 6) ctx.fillRect(-MW / 2, yy, MW, 2);
+        var bandY = ((time * 140) % (MH + 120)) - MH / 2 - 60;
+        var band = ctx.createLinearGradient(0, bandY - 40, 0, bandY + 40);
+        band.addColorStop(0, 'rgba(160,255,245,0)'); band.addColorStop(.5, 'rgba(160,255,245,.16)'); band.addColorStop(1, 'rgba(160,255,245,0)');
+        ctx.fillStyle = band; ctx.fillRect(-MW / 2, bandY - 40, MW, 80);
+        ctx.fillStyle = 'rgba(255,255,255,.25)';
+        for (var n = 0; n < 26; n++) ctx.fillRect((Math.random() - .5) * MW, (Math.random() - .5) * MH, 2 + Math.random() * 6, 1.5);
+        ctx.restore();
+        if (ok(IMG.frame)) { var fw = MW / .835, fh = h / .74; ctx.drawImage(IMG.frame, -fw / 2, -fh / 2 + fh * .0146, fw, fh); }
+        if (open > .6) {
+          ctx.globalAlpha = alpha;
+          ctx.fillStyle = 'rgba(40,20,90,.75)'; ctx.beginPath(); ctx.roundRect(-MW / 2 + 22, -h / 2 + 16, 220, 32, 16); ctx.fill();
+          ctx.strokeStyle = '#7ff6e6'; ctx.lineWidth = 2; ctx.stroke();
+          ctx.fillStyle = (time % 1) < .5 ? '#ff8db7' : '#ffd1ed'; ctx.beginPath(); ctx.arc(-MW / 2 + 44, -h / 2 + 32, 6, 0, Math.PI * 2); ctx.fill();
+          ctx.fillStyle = '#e8fffb'; ctx.font = '900 17px "M PLUS Rounded 1c", "Noto Sans JP", sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+          ctx.fillText(en() ? 'MOON PALACE · LIVE' : '月の宮より 通信中', -MW / 2 + 140, -h / 2 + 32);
+        }
+        ctx.restore();
+      }
+      function drawFx(now) {
+        var dt = Math.min(.05, (now - (fxLast || now)) / 1000); fxLast = now; clock += dt;
+        if (holo) holo.t += dt;
+        fctx.clearRect(0, 0, 1280, 720);
+        var line = index >= 0 ? LINES[index] : null;
+        if (line && right === 'mystery' && line.s !== 'narr') drawMystery(fctx, clock);
+        if (holo) drawHolo(fctx, clock, !!line && line.s === 'kaguya');
+        fxFrame = (holo || right === 'mystery') && index >= 0 ? requestAnimationFrame(drawFx) : 0;
+      }
+      function kickFx() { if (!fxFrame) { fxLast = 0; fxFrame = requestAnimationFrame(drawFx); } }
       Object.keys(BG).forEach(function (k) { new Image().src = BG[k]; });
       var still = matchMedia('(prefers-reduced-motion: reduce)').matches;
       var index = -1, shown = 0, full = '', timer = 0, ranFace = 'normal', song = '';
@@ -319,8 +409,10 @@
         scene.classList.add('is-talking');
         scene.classList.toggle('is-narration', line.s === 'narr');
         if (line.bg) setBg(line.bg);
-        if (line.s === 'luva' || line.s === 'kaguya') setGuest(line.s, line.face);
-        guest.classList.toggle('is-speaking', !!guestWho && line.s === guestWho);
+        if (line.holo === 'on') holo = { t: 0, on: true };
+        if (line.holo === 'off' && holo) { holo.on = false; holo.t = 0; }
+        if (line.s === 'ran' || line.s === 'luva' || line.s === 'mystery') right = line.s;
+        scene.classList.toggle('right-hidden', right === 'mystery');
         if (line.fx) { scene.classList.remove('fx-shake', 'fx-flash'); void scene.offsetWidth; scene.classList.add('fx-' + line.fx); }
         if (line.music || i === 0) playMusic(line.music || 'opening');
         if (line.bg === 'duo' && song === 'bossAppear') playMusic('opening');
@@ -328,11 +420,12 @@
         var who = NAMES[line.s];
         nameEl.textContent = who ? who[en() ? 1 : 0] : '';
         box.style.setProperty('--speaker', who ? who[2] : '#c8b2ff');
-        actors.forEach(function (a) { a.classList.toggle('is-speaking', a.dataset.actor === line.s); });
-        // Same face rule as the game (story.js guessFace) when a line has no face set.
-        if (line.s === 'ran') ranFace = line.face || guessFace(line.ja) || 'normal';
-        else if (i >= 3 && ranFace === 'normal') ranFace = 'trouble';
-        ranImg.src = 'assets/game/ran-face-' + ranFace + '.webp';
+        actors.forEach(function (a) { a.classList.toggle('is-speaking', a.dataset.actor === line.s || (a.dataset.actor === 'ran' && line.s === right)); });
+        // Same face rule as the game (story.js guessFace): a face changes only when that character speaks.
+        if (line.s === right && right !== 'mystery') ranFace = line.face || guessFace(line.ja) || 'normal';
+        if (right === 'luva') ranImg.src = ranFace === 'trouble' ? RIGHT.luva_trouble : RIGHT.luva;
+        else if (right === 'ran') ranImg.src = RIGHT.ran + ranFace + '.webp';
+        kickFx();
         playVoice(line);
         clearInterval(timer);
         if (still) { textEl.textContent = full; finish(); return; }
@@ -357,8 +450,8 @@
         clearInterval(timer); timer = 0; index = -1; ranFace = 'normal'; song = '';
         voice.pause(); bgm.pause(); bgm.removeAttribute('src');
         box.hidden = true; box.classList.remove('is-last');
-        scene.classList.remove('is-talking', 'is-narration', 'is-dark', 'is-scenery');
-        setGuest(''); curBg = ''; setBg('duo');
+        scene.classList.remove('is-talking', 'is-narration', 'is-dark', 'right-hidden');
+        holo = null; right = 'ran'; curBg = ''; setBg('duo'); fctx.clearRect(0, 0, 1280, 720);
         actors.forEach(function (a) { a.classList.remove('is-speaking'); });
         ranImg.src = 'assets/game/ran-face-normal.webp';
       }
