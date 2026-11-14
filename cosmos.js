@@ -102,7 +102,9 @@ function moonTexture() {
 /* ── objects ── */
 const sunDir = new THREE.Vector3(-1, .35, .55).normalize();
 const sun = new THREE.DirectionalLight(0xfff4e8, 2.6); sun.position.copy(sunDir).multiplyScalar(50); scene.add(sun);
-scene.add(new THREE.AmbientLight(0x6a5aa8, .22));
+scene.add(new THREE.AmbientLight(0xd8c8ff, .55));
+// Soft front light that rises near the end so the pastel moon reads bright, not in shadow.
+const fill = new THREE.PointLight(0xffe6f4, 0, 0, 0); camera.add(fill);
 
 const seg = small ? 48 : 96;
 const [earthMap, earthLights] = earthTextures();
@@ -115,12 +117,16 @@ earthMat.onBeforeCompile = shader => {
   shader.fragmentShader = 'uniform vec3 sunDirView;\n' + shader.fragmentShader.replace('#include <emissivemap_fragment>',
     '#include <emissivemap_fragment>\n totalEmissiveRadiance *= smoothstep(0.15, -0.25, dot(normalize(vNormal), sunDirView));');
 };
+new THREE.TextureLoader().load('assets/cosmos/earth-pastel.webp?v=1', tex => {
+  tex.colorSpace = THREE.SRGBColorSpace; tex.anisotropy = 4;
+  earthMat.map = tex; earthMat.emissiveIntensity = 0; earthMat.needsUpdate = true; wake();
+});
 const earthMesh = new THREE.Mesh(new THREE.SphereGeometry(4, seg, seg / 2), earthMat);
 earthMesh.rotation.z = .41;
 earth.add(earthMesh);
 const glowMat = new THREE.ShaderMaterial({
   transparent:true, side:THREE.BackSide, depthWrite:false, blending:THREE.AdditiveBlending,
-  uniforms:{color:{value:new THREE.Color(0x7fc8ff)}},
+  uniforms:{color:{value:new THREE.Color(0xffc6ec)}},
   vertexShader:'varying vec3 vN; varying vec3 vV; void main(){ vec4 mv = modelViewMatrix*vec4(position,1.); vN = normalize(normalMatrix*normal); vV = normalize(-mv.xyz); gl_Position = projectionMatrix*mv; }',
   fragmentShader:'uniform vec3 color; varying vec3 vN; varying vec3 vV; void main(){ float f = pow(clamp(-dot(vN, vV) * 2.1, 0.0, 1.0), 2.5); gl_FragColor = vec4(color * f * 0.9, 1.0); }'
 });
@@ -128,7 +134,13 @@ earth.add(new THREE.Mesh(new THREE.SphereGeometry(4.55, seg, seg / 2), glowMat))
 
 const moonOrbit = new THREE.Group(); moonOrbit.rotation.x = .22; moonOrbit.rotation.z = -.12; scene.add(moonOrbit);
 const ORBIT = 15;
-const moon = new THREE.Mesh(new THREE.SphereGeometry(1.25, seg, seg / 2), new THREE.MeshStandardMaterial({map:moonTexture(), roughness:1, metalness:0}));
+const moonMat = new THREE.MeshStandardMaterial({map:moonTexture(), roughness:1, metalness:0});
+// Pastel moon art (equirectangular); the procedural map stays as the fallback.
+new THREE.TextureLoader().load('assets/cosmos/moon-pastel.webp?v=1', tex => {
+  tex.colorSpace = THREE.SRGBColorSpace; tex.anisotropy = 4;
+  moonMat.map = tex; moonMat.color.set(0xffffff); moonMat.needsUpdate = true; wake();
+});
+const moon = new THREE.Mesh(new THREE.SphereGeometry(1.25, seg, seg / 2), moonMat);
 moonOrbit.add(moon);
 // Faint orbit ring
 const ringPts = []; for (let i = 0; i <= 160; i++) { const a = i / 160 * Math.PI * 2; ringPts.push(new THREE.Vector3(Math.cos(a) * ORBIT, 0, Math.sin(a) * ORBIT)); }
@@ -143,7 +155,7 @@ function glowSprite(color) {
   c.fillStyle = g; c.fillRect(0, 0, 128, 128);
   return new THREE.SpriteMaterial({map:new THREE.CanvasTexture(cv), transparent:true, depthWrite:false, blending:THREE.AdditiveBlending});
 }
-const palace = new THREE.Sprite(glowSprite('rgba(255,190,120,.75)'));
+const palace = new THREE.Sprite(glowSprite('rgba(255,170,215,.8)'));
 palace.scale.setScalar(.9); moon.add(palace);
 
 // Warp streaks
@@ -184,7 +196,6 @@ function render(now) {
 
   const p = smooth;
   earthMesh.rotation.y = drift * .04 + p * 2.4;
-  moon.rotation.y = drift * .02;
   // Moon travels 1.25 laps around the Earth as you scroll; ends on the near side.
   const ang = Math.PI * .85 + p * Math.PI * 2.5 + drift * .01;
   moon.position.set(Math.cos(ang) * ORBIT, 0, Math.sin(ang) * ORBIT);
@@ -199,6 +210,11 @@ function render(now) {
   camera.position.x += pointer.sx * 1.5; camera.position.y += pointer.sy * 1;
   look.set(0, 0, 0).lerp(moonWorld, toward);
   camera.lookAt(look);
+  // Turn the palace (texture centre = local +x) toward the camera as we arrive.
+  tmp.copy(camera.position).sub(moonWorld);
+  const face = Math.atan2(-tmp.z, tmp.x);
+  moon.rotation.y = drift * .02 * (1 - toward) + face * toward;
+  fill.intensity = toward * 2.2;
 
   // Palace glow faces the camera side of the moon.
   palace.position.copy(tmp.copy(camera.position).sub(moonWorld).normalize().multiplyScalar(1.27).applyQuaternion(moon.quaternion.clone().invert()));
