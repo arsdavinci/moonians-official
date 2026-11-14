@@ -1300,3 +1300,5 @@ html[lang=en] .g-card h4>small{display:none}
 .mob-more{margin:18px 0 0;text-align:right}
 @media(max-width:900px){.mob-worlds{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:620px){.mob-worlds{grid-template-columns:1fr;gap:12px}.mob img{max-width:96px}.mob h3{font-size:13px}.mob .world-quote{font-size:10.5px}}
+/* Home: 3D Earth and Moon behind the page */
+#cosmos-canvas{position:fixed;inset:0;width:100%;height:100%;z-index:-1;pointer-events:none;transition:opacity .6s}
