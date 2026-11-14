@@ -275,6 +275,12 @@
       var voice = new Audio(), bgm = new Audio();
       voice.preload = 'none'; bgm.preload = 'none'; bgm.loop = true; bgm.volume = 0.35;
       ['smile', 'surprise', 'trouble'].forEach(function (f) { new Image().src = 'assets/game/ran-face-' + f + '.webp'; });
+      function guessFace(text) {
+        if (/！？|えっ|あれ？/.test(text)) return 'surprise';
+        if (/……。$|あかん|出てこ|…………/.test(text)) return 'trouble';
+        if (/！/.test(text)) return 'smile';
+        return null;
+      }
       function en() { return (document.documentElement.lang || '').indexOf('en') === 0; }
       function paintSound() {
         soundBtn.setAttribute('aria-pressed', String(soundOn));
@@ -323,7 +329,8 @@
         nameEl.textContent = who ? who[en() ? 1 : 0] : '';
         box.style.setProperty('--speaker', who ? who[2] : '#c8b2ff');
         actors.forEach(function (a) { a.classList.toggle('is-speaking', a.dataset.actor === line.s); });
-        if (line.s === 'ran') ranFace = line.face || 'normal';
+        // Same face rule as the game (story.js guessFace) when a line has no face set.
+        if (line.s === 'ran') ranFace = line.face || guessFace(line.ja) || 'normal';
         else if (i >= 3 && ranFace === 'normal') ranFace = 'trouble';
         ranImg.src = 'assets/game/ran-face-' + ranFace + '.webp';
         playVoice(line);
