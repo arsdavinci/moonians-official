@@ -97,7 +97,7 @@
   consent.className = 'fx-dialog music-consent';
   consent.setAttribute('aria-labelledby', 'music-consent-title');
   consent.setAttribute('aria-describedby', 'music-consent-description');
-  consent.innerHTML = '<span class="consent-moon" aria-hidden="true">☾</span><p class="consent-kicker">WELCOME TO MOONIANS RADIO</p><h2 id="music-consent-title">音楽を流してもいい？</h2><p id="music-consent-description">テーマソング「ぼくらはムーニアンズ」を<br>聴きながら、月の街を楽しもう。</p><div class="music-consent-actions"><button type="button" class="music-allow">はい、音楽と楽しむ <span>▶</span></button><button type="button" class="music-decline" autofocus>いいえ、音楽なしで</button></div><p class="consent-note">後からプレーヤーで再生・停止・音量を変更できます。</p>';
+  consent.innerHTML = '<span class="consent-moon" aria-hidden="true">☾</span><p class="consent-kicker">WELCOME TO MOONIANS RADIO</p><h2 id="music-consent-title">音楽を流してもいい？</h2><p id="music-consent-description">テーマソング「ぼくらはムーニアンズ」を<br>聴きながら、月の街を楽しもう。</p><label class="consent-volume"><span>音量</span><input type="range" data-music-volume min="0" max="100" step="1" value="30" aria-label="音量"><output data-music-volume-output>30%</output></label><div class="music-consent-actions"><button type="button" class="music-allow">はい、音楽と楽しむ <span>▶</span></button><button type="button" class="music-decline" autofocus>いいえ、音楽なしで</button></div><p class="consent-note">後からプレーヤーで再生・停止・音量を変更できます。</p>';
   document.body.append(consent);
 
   let volume = .3;
@@ -449,7 +449,13 @@
   updateVolume();
   render();
   // The question waits for the opening sequence (cyber.js) when there is one.
-  const askAfterBoot = () => (window.MoonBootDone || Promise.resolve()).then(ask);
+  // Visitors who already answered at the city gate (the 3D home) are not asked again.
+  const askAfterBoot = () => (window.MoonBootDone || Promise.resolve()).then(() => {
+    let answered = false, wantsSound = false;
+    try { answered = sessionStorage.getItem('moonians.city') === '1'; wantsSound = JSON.parse(localStorage.getItem('moonians.sound')) === true; } catch { /* Optional. */ }
+    if (!answered) ask();
+    else if (wantsSound) play();
+  });
   if (audio.dataset.consent === 'off') { /* The music page starts from its own play button. */ }
   else if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', askAfterBoot, {once:true});
   else askAfterBoot();

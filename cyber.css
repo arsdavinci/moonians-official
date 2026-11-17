@@ -1310,3 +1310,20 @@ html[lang=en] .g-card h4>small{display:none}
 .duo-fx{position:absolute;inset:0;width:100%;height:100%;z-index:3;pointer-events:none}
 .duo-scene.right-hidden .duo-ran{opacity:0!important;pointer-events:none}
 .duo-scene.is-narration .duo-actor{opacity:0!important;pointer-events:none}
+
+/* Music question (roadmap page): pastel glass card with a volume slider, matching the gate of the 3D city home. */
+.fx-dialog.music-consent{background:linear-gradient(160deg,#fffffff2,#f6e9fff2 55%,#e3fbf6f2);color:#2a2152;border:2px solid #fff;border-radius:30px;box-shadow:0 0 0 1px #ffffff80,0 0 70px -10px #ff8fc8,0 30px 90px #5a3fc055}
+.fx-dialog.music-consent::backdrop{background:linear-gradient(#7b5fe0b3,#ff9fd2b3);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
+.fx-dialog.music-consent .consent-kicker{color:#e2439a;font-family:"DotGothic16",monospace;letter-spacing:.2em}
+.fx-dialog.music-consent .consent-moon{color:#ff7fc0;text-shadow:0 0 18px #ff8fc8}
+.fx-dialog.music-consent h2{color:#2a2152}
+.fx-dialog.music-consent #music-consent-description,.fx-dialog.music-consent .consent-note{color:#5a4f8c}
+.fx-dialog.music-consent .consent-volume{display:grid;grid-template-columns:auto 1fr 3.4em;align-items:center;gap:12px;margin:22px auto 0;max-width:310px;padding:12px 16px;border-radius:18px;background:#fff;font-size:12px;font-weight:700;color:#5a4f8c}
+.fx-dialog.music-consent .consent-volume input{-webkit-appearance:none;appearance:none;width:100%;height:8px;margin:0;padding:0;border:0;border-radius:99px;background:linear-gradient(90deg,#ff8fc8,#b9a3f5,#6ff7dc);cursor:pointer;writing-mode:horizontal-tb;direction:ltr}
+.fx-dialog.music-consent .consent-volume input::-webkit-slider-thumb{-webkit-appearance:none;width:20px;height:20px;border-radius:50%;background:#fff;border:3px solid #ff7fc0;box-shadow:0 2px 8px #7a3cb466}
+.fx-dialog.music-consent .consent-volume input::-moz-range-thumb{width:16px;height:16px;border-radius:50%;background:#fff;border:3px solid #ff7fc0}
+.fx-dialog.music-consent .consent-volume output{font-family:"DotGothic16",monospace;font-size:14px;color:#e2439a;text-align:right}
+.fx-dialog.music-consent .music-consent-actions{margin-top:16px}
+.fx-dialog.music-consent .music-consent-actions .music-allow{background:linear-gradient(135deg,#ff7fc0,#b58cff 60%,#3fe3c8);color:#fff;border:2px solid #fff;font-weight:800;text-shadow:0 1px 0 #5a288c73;box-shadow:0 8px 22px #ff7fc080}
+.fx-dialog.music-consent .music-consent-actions .music-decline{background:#fff;color:#2a2152;border:2px solid #b9a3f5;font-weight:800}
+.fx-dialog.music-consent .music-consent-actions .music-decline:hover{background:#f3ecff}

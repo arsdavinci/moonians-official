@@ -6,7 +6,9 @@
 - 構成：HTML、CSS、JavaScript。ビルド・外部APIキーは不要です。
 - 画像：assets 内。本人提供の素材を使用しています。
 - ローカル確認：このディレクトリで `python -m http.server 8765 --bind 127.0.0.1`
-- SNSリンク、プロフィール、活動記録：index.html
+- ホーム（3Dの街「パステルムーンシティ」で行き先をえらぶ）：index.html / city.js / city.css
+  - 街のモデル：assets/city/pastel-moon-city.glb。元データと作り直し用スクリプトは D:\Development_Game\PastelMoonCitylender（`build_city.py --low` で書き出し）
+- ロードマップ（以前のホーム。SNSリンク、プロフィール、活動記録）：roadmap.html
 - 参考資料：sources.html
 
 担当は本人確認済み。らんぴょんがツッコミ、ぴょんぴーがボケです。
@@ -114,7 +116,7 @@ SNS欄の締めのメッセージ「これからも、よろしゅうな。」�
 - コマは区間が近づいてから読み込みます。スマホ幅と通信量節約の設定では1枚おき（61枚）です。
 - 進み具合に応じて3つの見出しが切り替わります。PCは縦長スクリーン＋左に文字、スマホは全面表示＋下に文字です。
 - 動きを抑える設定とJavaScript無効時は、1枚目の静止画と最初の見出しだけを通常の区間として表示します。
-- 映像を差し替えるときは、同じ手順でコマを書き出し、`index.html` の `data-frames` を枚数に合わせます。
+- 映像を差し替えるときは、同じ手順でコマを書き出し、`roadmap.html` の `data-frames` を枚数に合わせます。
   `ffmpeg -i in.mp4 -vf "select=not(mod(n\,3)),scale=640:-2" -fps_mode vfr -c:v libwebp -q:v 60 assets/orbit/f%03d.webp`
 
 ## 3Dのぴょんぴー（ホーム）
