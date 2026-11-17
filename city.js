@@ -597,7 +597,7 @@ function start() {
   const landmarkModels = {};
   function loadLandmarks() {
     for (const [id, spec] of Object.entries(MODELS)) {
-      new GLTFLoader().load(`assets/city/lm/${id}.glb?v=20261118-1`, gltf => {
+      new GLTFLoader().load(`assets/city/lm/${id}.glb?v=20261118-2`, gltf => {
         const model = gltf.scene;
         model.traverse(node => { if (node.isMesh) (Array.isArray(node.material) ? node.material : [node.material]).forEach(m => { m.envMapIntensity = .45; m.roughness = .5; m.metalness = 0; }); });
         model.scale.setScalar(spec.height);
@@ -621,6 +621,63 @@ function start() {
     playPyon(name, true);
     if (name === 'Idle') setTimeout(() => { if (pyonActive === pyonActions.Idle && !pyonTurning) dance(); }, 1600);
   }
+  /* ── traffic: hover cars on the roads and bridges, the lower town, and drones in the air ── */
+  // Each route returns a position for a distance travelled; cars face along it and bob as they hover.
+  const TAU = Math.PI * 2;
+  const circle = (r, y, cx = 0, cz = 0) => ({length: TAU * r, at: (d, out) => { const a = d / r; out.set(cx + Math.cos(a) * r, y, cz + Math.sin(a) * r); }});
+  function stadium(x, z0, z1, y) {            // up one lane, round the end, back down the other
+    const r = x, straight = z1 - z0, total = straight * 2 + Math.PI * r * 2;
+    return {length: total, at: (d, out) => {
+      d = ((d % total) + total) % total;
+      if (d < straight) out.set(-x, y, z0 + d);
+      else if (d < straight + Math.PI * r) { const a = (d - straight) / r; out.set(-Math.cos(a) * r, y, z1 + Math.sin(a) * r); }
+      else if (d < straight * 2 + Math.PI * r) out.set(x, y, z1 - (d - straight - Math.PI * r));
+      else { const a = (d - straight * 2 - Math.PI * r) / r; out.set(Math.cos(a) * r, y, z0 - Math.sin(a) * r); }
+    }};
+  }
+  const helix = (r, y0, y1, turns) => ({length: TAU * r * turns * 2, at: (d, out) => { const total = TAU * r * turns * 2, k = (((d % total) + total) % total) / total, a = d / r; out.set(Math.cos(a) * r, lerp(y0, y1, .5 - .5 * Math.cos(k * TAU)), Math.sin(a) * r); }});
+  const ROUTES = {
+    plaza: circle(6.6, .32), road: stadium(2.1, 21, 62, .22), ringA: circle(46, .06), ringB: circle(75, .06),
+    low1: circle(34, -69.9), low2: circle(50, -69.9), low3: circle(22, -69.9),
+    air1: circle(24, 15), air2: circle(38, 22), air3: circle(58, 12), lift: helix(29, -62, 9, 3)
+  };
+  // yaw: how far each model's own front is turned from +Z.
+  const CARS = {
+    roadster: {height: 1.7, yaw: Math.PI / 2}, bubble: {height: 2.3, yaw: 0}, bus: {height: 3.1, yaw: Math.PI / 2}, van: {height: 2.7, yaw: Math.PI / 2},
+    scooter: {height: 1.8, yaw: 0}, patrol: {height: 1.9, yaw: 0}, delivery: {height: 2.6, yaw: 0}, cart: {height: 2.9, yaw: Math.PI / 2}
+  };
+  const FLEET = [   // model, route, speed (m/s; negative = the other way), starting distance
+    ['roadster', 'plaza', 3.2, 0], ['scooter', 'plaza', 3.2, 21],
+    ['bubble', 'road', 5, 0], ['van', 'road', 5, 38], ['roadster', 'road', 5, 70],
+    ['bus', 'ringA', 6, 0], ['bubble', 'ringA', 6, 120], ['van', 'ringA', -5, 60], ['bus', 'ringB', -6, 0], ['scooter', 'ringB', 7, 200],
+    ['cart', 'low1', 3.5, 0], ['van', 'low1', 3.5, 90], ['roadster', 'low2', -6, 0], ['cart', 'low2', -3, 130], ['scooter', 'low3', 4, 0], ['bubble', 'low2', -6, 240],
+    ['patrol', 'air1', 4, 0], ['patrol', 'air2', -5, 80], ['patrol', 'air3', 6, 200], ['delivery', 'lift', 7, 0], ['delivery', 'air2', 5, 10], ['delivery', 'lift', 7, 500]
+  ];
+  const traffic = []; let lineup = false;
+  function loadTraffic() {
+    for (const [id, spec] of Object.entries(CARS)) {
+      new GLTFLoader().load(`assets/city/cars/${id}.glb?v=20261118-1`, gltf => {
+        gltf.scene.traverse(node => { if (node.isMesh) (Array.isArray(node.material) ? node.material : [node.material]).forEach(m => { m.envMapIntensity = .5; m.roughness = .45; m.metalness = 0; }); });
+        FLEET.filter(f => f[0] === id).forEach(([, route, speed, start], i) => {
+          const body = gltf.scene.clone(); body.scale.setScalar(spec.height); body.rotation.y = spec.yaw;
+          const car = new THREE.Group(); car.add(body); scene.add(car);
+          traffic.push({id, car, body, route: ROUTES[route], speed, d: start, phase: Math.random() * 6, air: /air|lift/.test(route)});
+        });
+      }, undefined, () => { /* traffic is optional */ });
+    }
+  }
+  const carPos = V(0, 0, 0), carNext = V(0, 0, 0);
+  function updateTraffic(dt, still) {
+    if (lineup) { Object.keys(CARS).forEach((id, i) => { const t = traffic.find(x => x.id === id); if (t) { t.car.position.set(-10.5 + i * 3, .4, 5); t.car.rotation.set(0, 0, 0); } }); return; }
+    for (const t of traffic) {
+      if (!still) t.d += t.speed * dt;
+      t.route.at(t.d, carPos); t.route.at(t.d + Math.sign(t.speed) * .6, carNext);
+      t.car.position.copy(carPos); t.car.position.y += (t.air ? .5 : .12) * Math.sin(time * (t.air ? 1.6 : 2.4) + t.phase) + (t.air ? 0 : .25);
+      t.car.rotation.y = Math.atan2(carNext.x - carPos.x, carNext.z - carPos.z);
+      t.body.rotation.z = Math.sin(time * 1.7 + t.phase) * .04;
+    }
+  }
+
   function playPyon(name, once = false) {
     const next = pyonActions[name]; if (!next) return;
     next.reset(); next.setLoop(once ? THREE.LoopOnce : THREE.LoopRepeat, Infinity); next.clampWhenFinished = once;
@@ -659,7 +716,7 @@ function start() {
     view.idle = 0;
     if (pointers.size === 2) {
       const [a, b] = [...pointers.values()], d = Math.hypot(a.x - b.x, a.y - b.y);
-      if (pinch) view.radT = clamp(view.radT * (pinch / d), 8.5, 17);
+      if (pinch) view.radT = clamp(view.radT * (pinch / d), 10.5, 17);
       pinch = d; travelled += 20; return;
     }
     travelled += Math.abs(dx) + Math.abs(dy);
@@ -673,7 +730,7 @@ function start() {
     if (event.type === 'pointerup' && travelled < 9 && performance.now() - downAt < 450) pick(event.clientX, event.clientY);
   }
   canvas.addEventListener('pointerup', release); canvas.addEventListener('pointercancel', release);
-  canvas.addEventListener('wheel', event => { if (mode !== 'orbit') return; event.preventDefault(); view.radT = clamp(view.radT + event.deltaY * .012, 8.5, 17); view.idle = 0; }, {passive: false});
+  canvas.addEventListener('wheel', event => { if (mode !== 'orbit') return; event.preventDefault(); view.radT = clamp(view.radT + event.deltaY * .012, 10.5, 17); view.idle = 0; }, {passive: false});
   function pick(x, y) {
     if (mode !== 'orbit') return;
     ndc.set(x / innerWidth * 2 - 1, -(y / innerHeight) * 2 + 1); raycaster.setFromCamera(ndc, camera);
@@ -694,7 +751,7 @@ function start() {
     await wait(.72);
     body.classList.remove('is-loading');
     wipeEl.classList.remove('is-on');
-    loadPyonpy(); loadLandmarks();
+    loadPyonpy(); loadLandmarks(); loadTraffic();
     const token = ++introToken;
     if (motionOff()) { finishIntro(); return; }
     mode = 'intro';
@@ -798,6 +855,7 @@ function start() {
     channel.port1.onmessage = () => { if (wake) wake(); };
     window.__city = {
       get mode() { return mode; },
+      lineup(on) { lineup = on; },
       async advance(seconds) { for (let t = 0; t < seconds; t += 1 / 30) { step(1 / 30); await new Promise(resolve => { wake = resolve; channel.port2.postMessage(0); }); } return mode; }
     };
   }
@@ -873,6 +931,7 @@ function start() {
       m.material.opacity = (.75 + .25 * Math.sin(time * 5 + m.position.x)) * (.7 + .3 * night);
     }
     for (const c of paintedClouds) { const a = c.userData.a + time * .006; c.position.set(Math.cos(a) * c.userData.r, c.userData.y, Math.sin(a) * c.userData.r); c.material.opacity = .95 - night * .7; }
+    updateTraffic(dt, still);
     updateBursts(dt);
 
     // Labels and Pyonpy's speech bubble follow their spots on screen.
