@@ -4,6 +4,7 @@
     'ムーニアンズ｜月の内側へ、ようこそ。':'Moonians | Welcome to the inner Moon.',
     'ムーニアンズ ロードマップ｜月の内側のあるきかた':'Moonians Roadmap | A guide to the inner Moon', '街のホーム':'City home',
     'パステルムーンシティ。ムーニアンズが暮らす月の内側の街を3Dで見回して、行きたい場所をえらべます。':'Pastel Moon City. Look around the Moonians’ city inside the Moon in 3D and choose where to go.',
+    '夜にする':'Night', '昼にする':'Day',
     '行き先をえらぶ':'Choose where to go', 'ムーンビジョン':'Moon Vision', 'パステルUFO':'Pastel UFO', 'ミュージックドーム':'Music Dome',
     'うさぎロボ案内所':'Rabbit Robot Info', 'からくり工房':'Karakuri Workshop', 'ムーンタワー':'Moon Tower', 'ロードマップ':'Roadmap',
     '画面をドラッグすると、街を見回せます。':'Drag to look around the city.', 'ぴょんぴーをタップしてみてね。':'Try tapping Pyonpy.',

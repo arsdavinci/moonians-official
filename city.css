@@ -30,6 +30,12 @@ body.no-3d #city-canvas{display:none}
 .language-switch{display:flex;gap:2px;padding:3px;border-radius:999px}
 .language-switch button{font:800 .78rem var(--city-round);color:var(--city-ink-soft);background:transparent;border:0;border-radius:999px;padding:5px 12px;cursor:pointer}
 .language-switch button[aria-pressed="true"]{background:linear-gradient(135deg,var(--city-pink),var(--city-lav));color:#fff;text-shadow:0 1px 0 rgba(90,40,140,.35)}
+.city-night-toggle{display:flex;align-items:center;gap:8px;font:800 .78rem var(--city-round);color:var(--city-ink);border-radius:999px;padding:6px 14px 6px 10px;min-height:40px;cursor:pointer;
+  background:var(--city-glass);border:1.5px solid var(--city-line);-webkit-backdrop-filter:blur(14px) saturate(1.4);backdrop-filter:blur(14px) saturate(1.4);box-shadow:0 8px 26px rgba(98,74,190,.22)}
+.city-night-icon{width:16px;height:16px;border-radius:50%;background:#2a2152;box-shadow:inset -5px -2px 0 0 #ffe27a}
+.city-night-toggle[aria-pressed="true"]{background:linear-gradient(135deg,#2a2152,#5a3fc0);color:#fff;border-color:#b9a3f5}
+.city-night-toggle[aria-pressed="true"] .city-night-icon{background:#ffe27a;box-shadow:0 0 10px #ffe27a}
+body.city-night .city-menu .where,body.city-night .city-hint{color:var(--city-ink-soft)}
 .city-sound{display:flex;align-items:center;gap:8px;padding:4px 12px 4px 4px;border-radius:999px}
 .city-sound-toggle{display:flex;align-items:center;gap:8px;font:800 .78rem var(--city-round);color:var(--city-ink);background:#fff;border:0;border-radius:999px;padding:6px 12px 6px 10px;cursor:pointer;min-height:32px}
 .city-sound-toggle[aria-pressed="true"]{background:linear-gradient(135deg,var(--city-mint),#9fd8ff);color:#0f2b55}

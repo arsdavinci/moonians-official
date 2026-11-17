@@ -129,11 +129,92 @@ function start() {
   const sky = makeSky(SKY); sky.renderOrder = -10; scene.add(sky);
   scene.fog = new THREE.Fog(0xdde6ff, 120, 560);
   const camera = new THREE.PerspectiveCamera(50, 1, .3, 2000);
-  scene.add(new THREE.HemisphereLight(0xf4f6ff, 0xe2d4ff, 2.5));
+  const hemi = new THREE.HemisphereLight(0xf4f6ff, 0xe2d4ff, 2.5); scene.add(hemi);
   const sun = new THREE.DirectionalLight(0xfff2ea, 2.6); sun.position.set(-45, 80, 50); scene.add(sun);
   const pmrem = new THREE.PMREMGenerator(renderer);
   const envScene = new THREE.Scene(); envScene.add(makeSky(SKY));
-  scene.environment = pmrem.fromScene(envScene, .03).texture;
+  const dot = (() => { const c = document.createElement('canvas'); c.width = c.height = 64; const g = c.getContext('2d'), r = g.createRadialGradient(32, 32, 0, 32, 32, 32);
+    r.addColorStop(0, '#fff'); r.addColorStop(.35, 'rgba(255,255,255,.8)'); r.addColorStop(1, 'rgba(255,255,255,0)'); g.fillStyle = r; g.fillRect(0, 0, 64, 64); return new THREE.CanvasTexture(c); })();
+  const envDay = pmrem.fromScene(envScene, .03).texture;
+  scene.environment = envDay;
+
+  /* ── day and night ── */
+  const NIGHT_SKY = ['#5a3d9c', '#2c2170', '#140f45', '#070522'];
+  const envNightScene = new THREE.Scene(); envNightScene.add(makeSky(NIGHT_SKY));
+  const envNight = pmrem.fromScene(envNightScene, .03).texture;
+  const skyDay = SKY.map(c => new THREE.Color(c)), skyNight = NIGHT_SKY.map(c => new THREE.Color(c));
+  const fogDay = new THREE.Color(0xdde6ff), fogNight = new THREE.Color(0x1b1450);
+  const sunDay = new THREE.Color(0xfff2ea), sunNight = new THREE.Color(0x8fa4ff);
+  const hemiSkyDay = new THREE.Color(0xf4f6ff), hemiSkyNight = new THREE.Color(0x4a47b0), hemiGroundDay = new THREE.Color(0xe2d4ff), hemiGroundNight = new THREE.Color(0x3a2a80);
+  let night = 0, nightT = 0;
+  try { nightT = night = JSON.parse(localStorage.getItem('moonians.city-night')) === true ? 1 : 0; } catch { /* optional */ }
+  const uTime = {value: 0}, uGlow = {value: 1};
+  const nightToggle = $('#night-toggle'), nightLabel = $('#night-label'), keep = {};
+  function showNight() {
+    if (!nightToggle) return;
+    nightToggle.setAttribute('aria-pressed', String(nightT === 1));
+    nightLabel.textContent = tr(nightT === 1 ? '昼にする' : '夜にする');
+    body.classList.toggle('city-night', nightT === 1);
+  }
+  if (nightToggle) nightToggle.addEventListener('click', () => {
+    nightT = nightT === 1 ? 0 : 1;
+    try { localStorage.setItem('moonians.city-night', JSON.stringify(nightT === 1)); } catch { /* optional */ }
+    sound.fx.pop(); showNight();
+  });
+  document.addEventListener('moonians:languagechange', showNight);
+  showNight();
+
+  // LEDs: every glowing material is animated in its shader, by where each light sits in the city.
+  const LED = {
+    neon: 'float la = atan(vLedPos.z, vLedPos.x); float fx = 0.72 + 0.48 * sin(la * 5.0 + length(vLedPos.xz) * 0.12 + vLedPos.y * 0.35 - uTime * 2.6); fx += 0.4 * step(0.9, sin(la * 2.0 + vLedPos.y * 0.05 - uTime * 1.4));',
+    window: 'float lh = ledHash(floor(vLedPos * vec3(0.6, 0.5, 0.6))); float fx = 0.45 + 0.8 * smoothstep(0.35, 0.5, fract(lh * 9.0 + uTime * (0.04 + lh * 0.12)));',
+    screen: 'float fx = 0.85 + 0.2 * sin(vLedPos.y * 9.0 - uTime * 7.0) + 0.14 * step(0.95, fract(sin(floor(uTime * 9.0)) * 91.7));'
+  };
+  function led(material, kind) {
+    material.onBeforeCompile = shader => {
+      shader.uniforms.uTime = uTime; shader.uniforms.uGlow = uGlow;
+      shader.vertexShader = shader.vertexShader.replace('#include <common>', '#include <common>\nvarying vec3 vLedPos;')
+        .replace('#include <project_vertex>', '#include <project_vertex>\nvLedPos = (modelMatrix * vec4(transformed, 1.0)).xyz;');
+      shader.fragmentShader = shader.fragmentShader.replace('#include <common>', '#include <common>\nuniform float uTime; uniform float uGlow; varying vec3 vLedPos;\nfloat ledHash(vec3 p){ return fract(sin(dot(p, vec3(12.9898, 78.233, 37.719))) * 43758.5453); }')
+        .replace('#include <emissivemap_fragment>', '#include <emissivemap_fragment>\n' + LED[kind] + '\ntotalEmissiveRadiance *= fx * uGlow;');
+    };
+    material.customProgramCacheKey = () => 'led-' + kind;
+  }
+
+  // Sunbeams slanting across the city by day; stars and a moon by night.
+  const beamTexture = (() => { const c = document.createElement('canvas'); c.width = 64; c.height = 256; const g = c.getContext('2d');
+    const across = g.createLinearGradient(0, 0, 64, 0); across.addColorStop(0, 'rgba(255,255,255,0)'); across.addColorStop(.5, 'rgba(255,255,255,1)'); across.addColorStop(1, 'rgba(255,255,255,0)');
+    g.fillStyle = across; g.fillRect(0, 0, 64, 256); g.globalCompositeOperation = 'destination-in';
+    const along = g.createLinearGradient(0, 0, 0, 256); along.addColorStop(0, 'rgba(0,0,0,0)'); along.addColorStop(.25, 'rgba(0,0,0,1)'); along.addColorStop(1, 'rgba(0,0,0,0)');
+    g.fillStyle = along; g.fillRect(0, 0, 64, 256); return new THREE.CanvasTexture(c); })();
+  const sunDir = V(-45, 80, 50).normalize(), beams = [];
+  for (let i = 0; i < 7; i++) {
+    const m = new THREE.Mesh(new THREE.PlaneGeometry(14 + (i % 3) * 9, 230), new THREE.MeshBasicMaterial({map: beamTexture, color: 0xfff1d6, transparent: true, opacity: .12, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide, fog: false}));
+    m.position.set(-70 + i * 24 + (i % 2) * 9, 48, -40 + (i * 37) % 90).addScaledVector(sunDir, 30);
+    m.quaternion.setFromUnitVectors(V(0, 1, 0), sunDir); m.rotateY(i * .9);
+    m.renderOrder = 4; scene.add(m); beams.push(m);
+  }
+  const sunDisc = new THREE.Sprite(new THREE.SpriteMaterial({map: dot, color: 0xfff3d0, transparent: true, opacity: .95, blending: THREE.AdditiveBlending, depthWrite: false, fog: false}));
+  sunDisc.scale.setScalar(260); scene.add(sunDisc);
+  const moonDisc = new THREE.Sprite(new THREE.SpriteMaterial({map: dot, color: 0xdfe6ff, transparent: true, opacity: 0, depthWrite: false, fog: false}));
+  moonDisc.scale.setScalar(90); scene.add(moonDisc);
+  const starN = 900, starPos = new Float32Array(starN * 3);
+  for (let i = 0; i < starN; i++) { const v = V(Math.random() - .5, Math.random() * .9 + .04, Math.random() - .5).normalize().multiplyScalar(820); starPos.set([v.x, v.y, v.z], i * 3); }
+  const starGeo = new THREE.BufferGeometry(); starGeo.setAttribute('position', new THREE.BufferAttribute(starPos, 3));
+  const stars = new THREE.Points(starGeo, new THREE.PointsMaterial({size: 5, map: dot, sizeAttenuation: true, transparent: true, opacity: 0, depthWrite: false, fog: false, color: 0xffffff}));
+  stars.frustumCulled = false; scene.add(stars);
+  function applyNight(k) {
+    const sk = sky.material.uniforms;
+    ['c0', 'c1', 'c2', 'c3'].forEach((name, i) => sk[name].value.copy(skyDay[i]).lerp(skyNight[i], k));
+    scene.fog.color.copy(fogDay).lerp(fogNight, k);
+    hemi.color.copy(hemiSkyDay).lerp(hemiSkyNight, k); hemi.groundColor.copy(hemiGroundDay).lerp(hemiGroundNight, k); hemi.intensity = lerp(2.5, .75, k);
+    sun.color.copy(sunDay).lerp(sunNight, k); sun.intensity = lerp(2.6, .55, k);
+    scene.environment = k > .5 ? envNight : envDay;
+    uGlow.value = lerp(1, 1.75, k);
+    stars.material.opacity = k; moonDisc.material.opacity = k * .95; sunDisc.material.opacity = (1 - k) * .95;
+    if (keep.cloud) keep.cloud.emissiveIntensity = lerp(.34, .04, k);
+    if (keep.mist) keep.mist.opacity = lerp(.13, .3, k);
+  }
 
   /* ── loading scene: a little moon gate spinning in space ── */
   const loadScene = new THREE.Scene();
@@ -161,8 +242,6 @@ function start() {
   }
   const warpN = 420, warpPos = new Float32Array(warpN * 3);
   for (let i = 0; i < warpN; i++) { warpPos[i * 3] = (Math.random() - .5) * 60; warpPos[i * 3 + 1] = (Math.random() - .5) * 60; warpPos[i * 3 + 2] = -Math.random() * 120; }
-  const dot = (() => { const c = document.createElement('canvas'); c.width = c.height = 64; const g = c.getContext('2d'), r = g.createRadialGradient(32, 32, 0, 32, 32, 32);
-    r.addColorStop(0, '#fff'); r.addColorStop(.35, 'rgba(255,255,255,.8)'); r.addColorStop(1, 'rgba(255,255,255,0)'); g.fillStyle = r; g.fillRect(0, 0, 64, 64); return new THREE.CanvasTexture(c); })();
   const warpGeo = new THREE.BufferGeometry(); warpGeo.setAttribute('position', new THREE.BufferAttribute(warpPos, 3));
   loadScene.add(new THREE.Points(warpGeo, new THREE.PointsMaterial({size: .7, map: dot, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, color: 0xfff0fb})));
 
@@ -179,8 +258,9 @@ function start() {
     jobs.add(job); job(0);
   });
   function orbitPose(pos, look) {
-    pos.set(Math.sin(view.az) * view.rad, 4.2 + 1.6 * view.tilt, Math.cos(view.az) * view.rad);
-    look.set(0, 5.4 + 21 * view.tilt, 0);
+    const up = Math.max(0, view.tilt), down = Math.max(0, -view.tilt), rad = view.rad * (1 + down * .3);
+    pos.set(Math.sin(view.az) * rad, 4.2 + 1.6 * up + 17 * down, Math.cos(view.az) * rad);
+    look.set(-Math.sin(view.az) * 42 * down, 5.4 + 21 * up - 12 * down, -Math.cos(view.az) * 42 * down);   // looking down means looking out over the far rim
   }
   function fly(toPos, toLook, duration, arc = 0, ease = easeInOut) {
     const fromPos = camPos.clone(), fromLook = camLook.clone();
@@ -212,15 +292,20 @@ function start() {
     material.envMapIntensity = .55;
     if (/M_(N_|W_|SCREEN|GLOW|HALO|LANTERN)/.test(name)) {
       material.emissiveIntensity = /M_W_|SCREEN/.test(name) ? .82 : 1;
+      led(material, /M_W_/.test(name) ? 'window' : /SCREEN/.test(name) ? 'screen' : 'neon');
       material.color.copy(material.emissive).multiplyScalar(.22);
       material.envMapIntensity = 0;
     }
-    if (/M_(FLOOR|PLAZA|ROAD)$/.test(name)) { material.transparent = true; material.opacity = .52; material.roughness = .1; material.metalness = .2; material.envMapIntensity = 1.15; material.depthWrite = false; }
+    if (/M_(FLOOR|PLAZA|ROAD)$/.test(name)) { material.roughness = .08; material.metalness = .3; material.envMapIntensity = 1.3; }
+    if (/M_LOWGROUND$/.test(name)) { material.roughness = .7; material.metalness = 0; material.envMapIntensity = .12; }
+    if (/M_D_/.test(name)) material.envMapIntensity = .25;
+    if (/M_MIST$/.test(name)) { material.transparent = true; material.opacity = .13; material.depthWrite = false; material.side = THREE.DoubleSide; material.emissiveIntensity = .5; material.envMapIntensity = 0; }
     if (/M_(GLASS|BUBBLE)$/.test(name)) { material.depthWrite = false; material.envMapIntensity = 1.4; material.roughness = .05; }
-    if (/M_CLOUD$/.test(name)) { material.emissiveIntensity = .34; material.envMapIntensity = .2; }
+    if (/M_CLOUD$/.test(name)) { material.emissiveIntensity = .34; material.envMapIntensity = .2; keep.cloud = material; }
+    if (/M_MIST$/.test(name)) keep.mist = material;
   }
 
-  let mirror = null, sparkle = null, pyon = null, pyonMixer = null, pyonActions = {}, pyonActive = null, statueBounce = 0;
+  let sparkle = null, pyon = null, pyonMixer = null, pyonActions = {}, pyonActive = null, statueBounce = 0;
   const ufoBase = V(0, 0, 0), shutterBase = {};
 
   function build(gltf) {
@@ -231,11 +316,7 @@ function start() {
     });
     for (const [id, place] of Object.entries(PLACES)) { place.id = id; place.node = N[place.anchor]; }
 
-    // Fake reflections: the city mirrored under a see-through floor.
-    mirror = new THREE.Group(); mirror.scale.y = -1;
-    ['City_Static', 'City_Far', 'Statue'].forEach(name => { if (N[name]) mirror.add(N[name].clone()); });
-    scene.add(mirror);
-    if (N.City_Floor) N.City_Floor.traverse(o => { o.renderOrder = 2; });
+    if (N.City_Mist) N.City_Mist.traverse(o => { o.renderOrder = 3; });   // the haze between the main level and the town below
 
     // Moon Vision: a real picture on the big screen, behind shutters that open when you arrive.
     const screen = N.Anime_Screen;
@@ -503,7 +584,7 @@ function start() {
     }
     travelled += Math.abs(dx) + Math.abs(dy);
     const k = 2.6 / Math.min(innerWidth, 900);
-    view.azT -= dx * k * 1.9; view.tiltT = clamp(view.tiltT + dy * k * .9, -.12, 1);
+    view.azT -= dx * k * 1.9; view.tiltT = clamp(view.tiltT + dy * k * .9, -.9, 1);
   });
   function release(event) {
     if (!pointers.has(event.pointerId)) return;
@@ -575,7 +656,7 @@ function start() {
     setShutters(boost.shutter); jobs.clear(); orbitPose(camPos, camLook); mode = 'orbit';
   });
 
-  new GLTFLoader().load('assets/city/pastel-moon-city.glb?v=20261118-1', gltf => {
+  new GLTFLoader().load('assets/city/pastel-moon-city.glb?v=20261118-2', gltf => {
     try { build(gltf); } catch (error) { console.error(error); fail(); return; }
     progress = 1;
   }, event => { progress = Math.min(.98, event.loaded / (event.total || 3460872)); }, () => fail());
@@ -622,7 +703,7 @@ function start() {
         slow += dt; frames++;
         if (frames === 90) {
           const average = slow / frames;
-          if (average > .027) { if (dpr > 1) { dpr = Math.max(1, dpr - .5); renderer.setPixelRatio(dpr); } else if (mirror && mirror.visible) mirror.visible = false; }
+          if (average > .027) { if (dpr > 1) { dpr = Math.max(1, dpr - .5); renderer.setPixelRatio(dpr); } else if (N.City_Lower && N.City_Lower.visible && average > .04) N.City_Lower.visible = false; }
           slow = 0; frames = 0;
         }
       }
@@ -641,6 +722,10 @@ function start() {
 
   function update(dt) {
     const still = motionOff();
+    if (!still) uTime.value = time;
+    night = Math.abs(nightT - night) < .002 ? nightT : lerp(night, nightT, 1 - Math.pow(.02, dt));
+    applyNight(night);
+    beams.forEach((m, i) => { m.material.opacity = (1 - night) * (.07 + .07 * (Math.sin(time * .35 + i * 1.7) * .5 + .5)); m.visible = night < .98; });
     if (mode === 'orbit') {
       view.idle += dt;
       if (view.idle > 6 && !still && !pointers.size) view.azT += dt * .045;
@@ -649,7 +734,9 @@ function start() {
       orbitPose(camPos, camLook);
     }
     camera.position.copy(camPos); camera.lookAt(camLook);
-    sky.position.copy(camPos);
+    sky.position.copy(camPos); stars.position.copy(camPos); stars.rotation.y = time * .004;
+    sunDisc.position.copy(camPos).addScaledVector(sunDir, 760); moonDisc.position.copy(camPos).add(tmp2.set(260, 330, -620));
+    if (N.screenFace) N.screenFace.material.color.setScalar(boost.screen * (.93 + .07 * Math.sin(time * 9) + (Math.sin(time * 2.3) > .97 ? -.2 : 0)));
 
     if (N.UFO) {
       const u = N.UFO;
