@@ -7,7 +7,7 @@
 - 画像：assets 内。本人提供の素材を使用しています。
 - ローカル確認：このディレクトリで `python -m http.server 8765 --bind 127.0.0.1`
 - ホーム（3Dの街「パステルムーンシティ」で行き先をえらぶ）：index.html / city.js / city.css
-  - 街のモデル：assets/city/pastel-moon-city.glb。元データと作り直し用スクリプトは D:\Development_Game\PastelMoonCitylender（`build_city.py --low` で書き出し）
+  - 街のモデル：assets/city/pastel-moon-city.glb。元データと作り直し用スクリプトは PastelMoonCity/blender（Git管理外。`build_city.py --low` で書き出し）
 - ロードマップ（以前のホーム。SNSリンク、プロフィール、活動記録）：roadmap.html
 - 参考資料：sources.html
 

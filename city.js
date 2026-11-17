@@ -119,14 +119,29 @@ function start() {
   function makeSky(colors, whole = false) {
     return new THREE.Mesh(new THREE.SphereGeometry(900, 32, 20), new THREE.ShaderMaterial({
       side: THREE.BackSide, depthWrite: false, fog: false,
-      uniforms: {whole: {value: whole ? 1 : 0}, c0: {value: new THREE.Color(colors[0])}, c1: {value: new THREE.Color(colors[1])}, c2: {value: new THREE.Color(colors[2])}, c3: {value: new THREE.Color(colors[3])}},
+      uniforms: {pano: {value: null}, panoMix: {value: 0}, whole: {value: whole ? 1 : 0}, c0: {value: new THREE.Color(colors[0])}, c1: {value: new THREE.Color(colors[1])}, c2: {value: new THREE.Color(colors[2])}, c3: {value: new THREE.Color(colors[3])}},
       vertexShader: 'varying vec3 vDir; void main(){ vDir = normalize(position); gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }',
-      fragmentShader: 'uniform float whole; uniform vec3 c0; uniform vec3 c1; uniform vec3 c2; uniform vec3 c3; varying vec3 vDir; void main(){ float y = normalize(vDir).y; float h = clamp(mix(y, y * 0.5 + 0.5, whole), 0.0, 1.0); vec3 c = mix(c0, c1, smoothstep(0.0, 0.07, h)); c = mix(c, c2, smoothstep(0.07, 0.34, h)); c = mix(c, c3, smoothstep(0.34, 1.0, h)); gl_FragColor = vec4(c, 1.0); \n#include <colorspace_fragment>\n }'
+      fragmentShader: 'uniform sampler2D pano; uniform float panoMix; uniform float whole; uniform vec3 c0; uniform vec3 c1; uniform vec3 c2; uniform vec3 c3; varying vec3 vDir; void main(){ float y = normalize(vDir).y; float h = clamp(mix(y, y * 0.5 + 0.5, whole), 0.0, 1.0); vec3 c = mix(c0, c1, smoothstep(0.0, 0.07, h)); c = mix(c, c2, smoothstep(0.07, 0.34, h)); c = mix(c, c3, smoothstep(0.34, 1.0, h)); if (panoMix > 0.0) { vec3 d = normalize(vDir); vec2 uv = vec2(atan(d.z, d.x) / 6.2831853 + 0.5, asin(clamp(d.y, -1.0, 1.0)) / 3.1415927 + 0.5); c = mix(c, texture2D(pano, uv).rgb, panoMix); } gl_FragColor = vec4(c, 1.0); \n#include <colorspace_fragment>\n }'
     }));
   }
   const SKY = ['#fbe4f5', '#d6e4ff', '#8fbcfc', '#6798f5'];
   const scene = new THREE.Scene();
   const sky = makeSky(SKY); sky.renderOrder = -10; scene.add(sky);
+  const textures = new THREE.TextureLoader();
+  let panoReady = false;
+  textures.load('assets/city/sky-panorama.jpg', texture => { texture.colorSpace = THREE.SRGBColorSpace; texture.wrapS = THREE.RepeatWrapping; sky.material.uniforms.pano.value = texture; panoReady = true; });
+  const tileTexture = textures.load('assets/city/floor-tile.jpg', texture => { texture.colorSpace = THREE.SRGBColorSpace; texture.wrapS = texture.wrapT = THREE.RepeatWrapping; texture.anisotropy = 4; });
+  // Floors take the tile picture by world position, so the merged model needs no UVs.
+  function tiled(material) {
+    material.onBeforeCompile = shader => {
+      shader.uniforms.uTile = {value: tileTexture};
+      shader.vertexShader = shader.vertexShader.replace('#include <common>', '#include <common>\nvarying vec3 vTilePos;')
+        .replace('#include <project_vertex>', '#include <project_vertex>\nvTilePos = (modelMatrix * vec4(transformed, 1.0)).xyz;');
+      shader.fragmentShader = shader.fragmentShader.replace('#include <common>', '#include <common>\nuniform sampler2D uTile; varying vec3 vTilePos;')
+        .replace('#include <map_fragment>', '#include <map_fragment>\nvec4 tileTexel = texture2D(uTile, vTilePos.xz * 0.11);\n#ifdef DECODE_VIDEO_TEXTURE\n#endif\ndiffuseColor.rgb = mix(diffuseColor.rgb, pow(tileTexel.rgb, vec3(2.2)), 0.85);');
+    };
+    material.customProgramCacheKey = () => 'tiled';
+  }
   scene.fog = new THREE.Fog(0xdde6ff, 120, 560);
   const camera = new THREE.PerspectiveCamera(50, 1, .3, 2000);
   const hemi = new THREE.HemisphereLight(0xf4f6ff, 0xe2d4ff, 2.5); scene.add(hemi);
@@ -211,6 +226,7 @@ function start() {
     sun.color.copy(sunDay).lerp(sunNight, k); sun.intensity = lerp(2.6, .55, k);
     scene.environment = k > .5 ? envNight : envDay;
     uGlow.value = lerp(1, 1.75, k);
+    sk.panoMix.value = panoReady ? 1 - k : 0;
     stars.material.opacity = k; moonDisc.material.opacity = k * .95; sunDisc.material.opacity = (1 - k) * .95;
     if (keep.cloud) keep.cloud.emissiveIntensity = lerp(.34, .04, k);
     if (keep.mist) keep.mist.opacity = lerp(.13, .3, k);
@@ -296,7 +312,7 @@ function start() {
       material.color.copy(material.emissive).multiplyScalar(.22);
       material.envMapIntensity = 0;
     }
-    if (/M_(FLOOR|PLAZA|ROAD)$/.test(name)) { material.roughness = .08; material.metalness = .3; material.envMapIntensity = 1.3; }
+    if (/M_(FLOOR|PLAZA|ROAD)$/.test(name)) { material.roughness = .1; material.metalness = .25; material.envMapIntensity = 1.2; tiled(material); }
     if (/M_LOWGROUND$/.test(name)) { material.roughness = .7; material.metalness = 0; material.envMapIntensity = .12; }
     if (/M_D_/.test(name)) material.envMapIntensity = .25;
     if (/M_MIST$/.test(name)) { material.transparent = true; material.opacity = .13; material.depthWrite = false; material.side = THREE.DoubleSide; material.emissiveIntensity = .5; material.envMapIntensity = 0; }
@@ -305,6 +321,7 @@ function start() {
     if (/M_MIST$/.test(name)) keep.mist = material;
   }
 
+  const holos = [], paintedClouds = [];
   let sparkle = null, pyon = null, pyonMixer = null, pyonActions = {}, pyonActive = null, statueBounce = 0;
   const ufoBase = V(0, 0, 0), shutterBase = {};
 
@@ -379,6 +396,32 @@ function start() {
     sparkle = new THREE.Points(geometry, new THREE.PointsMaterial({size: .55, map: dot, vertexColors: true, transparent: true, opacity: .9, depthWrite: false, blending: THREE.AdditiveBlending, fog: false}));
     scene.add(sparkle);
     setShutters(boost.shutter);
+
+    // Holographic neon icons: one turning above each landmark, the rest circling the inner ring bridge.
+    const atlas = textures.load('assets/city/neon-icons.jpg', texture => { texture.colorSpace = THREE.SRGBColorSpace; });
+    const icon = (index, size) => {
+      const map = atlas.clone(); map.repeat.set(.25, .25); map.offset.set((index % 4) * .25, .75 - Math.floor(index / 4) * .25);
+      const mesh = new THREE.Mesh(new THREE.PlaneGeometry(size, size), new THREE.MeshBasicMaterial({map, transparent: true, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide, fog: false}));
+      scene.add(mesh); holos.push(mesh); return mesh;
+    };
+    for (const [id, index, height] of [['anime', 12, 33], ['music', 6, 19], ['friends', 2, 23], ['lab', 10, 17], ['roadmap', 0, 12]]) {
+      const m = icon(index, 5); m.position.copy(PLACES[id].node.position); m.position.y += height; m.userData.spin = .9;
+    }
+    [1, 3, 4, 5, 7, 8, 9, 11, 13, 14, 15, 1, 3, 9].forEach((index, i) => {
+      const a = (i / 14) * Math.PI * 2 + .3, m = icon(index, 4.2);
+      m.userData.ring = {a, r: 46, y: 11 + (i % 3) * 3};
+    });
+    // Painted clouds drifting between the towers.
+    textures.load('assets/city/clouds.webp', texture => {
+      texture.colorSpace = THREE.SRGBColorSpace;
+      for (let i = 0; i < 12; i++) {
+        const map = texture.clone(); map.repeat.set(1 / 3, .5); map.offset.set((i % 3) / 3, Math.floor(i / 3) % 2 * .5); map.needsUpdate = true;
+        const sprite = new THREE.Sprite(new THREE.SpriteMaterial({map, transparent: true, depthWrite: false, fog: true}));
+        const a = (i / 12) * Math.PI * 2 + i, r = 90 + (i * 53) % 110;
+        sprite.userData = {a, r, y: 26 + (i * 17) % 60}; sprite.scale.set(70, 46, 1);
+        scene.add(sprite); paintedClouds.push(sprite);
+      }
+    });
   }
 
   function setShutters(closed) {
@@ -773,6 +816,12 @@ function start() {
       while (delta > Math.PI) delta -= Math.PI * 2; while (delta < -Math.PI) delta += Math.PI * 2;
       pyon.rotation.y += delta * (1 - Math.pow(.02, dt));
     }
+    for (const m of holos) {
+      if (m.userData.ring) { const g = m.userData.ring, a = g.a + time * .12; m.position.set(Math.cos(a) * g.r, g.y + Math.sin(time * 1.3 + g.a * 5) * .6, Math.sin(a) * g.r); m.rotation.y = -a + Math.PI / 2 + time * .8; }
+      else m.rotation.y = time * m.userData.spin;
+      m.material.opacity = (.75 + .25 * Math.sin(time * 5 + m.position.x)) * (.7 + .3 * night);
+    }
+    for (const c of paintedClouds) { const a = c.userData.a + time * .006; c.position.set(Math.cos(a) * c.userData.r, c.userData.y, Math.sin(a) * c.userData.r); c.material.opacity = .95 - night * .7; }
     updateBursts(dt);
 
     // Labels and Pyonpy's speech bubble follow their spots on screen.
