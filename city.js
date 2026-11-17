@@ -584,6 +584,33 @@ function start() {
       burst(V(0, 2, 0), PASTEL, 50, 6, .8);
     }, undefined, () => { /* the city works without him */ });
   }
+  // The landmark models made from the design sheets (Meshy). Each replaces the hand-built one once it has loaded.
+  const MODELS = {
+    anime:   {height: 27,  hide: ['Proc_Anime', 'Anime_ShutterL', 'Anime_ShutterR', 'Anime_Screen']},
+    music:   {height: 15,  hide: ['Proc_Music', 'Music_Note', 'Music_EqBars']},
+    friends: {height: 17,  hide: ['Proc_Friends', 'Friends_EarL', 'Friends_EarR', 'Friends_Face']},
+    lab:     {height: 14,  hide: ['Proc_Lab', 'Gear_A', 'Gear_B', 'Lab_Bubbles']},
+    roadmap: {height: 72,  hide: ['Proc_Roadmap', 'Tower_Ring1', 'Tower_Ring2', 'Tower_Ring3', 'Tower_Crescent']},
+    game:    {height: 6.2, hide: []}
+  };
+  const landmarkModels = {};
+  function loadLandmarks() {
+    for (const [id, spec] of Object.entries(MODELS)) {
+      new GLTFLoader().load(`assets/city/lm/${id}.glb?v=20261118-1`, gltf => {
+        const model = gltf.scene;
+        model.traverse(node => { if (node.isMesh) (Array.isArray(node.material) ? node.material : [node.material]).forEach(m => { m.envMapIntensity = .45; m.roughness = .5; m.metalness = 0; }); });
+        model.scale.setScalar(spec.height);
+        if (id === 'game') {
+          N.UFO.traverse(node => { if (node.isMesh && node.parent !== N.UFO_BeamMesh && node !== N.UFO_BeamMesh) node.visible = false; });
+          model.position.y = -spec.height * .42; N.UFO.add(model);
+        } else {
+          const anchor = PLACES[id].node; model.position.copy(anchor.position); model.quaternion.copy(anchor.quaternion); scene.add(model);
+          spec.hide.forEach(name => { if (N[name]) N[name].visible = false; });
+        }
+        landmarkModels[id] = model;
+      }, undefined, () => { /* the hand-built landmark stays */ });
+    }
+  }
   function playPyon(name, once = false) {
     const next = pyonActions[name]; if (!next) return;
     next.reset(); next.setLoop(once ? THREE.LoopOnce : THREE.LoopRepeat, Infinity); next.clampWhenFinished = once;
@@ -657,7 +684,7 @@ function start() {
     await wait(.72);
     body.classList.remove('is-loading');
     wipeEl.classList.remove('is-on');
-    loadPyonpy();
+    loadPyonpy(); loadLandmarks();
     const token = ++introToken;
     if (motionOff()) { finishIntro(); return; }
     mode = 'intro';
@@ -699,7 +726,7 @@ function start() {
     setShutters(boost.shutter); jobs.clear(); orbitPose(camPos, camLook); mode = 'orbit';
   });
 
-  new GLTFLoader().load('assets/city/pastel-moon-city.glb?v=20261118-2', gltf => {
+  new GLTFLoader().load('assets/city/pastel-moon-city.glb?v=20261118-3', gltf => {
     try { build(gltf); } catch (error) { console.error(error); fail(); return; }
     progress = 1;
   }, event => { progress = Math.min(.98, event.loaded / (event.total || 3460872)); }, () => fail());
