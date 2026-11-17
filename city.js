@@ -580,8 +580,8 @@ function start() {
         clip.tracks = clip.tracks.filter(track => !/^(root|RootNode)\.position$/.test(track.name));
         pyonActions[clip.name] = pyonMixer.clipAction(clip);
       });
-      pyonMixer.addEventListener('finished', () => playPyon('Idle'));
-      playPyon('Idle');
+      pyonMixer.addEventListener('finished', () => { if (!pyonTurning) dance(); });
+      dance();
       burst(V(0, 2, 0), PASTEL, 50, 6, .8);
     }, undefined, () => { /* the city works without him */ });
   }
@@ -611,6 +611,15 @@ function start() {
         landmarkModels[id] = model;
       }, undefined, () => { /* the hand-built landmark stays */ });
     }
+  }
+  // He dances on the stage: his happy moves one after another, with a little bounce and sway on top.
+  const DANCE = ['Cheer', 'Jump', 'Talk', 'Cheer', 'Idle', 'Jump'];
+  let danceIndex = 0, pyonTurning = false, pyonFacing = 0;
+  function dance() {
+    const moves = DANCE.filter(name => pyonActions[name]); if (!moves.length) return;
+    const name = moves[danceIndex++ % moves.length];
+    playPyon(name, true);
+    if (name === 'Idle') setTimeout(() => { if (pyonActive === pyonActions.Idle && !pyonTurning) dance(); }, 1600);
   }
   function playPyon(name, once = false) {
     const next = pyonActions[name]; if (!next) return;
@@ -737,7 +746,10 @@ function start() {
     const w = innerWidth, h = innerHeight;
     renderer.setSize(w, h, false);
     for (const cam of [camera, loadCam]) { cam.aspect = w / h; }
-    camera.fov = w / h < .75 ? 64 : w / h < 1.2 ? 56 : 48; camera.updateProjectionMatrix();
+    camera.fov = w / h < .75 ? 64 : w / h < 1.2 ? 56 : 48;
+    // On narrow screens the menu sits along the bottom, so lift the whole view to keep Pyonpy above it.
+    if (w < 760) camera.setViewOffset(w, h, 0, h * .15, w, h); else camera.clearViewOffset();
+    camera.updateProjectionMatrix();
     loadCam.position.set(0, 0, w / h < .8 ? 24 : 14.5); loadCam.updateProjectionMatrix();
   }
   addEventListener('resize', resize); resize();
@@ -842,9 +854,18 @@ function start() {
     if (N.Statue) { statueBounce = Math.max(0, statueBounce - dt * 1.6); N.Statue.scale.setScalar(1 + Math.sin(statueBounce * Math.PI * 3) * .12 * statueBounce); }
     if (pyon) {
       if (pyonMixer && !still) pyonMixer.update(dt);
-      let want = Math.atan2(camPos.x, camPos.z), delta = want - pyon.rotation.y;
+      // When the view moves round, he steps round slowly on the spot until he faces it again, then goes back to dancing.
+      let delta = Math.atan2(camPos.x, camPos.z) - pyonFacing;
       while (delta > Math.PI) delta -= Math.PI * 2; while (delta < -Math.PI) delta += Math.PI * 2;
-      pyon.rotation.y += delta * (1 - Math.pow(.02, dt));
+      if (!pyonTurning && Math.abs(delta) > .3 && !still) { pyonTurning = true; playPyon(pyonActions.Walk ? 'Walk' : 'Idle'); if (pyonActive) pyonActive.timeScale = .7; }
+      if (pyonTurning) {
+        pyonFacing += Math.sign(delta) * Math.min(Math.abs(delta), dt * .55);
+        if (Math.abs(delta) < .04) { pyonTurning = false; if (pyonActive) pyonActive.timeScale = 1; dance(); }
+      } else if (still) pyonFacing += delta * (1 - Math.pow(.02, dt));
+      const groove = pyonTurning || still ? 0 : 1;
+      pyon.rotation.y = pyonFacing + Math.sin(time * 1.6) * .22 * groove;
+      pyon.rotation.z = Math.sin(time * 3.2) * .07 * groove;
+      pyon.position.y = .68 + Math.abs(Math.sin(time * 3.2)) * .09 * groove;
     }
     for (const m of holos) {
       if (m.userData.ring) { const g = m.userData.ring, a = g.a + time * .12; m.position.set(Math.cos(a) * g.r, g.y + Math.sin(time * 1.3 + g.a * 5) * .6, Math.sin(a) * g.r); m.rotation.y = -a + Math.PI / 2 + time * .8; }
