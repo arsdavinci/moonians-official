@@ -324,6 +324,7 @@ function start() {
   const holos = [], paintedClouds = [];
   let sparkle = null, pyon = null, pyonMixer = null, pyonActions = {}, pyonActive = null, statueBounce = 0;
   const ufoBase = V(0, 0, 0), shutterBase = {};
+  let ufoAngle = 2.4;
 
   function build(gltf) {
     const root = gltf.scene; scene.add(root);
@@ -366,7 +367,7 @@ function start() {
     };
     const P = PLACES, up = (place, y) => place.node.position.clone().add(V(0, y, 0));
     proxy('place', 'anime', new THREE.BoxGeometry(20, 29, 11), up(P.anime, 14.5), P.anime.node.quaternion);
-    N.ufoProxy = proxy('place', 'game', new THREE.SphereGeometry(6.2, 12, 8), P.game.node.position);
+    N.ufoProxy = proxy('place', 'game', new THREE.SphereGeometry(9.5, 12, 8), P.game.node.position);
     proxy('place', 'music', new THREE.SphereGeometry(11, 12, 8), up(P.music, 3.5));
     proxy('place', 'friends', new THREE.SphereGeometry(7.2, 12, 8), up(P.friends, 6.5));
     proxy('place', 'lab', new THREE.BoxGeometry(13, 14, 10), up(P.lab, 6.5), P.lab.node.quaternion);
@@ -548,7 +549,7 @@ function start() {
     while (target - view.azT > Math.PI) target -= Math.PI * 2;
     while (target - view.azT < -Math.PI) target += Math.PI * 2;
     view.azT = target; view.idle = 0;
-    if (id === 'game' || id === 'roadmap') view.tiltT = id === 'game' ? .5 : .75; else view.tiltT = .12;
+    if (id === 'game' || id === 'roadmap') view.tiltT = id === 'game' ? .95 : .75; else view.tiltT = .12;
   }
 
   links.forEach(link => {
@@ -810,7 +811,9 @@ function start() {
 
     if (N.UFO) {
       const u = N.UFO;
-      u.position.set(ufoBase.x + Math.cos(time * .22) * 2.6, ufoBase.y + Math.sin(time * 1.25) * .55, ufoBase.z + Math.sin(time * .22) * 2.6);
+      // The UFO circles high over the city; it holds still while the camera flies anywhere, so it is easy to reach.
+      if (mode !== 'fly' && !still) ufoAngle += dt * .16;
+      u.position.set(Math.cos(ufoAngle) * 30, 27 + Math.sin(time * 1.25) * .8, Math.sin(ufoAngle) * 30);
       u.rotation.y += dt * .35 * boost.ufo; u.rotation.z = Math.sin(time * .9) * .06; u.rotation.x = Math.cos(time * .7) * .05;
       if (N.ufoProxy) { N.ufoProxy.position.copy(u.position); N.ufoProxy.updateMatrixWorld(); }
       if (N.UFO_BeamMesh) N.UFO_BeamMesh.traverse(o => { if (o.isMesh) { o.material.opacity = boost.beam * (.8 + Math.sin(time * 22) * .2); o.visible = boost.beam > .01; } });
