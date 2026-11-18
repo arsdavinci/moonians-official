@@ -1435,7 +1435,7 @@ function start() {
   function skipIntro() { introToken++; jobs.clear(); finishIntro(); }
   function finishIntro() {
     orbitPose(camPos, camLook);
-    mode = 'orbit'; body.classList.add('is-exploring');
+    mode = 'orbit'; body.classList.add('is-exploring'); view.idle = 9;   // the slow turn starts straight away
   }
   // The welcome shot (the pause at the end of the dive in) should show the UFO left of the Moon Tower and the airship
   // at the upper right. Both are already flying, so they are put back along their own paths by exactly the time
@@ -1567,7 +1567,7 @@ function start() {
         while (target - view.azT > Math.PI) target -= Math.PI * 2; while (target - view.azT < -Math.PI) target += Math.PI * 2;
         view.azT = target; view.tiltT = .34; view.idle = 0;
       }
-      if (view.idle > 6 && !still && !pointers.size) view.azT += dt * .045;
+      if (view.idle > 1.8 && !still && !pointers.size) view.azT += dt * .045 * Math.min(1, (view.idle - 1.8) / 1.2);   // starts turning again soon after you let go, easing in
       const k = 1 - Math.pow(.0015, dt);
       view.az = lerp(view.az, view.azT, k); view.tilt = lerp(view.tilt, view.tiltT, k); view.rad = lerp(view.rad, view.radT, k);
       orbitPose(camPos, camLook);
