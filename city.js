@@ -601,6 +601,20 @@ function start() {
     if (id === 'game' || id === 'roadmap') view.tiltT = id === 'game' ? .34 : .75; else view.tiltT = .12;
   }
 
+  // 07 SNS: look up at the airship and open the row of SNS buttons (the airship itself does the same when clicked).
+  const snsEl = $('#city-sns'), snsLink = document.querySelector('.city-menu a[data-sns]');
+  function openSns(force) {
+    const open = force || snsEl.hidden; snsEl.hidden = !open; snsLink.classList.toggle('is-going', open);
+    if (!open) return;
+    sound.fx.select(); snsEl.classList.add('is-hot'); setTimeout(() => snsEl.classList.remove('is-hot'), 3600);
+    const ship = typeof traffic !== 'undefined' && traffic.find(t => t.id === 'airship');
+    if (ship && mode === 'orbit') {
+      let target = Math.atan2(ship.car.position.x, ship.car.position.z) + Math.PI;
+      while (target - view.azT > Math.PI) target -= Math.PI * 2; while (target - view.azT < -Math.PI) target += Math.PI * 2;
+      view.azT = target; view.tiltT = .62; view.idle = 0;
+    }
+  }
+  snsLink.addEventListener('click', event => { if (body.classList.contains('no-3d') || event.metaKey || event.ctrlKey || event.shiftKey) return; event.preventDefault(); openSns(false); });
   links.forEach(link => {
     link.addEventListener('click', event => {
       if (body.classList.contains('no-3d') || !loaded || event.metaKey || event.ctrlKey || event.shiftKey) return;
@@ -857,19 +871,21 @@ function start() {
   const ROUTES = {
     plaza: circle(6.6, .32), road: stadium(2.1, 21, 62, .22), ringA: circle(46, .06), ringB: circle(75, .06),
     low1: circle(34, -69.9), low2: circle(50, -69.9), low3: circle(22, -69.9),
-    air1: circle(24, 15), air2: circle(38, 22), air3: circle(58, 12), lift: helix(29, -62, 9, 3)
+    air1: circle(24, 15), air2: circle(38, 22), air3: circle(58, 12), lift: helix(29, -62, 9, 3), sky: circle(62, 50)
   };
   // yaw: how far each model's own front is turned from +Z.
   const CARS = {
     roadster: {height: 1.7, yaw: Math.PI / 2}, bubble: {height: 2.3, yaw: 0}, bus: {height: 3.1, yaw: Math.PI / 2}, van: {height: 2.7, yaw: Math.PI / 2},
-    scooter: {height: 1.8, yaw: 0}, patrol: {height: 1.9, yaw: 0}, delivery: {height: 2.6, yaw: 0}, cart: {height: 2.9, yaw: Math.PI / 2}
+    scooter: {height: 1.8, yaw: 0}, patrol: {height: 1.9, yaw: 0}, delivery: {height: 2.6, yaw: 0}, cart: {height: 2.9, yaw: Math.PI / 2},
+    airship: {height: 26, yaw: Math.PI / 2}        // the giant SNS airship
   };
   const FLEET = [   // model, route, speed (m/s; negative = the other way), starting distance
     ['roadster', 'plaza', 3.2, 0], ['scooter', 'plaza', 3.2, 21],
     ['bubble', 'road', 5, 0], ['van', 'road', 5, 38], ['roadster', 'road', 5, 70],
     ['bus', 'ringA', 6, 0], ['bubble', 'ringA', 6, 120], ['van', 'ringA', -5, 60], ['bus', 'ringB', -6, 0], ['scooter', 'ringB', 7, 200],
     ['cart', 'low1', 3.5, 0], ['van', 'low1', 3.5, 90], ['roadster', 'low2', -6, 0], ['cart', 'low2', -3, 130], ['scooter', 'low3', 4, 0], ['bubble', 'low2', -6, 240],
-    ['patrol', 'air1', 4, 0], ['patrol', 'air2', -5, 80], ['patrol', 'air3', 6, 200], ['delivery', 'lift', 7, 0], ['delivery', 'air2', 5, 10], ['delivery', 'lift', 7, 500]
+    ['patrol', 'air1', 4, 0], ['patrol', 'air2', 5, 80], ['patrol', 'air3', 6, 200], ['delivery', 'lift', 7, 0], ['delivery', 'air2', 5, 10], ['delivery', 'lift', 7, 500],
+    ['airship', 'sky', -1.6, 40]
   ];
   const traffic = []; let lineup = false;
   function loadTraffic() {
@@ -879,6 +895,7 @@ function start() {
         FLEET.filter(f => f[0] === id).forEach(([, route, speed, start], i) => {
           const body = gltf.scene.clone(); body.scale.setScalar(spec.height); body.rotation.y = spec.yaw;
           const car = new THREE.Group(); car.add(body); scene.add(car);
+          if (id === 'airship') { const p = new THREE.Mesh(new THREE.SphereGeometry(16, 10, 8)); p.userData = {kind: 'airship', id}; proxies.push(p); car.userData.proxy = p; }
           traffic.push({id, car, body, routeName: route, route: ROUTES[route], speed, d: start, phase: Math.random() * 6, air: /air|lift/.test(route)});
         });
       }, undefined, () => { /* traffic is optional */ });
@@ -892,7 +909,8 @@ function start() {
       t.route.at(t.d, carPos); t.route.at(t.d + Math.sign(t.speed) * .6, carNext);
       t.car.position.copy(carPos); t.car.position.y += (t.air ? .5 : .12) * Math.sin(time * (t.air ? 1.6 : 2.4) + t.phase) + (t.air ? 0 : .25);
       t.car.rotation.y = Math.atan2(carNext.x - carPos.x, carNext.z - carPos.z);
-      t.body.rotation.z = Math.sin(time * 1.7 + t.phase) * .04;
+      t.body.rotation.z = Math.sin(time * 1.7 + t.phase) * (t.id === 'airship' ? .012 : .04);
+      if (t.car.userData.proxy) { t.car.userData.proxy.position.copy(t.car.position); t.car.userData.proxy.position.y += 12; t.car.userData.proxy.updateMatrixWorld(); }
     }
   }
 
@@ -955,7 +973,7 @@ function start() {
     const hit = raycaster.intersectObjects(proxies, false)[0];
     if (!hit) return;
     const {kind, id} = hit.object.userData;
-    if (kind === 'place') go(id); else if (kind === 'cast') meet(id); else if (kind === 'pyon') { if (pyon) meet('pyon'); } else if (kind === 'statue') { statueBounce = 1; sound.fx.pop(); burst(N.Statue.position.clone().add(V(0, 4, 0)), [0xff9bd0, 0xffffff], 40, 6, .8); }
+    if (kind === 'place') go(id); else if (kind === 'cast') meet(id); else if (kind === 'airship') openSns(true); else if (kind === 'pyon') { if (pyon) meet('pyon'); } else if (kind === 'statue') { statueBounce = 1; sound.fx.pop(); burst(N.Statue.position.clone().add(V(0, 4, 0)), [0xff9bd0, 0xffffff], 40, 6, .8); }
   }
 
   /* ── entering the city ── */
