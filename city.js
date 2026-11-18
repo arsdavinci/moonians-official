@@ -1264,7 +1264,20 @@ function start() {
       const names = PICS[o.tree ? 'tree' : 'bush'], file = names[i % names.length];
       textures.load(`assets/city/plants/${file}.webp`, map => {
         map.colorSpace = THREE.SRGBColorSpace;
-        const sprite = new THREE.Sprite(new THREE.SpriteMaterial({map, transparent: true, alphaTest: .35, fog: true}));
+        const material = new THREE.SpriteMaterial({map, transparent: true, alphaTest: .35, fog: true});
+        // The picture plants are not lit by the scene, so at night they are dimmed here: leaves and trunks go dark,
+        // and only fruit (on the fruit tree) or flowers (on the bushes) keep a glow.
+        const glow = file === 'tree-fruit' ? 1 : /^bush/.test(file) ? 2 : 0;
+        material.onBeforeCompile = shader => {
+          shader.uniforms.uNight = uNight;
+          shader.fragmentShader = shader.fragmentShader.replace('#include <common>', '#include <common>\nuniform float uNight;')
+            .replace('#include <map_fragment>', '#include <map_fragment>\nvec3 pc = diffuseColor.rgb; float lit = 0.0;\n' +
+              (glow === 1 ? 'lit = smoothstep(0.22, 0.4, min(pc.r, pc.g) - pc.b) * step(pc.g * 0.98, pc.r);\n' : '') +
+              (glow === 2 ? 'lit = max(smoothstep(0.22, 0.4, min(pc.r, pc.g) - pc.b) * step(pc.g * 0.98, pc.r), max(smoothstep(0.18, 0.34, pc.r - pc.g) * step(0.45, pc.b), smoothstep(0.78, 0.9, min(pc.r, min(pc.g, pc.b)))));\n' : '') +
+              'diffuseColor.rgb = mix(pc, mix(pc * vec3(0.2, 0.22, 0.36), pc * 1.1, lit), uNight);');
+        };
+        material.customProgramCacheKey = () => 'plant-night-' + glow;
+        const sprite = new THREE.Sprite(material);
         const h = (o.tree ? 5.4 : 1.6) * o.s; sprite.center.set(.5, 0); sprite.scale.set(h * map.image.width / map.image.height, h, 1); sprite.position.copy(o.p); scene.add(sprite);
       });
     });
