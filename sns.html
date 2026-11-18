@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#cdbdf7">
+  <title>ムーニアンズ SNS｜空飛ぶ放送局</title>
+  <meta name="description" content="ムーニアンズのSNSがぜんぶ集まる、空飛ぶ放送局。X、Instagram、TikTok、YouTubeへは、ここからどうぞ。">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="ムーニアンズ SNS｜空飛ぶ放送局">
+  <meta property="og:image" content="https://moonians-official.com/assets/moon-city.png">
+  <link rel="canonical" href="https://moonians-official.com/sns.html">
+  <link rel="icon" href="assets/favicon.png?v=1" type="image/png" sizes="256x256">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DotGothic16&family=M+PLUS+Rounded+1c:wght@700;800;900&family=Unbounded:wght@700;900&display=swap" rel="stylesheet">
+  <script src="language.js?v=20261118-7"></script>
+  <style>
+    :root{--ink:#2a2152;--soft:#5a4f8c;--pink:#ff7fc0;--pink-d:#e2439a;--mint:#3fe3c8;--mint-d:#0d9d8a;--lav:#b9a3f5;--yel:#ffe27a;
+      --round:"M PLUS Rounded 1c","Hiragino Maru Gothic ProN","Yu Gothic",sans-serif;--dot:"DotGothic16",monospace;--disp:"Unbounded","M PLUS Rounded 1c",sans-serif}
+    *{box-sizing:border-box}
+    body{margin:0;min-height:100vh;color:var(--ink);font-family:var(--round);font-weight:700;overflow-x:hidden;
+      background:linear-gradient(#7fb2fb 0,#b7cdff 38%,#f3d6f2 78%,#fdeefa 100%) fixed}
+    #sky{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:0}
+    .wrap{position:relative;z-index:1;max-width:1080px;margin:0 auto;padding:calc(18px + env(safe-area-inset-top,0px)) max(18px,env(safe-area-inset-right,0px)) 72px max(18px,env(safe-area-inset-left,0px))}
+    header{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+    .brand{display:block;width:min(40vw,180px);filter:drop-shadow(0 2px 0 #fff) drop-shadow(0 6px 14px rgba(120,90,220,.35))}
+    .brand img{display:block;width:100%;height:auto}
+    .tools{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+    .pill,.language-switch{background:rgba(255,255,255,.7);border:1.5px solid #fff;border-radius:999px;-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);box-shadow:0 8px 24px rgba(98,74,190,.2)}
+    .pill{padding:8px 16px;color:var(--ink);text-decoration:none;font-size:.82rem}
+    .pill:hover{background:#fff}
+    .language-switch{display:flex;gap:2px;padding:3px}
+    .language-switch button{font:800 .78rem var(--round);color:var(--soft);background:transparent;border:0;border-radius:999px;padding:5px 12px;cursor:pointer}
+    .language-switch button[aria-pressed="true"]{background:linear-gradient(135deg,var(--pink),var(--lav));color:#fff}
+    .hero{display:grid;grid-template-columns:1.1fr .9fr;align-items:center;gap:8px;margin-top:22px}
+    .kicker{margin:0;font:.82rem var(--dot);letter-spacing:.24em;color:#fff;text-shadow:0 0 10px var(--pink),0 1px 0 rgba(80,50,160,.6)}
+    h1{margin:6px 0 12px;font:900 clamp(2rem,6.6vw,4.2rem)/1.1 var(--round);color:#fff;text-shadow:0 2px 0 var(--pink-d),0 0 24px rgba(255,127,192,.75),0 8px 26px rgba(70,40,150,.4);text-wrap:balance}
+    .lead{margin:0;max-width:30em;font-size:1rem;line-height:1.9;color:var(--ink)}
+    .ship{position:relative;justify-self:center;width:min(100%,430px);aspect-ratio:1;cursor:pointer;border:0;background:none;padding:0;-webkit-tap-highlight-color:transparent}
+    .ship img{width:100%;height:100%;object-fit:contain;animation:float 5s ease-in-out infinite;filter:drop-shadow(0 26px 30px rgba(110,80,200,.35));transition:transform .5s cubic-bezier(.2,1.6,.4,1)}
+    .ship.is-boop img{transform:rotate(-8deg) scale(1.08)}
+    @keyframes float{0%,100%{translate:0 -10px;rotate:-2deg}50%{translate:0 12px;rotate:2deg}}
+    .signal{position:absolute;left:50%;top:50%;width:60%;aspect-ratio:1;border-radius:50%;border:3px solid rgba(255,255,255,.8);translate:-50% -50%;animation:ping 2.6s ease-out infinite;pointer-events:none}
+    .signal:nth-child(3){animation-delay:1.3s}
+    @keyframes ping{from{scale:.5;opacity:.9}to{scale:1.6;opacity:0}}
+    .cards{display:grid;grid-template-columns:repeat(2,1fr);gap:18px;margin-top:26px;perspective:1200px}
+    .card{position:relative;display:grid;grid-template-columns:132px 1fr;gap:16px;align-items:center;padding:16px;border-radius:26px;text-decoration:none;color:var(--ink);overflow:hidden;
+      background:rgba(255,255,255,.72);border:2px solid #fff;-webkit-backdrop-filter:blur(14px) saturate(1.4);backdrop-filter:blur(14px) saturate(1.4);
+      box-shadow:0 14px 36px rgba(98,74,190,.25);transform-style:preserve-3d;transition:transform .18s ease-out,box-shadow .2s;will-change:transform}
+    .card::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at var(--mx,50%) var(--my,50%),rgba(255,255,255,.85),transparent 42%);opacity:0;transition:opacity .2s;pointer-events:none}
+    .card:hover::before,.card:focus-visible::before{opacity:1}
+    .card:hover,.card:focus-visible{box-shadow:0 22px 50px rgba(255,127,192,.45)}
+    .card:focus-visible{outline:3px solid var(--mint-d);outline-offset:4px}
+    .thumb{width:132px;aspect-ratio:1;border-radius:20px;overflow:hidden;border:3px solid #fff;box-shadow:0 6px 16px rgba(98,74,190,.25);transform:translateZ(30px);background:var(--lav)}
+    .thumb img{width:100%;height:100%;object-fit:cover;display:block;transition:scale .5s}
+    .card:hover .thumb img{scale:1.1}
+    .card-body{transform:translateZ(20px);min-width:0}
+    .tag{display:inline-block;font:.72rem var(--dot);letter-spacing:.16em;color:#fff;padding:2px 10px;border-radius:999px;background:var(--c,var(--pink))}
+    .card h2{margin:6px 0 2px;font:900 1.5rem/1.2 var(--disp);letter-spacing:.01em}
+    .handle{margin:0;font:.86rem var(--dot);color:var(--soft);overflow-wrap:anywhere}
+    .what{margin:6px 0 0;font-size:.84rem;line-height:1.6;color:var(--soft)}
+    .go{position:absolute;right:14px;bottom:12px;font-size:.78rem;color:var(--c,var(--pink-d));transition:translate .2s}
+    .card:hover .go{translate:5px 0}
+    .on-air{display:flex;align-items:center;gap:8px;margin:34px 0 0;font:.8rem var(--dot);letter-spacing:.2em;color:#fff;text-shadow:0 1px 0 rgba(80,50,160,.6)}
+    .on-air i{width:10px;height:10px;border-radius:50%;background:var(--pink);box-shadow:0 0 12px var(--pink);animation:blink 1s steps(2) infinite}
+    @keyframes blink{50%{opacity:.2}}
+    footer{margin-top:40px;display:flex;gap:10px;flex-wrap:wrap}
+    @media (max-width:760px){.hero{grid-template-columns:1fr}.ship{width:min(70vw,300px);order:-1}.cards{grid-template-columns:1fr}.card{grid-template-columns:96px 1fr}.thumb{width:96px}.card h2{font-size:1.25rem}}
+    @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+  </style>
+</head>
+<body>
+  <canvas id="sky" aria-hidden="true"></canvas>
+  <div class="wrap">
+    <header>
+      <a class="brand" href="./" data-language-link aria-label="ムーニアンズ ホーム"><img src="assets/logo.png?v=20261110-11" alt="ムーニアンズ" width="2421" height="833"></a>
+      <div class="tools">
+        <a class="pill" href="./" data-language-link>← ムーニアンズの街へ戻る</a>
+        <div class="language-switch" data-language-switch role="group" aria-label="Language / 言語"><button type="button" data-language="ja" lang="ja" aria-pressed="true">日本語</button><button type="button" data-language="en" lang="en" aria-pressed="false">EN</button></div>
+      </div>
+    </header>
+
+    <main>
+      <section class="hero">
+        <div>
+          <p class="kicker" translate="no">MOONIANS SKY STATION</p>
+          <h1>空飛ぶ放送局へ、ようこそ。</h1>
+          <p class="lead">ムーニアンズのSNSは、この飛行船からぜんぶ届けています。気になるチャンネルを、えらんでな。</p>
+        </div>
+        <button class="ship" id="ship" type="button" aria-label="飛行船をつつく">
+          <img src="assets/sns-airship.webp" alt="" width="720" height="720">
+          <span class="signal"></span><span class="signal"></span>
+        </button>
+      </section>
+
+      <p class="on-air" translate="no"><i></i>ON AIR · 4 CHANNELS</p>
+      <section class="cards" aria-label="SNS">
+        <a class="card" style="--c:#7a5cf0" href="https://x.com/ranpyon_moonian" target="_blank" rel="noopener">
+          <span class="thumb"><img src="assets/social-x.webp" alt="" loading="lazy"></span>
+          <span class="card-body"><span class="tag" translate="no">CH.01</span><h2 translate="no">X</h2><p class="handle" translate="no">@ranpyon_moonian</p><p class="what">らんぴょんの、日々のひとこと。</p></span><span class="go" aria-hidden="true">ひらく →</span>
+        </a>
+        <a class="card" style="--c:#e2439a" href="https://www.instagram.com/pyonpy_moonians/" target="_blank" rel="noopener">
+          <span class="thumb"><img src="assets/social-instagram.jpg" alt="" loading="lazy"></span>
+          <span class="card-body"><span class="tag" translate="no">CH.02</span><h2 translate="no">Instagram</h2><p class="handle" translate="no">@pyonpy_moonians</p><p class="what">ぴょんぴーの、写真と動画。</p></span><span class="go" aria-hidden="true">ひらく →</span>
+        </a>
+        <a class="card" style="--c:#0d9d8a" href="https://www.tiktok.com/@moonians0422" target="_blank" rel="noopener">
+          <span class="thumb"><img src="assets/social-tiktok.avif" alt="" loading="lazy"></span>
+          <span class="card-body"><span class="tag" translate="no">CH.03</span><h2 translate="no">TikTok</h2><p class="handle" translate="no">@moonians0422</p><p class="what">みじかい動画は、こちら。</p></span><span class="go" aria-hidden="true">ひらく →</span>
+        </a>
+        <a class="card" style="--c:#f0567a" href="https://youtube.com/@moonians" target="_blank" rel="noopener">
+          <span class="thumb"><img src="assets/youtube-featured.avif" alt="" loading="lazy"></span>
+          <span class="card-body"><span class="tag" translate="no">CH.04</span><h2 translate="no">YouTube</h2><p class="handle" translate="no">@moonians</p><p class="what">ネタ動画と、3Dアニメ。</p></span><span class="go" aria-hidden="true">ひらく →</span>
+        </a>
+      </section>
+
+      <footer>
+        <a class="pill" href="./" data-language-link>← ムーニアンズの街へ戻る</a>
+        <a class="pill" href="roadmap.html" data-language-link>ロードマップ</a>
+        <a class="pill" href="https://suzuri.jp/Ranpyon" target="_blank" rel="noopener">グッズ</a>
+      </footer>
+    </main>
+  </div>
+
+  <script>
+  (function () {
+    'use strict';
+    var still = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    // Cards tilt toward the pointer, with a spot of light that follows it.
+    document.querySelectorAll('.card').forEach(function (card) {
+      card.addEventListener('pointermove', function (e) {
+        var r = card.getBoundingClientRect(), x = (e.clientX - r.left) / r.width, y = (e.clientY - r.top) / r.height;
+        card.style.setProperty('--mx', (x * 100) + '%'); card.style.setProperty('--my', (y * 100) + '%');
+        if (!still) card.style.transform = 'rotateY(' + ((x - .5) * 12) + 'deg) rotateX(' + ((.5 - y) * 10) + 'deg) translateZ(6px)';
+      });
+      card.addEventListener('pointerleave', function () { card.style.transform = ''; });
+    });
+    // Sky: bubbles and stars drifting up; poking the airship sends out a burst.
+    var canvas = document.getElementById('sky'), ctx = canvas.getContext('2d'), things = [], w = 0, h = 0, dpr = 1;
+    var colors = ['#ffffff', '#ff9bd0', '#8ffbe6', '#ffe680', '#b9a3ff'];
+    function size() { dpr = Math.min(devicePixelRatio || 1, 2); w = innerWidth; h = innerHeight; canvas.width = w * dpr; canvas.height = h * dpr; }
+    function add(x, y, burst) {
+      things.push({x: x, y: y, r: 3 + Math.random() * (burst ? 9 : 16), vx: (Math.random() - .5) * (burst ? 260 : 14), vy: burst ? -Math.random() * 260 - 40 : -8 - Math.random() * 22,
+        star: Math.random() < (burst ? .6 : .25), c: colors[Math.floor(Math.random() * colors.length)], life: 0, max: burst ? 1.6 : 99, spin: Math.random() * 6});
+    }
+    function star(x, y, r, a) { ctx.beginPath(); for (var i = 0; i < 10; i++) { var rr = i % 2 ? r * .45 : r, t = a + i * Math.PI / 5; ctx.lineTo(x + Math.sin(t) * rr, y - Math.cos(t) * rr); } ctx.closePath(); ctx.fill(); }
+    var last = 0;
+    function frame(now) {
+      var dt = Math.min(.05, (now - (last || now)) / 1000); last = now;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.clearRect(0, 0, w, h);
+      for (var i = things.length - 1; i >= 0; i--) {
+        var t = things[i]; t.life += dt; t.x += t.vx * dt; t.y += t.vy * dt; if (t.max < 9) { t.vy += 220 * dt; t.vx *= 1 - dt; }
+        if (t.y < -30 || t.life > t.max) { things.splice(i, 1); continue; }
+        ctx.globalAlpha = t.max < 9 ? 1 - t.life / t.max : .75;
+        if (t.star) { ctx.fillStyle = t.c; star(t.x, t.y, t.r * .8, t.spin + t.life); }
+        else { ctx.strokeStyle = 'rgba(255,255,255,.9)'; ctx.lineWidth = 1.5; ctx.fillStyle = 'rgba(255,255,255,.16)'; ctx.beginPath(); ctx.arc(t.x, t.y, t.r, 0, 6.3); ctx.fill(); ctx.stroke(); }
+      }
+      ctx.globalAlpha = 1;
+      while (things.length < 46) add(Math.random() * w, h + 20 + Math.random() * 60, false);
+      if (!document.hidden) requestAnimationFrame(frame);
+    }
+    size(); addEventListener('resize', size);
+    for (var k = 0; k < 46; k++) add(Math.random() * innerWidth, Math.random() * innerHeight, false);
+    if (!still) requestAnimationFrame(frame); else frame(0);
+    document.addEventListener('visibilitychange', function () { if (!document.hidden && !still) { last = 0; requestAnimationFrame(frame); } });
+    var ship = document.getElementById('ship');
+    ship.addEventListener('click', function () {
+      var r = ship.getBoundingClientRect();
+      for (var i = 0; i < 44; i++) add(r.left + r.width / 2, r.top + r.height * .45, true);
+      ship.classList.add('is-boop'); setTimeout(function () { ship.classList.remove('is-boop'); }, 420);
+    });
+  })();
+  </script>
+</body>
+</html>

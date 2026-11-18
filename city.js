@@ -603,18 +603,21 @@ function start() {
 
   // 07 SNS: look up at the airship and open the row of SNS buttons (the airship itself does the same when clicked).
   const snsEl = $('#city-sns'), snsLink = document.querySelector('.city-menu a[data-sns]');
-  function openSns(force) {
-    const open = force || snsEl.hidden; snsEl.hidden = !open; snsLink.classList.toggle('is-going', open);
-    if (!open) return;
-    sound.fx.select(); snsEl.classList.add('is-hot'); setTimeout(() => snsEl.classList.remove('is-hot'), 3600);
-    const ship = typeof traffic !== 'undefined' && traffic.find(t => t.id === 'airship');
-    if (ship && mode === 'orbit') {
-      let target = Math.atan2(ship.car.position.x, ship.car.position.z) + Math.PI;
-      while (target - view.azT > Math.PI) target -= Math.PI * 2; while (target - view.azT < -Math.PI) target += Math.PI * 2;
-      view.azT = target; view.tiltT = .62; view.idle = 0;
+  async function openSns() {
+    if (mode !== 'orbit') return;
+    mode = 'fly'; body.classList.add('is-travelling'); snsLink.classList.add('is-going'); hintEl.classList.remove('is-on'); bubbleEl.hidden = true;
+    sound.fx.select();
+    const ship = traffic.find(t => t.id === 'airship');
+    if (ship && !motionOff()) {
+      ship.halt = true; sound.fx.whoosh(2.2);
+      const p = ship.car.position.clone().add(V(0, 13, 0)), out = p.clone().setY(0).normalize();
+      await fly(p.clone().addScaledVector(out, -46).add(V(0, -6, 0)), p, 2.3, 8);
+      burst(p, PASTEL, 90, 14, 1.4); sound.fx.arrive();
+      await fly(p.clone().addScaledVector(out, -24).add(V(0, -2, 0)), p, 1.1, 0);
     }
+    wipeEl.classList.add('is-on'); await wait(.72); location.href = snsLink.href;
   }
-  snsLink.addEventListener('click', event => { if (body.classList.contains('no-3d') || event.metaKey || event.ctrlKey || event.shiftKey) return; event.preventDefault(); openSns(false); });
+  snsLink.addEventListener('click', event => { if (body.classList.contains('no-3d') || event.metaKey || event.ctrlKey || event.shiftKey) return; event.preventDefault(); if (mode === 'intro') skipIntro(); openSns(); });
   links.forEach(link => {
     link.addEventListener('click', event => {
       if (body.classList.contains('no-3d') || !loaded || event.metaKey || event.ctrlKey || event.shiftKey) return;
@@ -973,7 +976,7 @@ function start() {
     const hit = raycaster.intersectObjects(proxies, false)[0];
     if (!hit) return;
     const {kind, id} = hit.object.userData;
-    if (kind === 'place') go(id); else if (kind === 'cast') meet(id); else if (kind === 'airship') openSns(true); else if (kind === 'pyon') { if (pyon) meet('pyon'); } else if (kind === 'statue') { statueBounce = 1; sound.fx.pop(); burst(N.Statue.position.clone().add(V(0, 4, 0)), [0xff9bd0, 0xffffff], 40, 6, .8); }
+    if (kind === 'place') go(id); else if (kind === 'cast') meet(id); else if (kind === 'airship') openSns(); else if (kind === 'pyon') { if (pyon) meet('pyon'); } else if (kind === 'statue') { statueBounce = 1; sound.fx.pop(); burst(N.Statue.position.clone().add(V(0, 4, 0)), [0xff9bd0, 0xffffff], 40, 6, .8); }
   }
 
   /* ── entering the city ── */
@@ -1024,7 +1027,7 @@ function start() {
   // Coming back with the browser's Back button: put the city back as it was.
   addEventListener('pageshow', event => {
     if (!event.persisted || !loaded) return;
-    wipeEl.classList.remove('is-on'); body.classList.remove('is-travelling'); links.forEach(a => a.classList.remove('is-going'));
+    wipeEl.classList.remove('is-on'); body.classList.remove('is-travelling'); links.forEach(a => a.classList.remove('is-going')); snsLink.classList.remove('is-going'); traffic.forEach(t => { t.halt = false; });
     Object.assign(boost, {gear: 1, ring: 1, eq: 1, ear: 0, note: 1, ufo: 1, shutter: .86, screen: .72, beam: 0, bubbles: 0, crescent: 1});
     setShutters(boost.shutter); jobs.clear(); orbitPose(camPos, camLook); mode = 'orbit';
     profileEl.hidden = true; shiftT = 0; body.classList.remove('is-meeting'); if (meeting) { meeting.stopped = false; meeting = null; }
