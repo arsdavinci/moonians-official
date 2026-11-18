@@ -475,7 +475,7 @@ function start() {
       o.material = glowing.get(o.material); o.renderOrder = 6;
     });
     // The plaza floor and Pyonpy's stage get their own round pictures.
-    const disc = (file, radius, y) => { const m = new THREE.Mesh(new THREE.CircleGeometry(radius, 64), new THREE.MeshBasicMaterial({map: textures.load(file, t => { t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 8; }), transparent: true, depthWrite: false, toneMapped: false}));
+    const disc = (file, radius, y) => { const m = new THREE.Mesh(new THREE.CircleGeometry(radius, 64), new THREE.MeshBasicMaterial({map: textures.load(file, t => { t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 8; }), alphaTest: .5, toneMapped: false, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2}));   // solid, so clouds in front of it hide it
       m.rotation.x = -Math.PI / 2; m.position.y = y; m.renderOrder = 1; scene.add(m); return m; };
     N.plazaArt = disc('assets/city/plaza-floor.webp', 17.2, .285); N.stageArt = disc('assets/city/stage-emblem.webp', 2.62, .7);
     // Far skyline: a painted band right round the horizon, day and night versions.
