@@ -1419,7 +1419,9 @@ function start() {
       else hang(node, k, Math.max(3, w * .95), 0, h / 2 + .75, .05, false);                      // wide sign over the top
     });
     // a ring of signs round the plaza, and tall ones along the main road
-    for (let i = 0; i < 8; i++) { if (i === 2 || i === 7) continue; const a = i === 1 ? .62 : i / 8 * Math.PI * 2 + .39, g = new THREE.Group(); g.position.set(Math.cos(a) * 25.2, 6.2 + (i % 2) * 1.6, Math.sin(a) * 25.2); g.rotation.y = -a - Math.PI / 2; scene.add(g); hang(g, (i + 3) % 8, 5.2, 0, 0, 0, i % 2 === 1); }
+    for (let i = 0; i < 8; i++) { if (i === 2 || i === 7) continue; const a = i / 8 * Math.PI * 2 + .39, g = new THREE.Group(); g.position.set(Math.cos(a) * 25.2, 6.2 + (i % 2) * 1.6, Math.sin(a) * 25.2); g.rotation.y = -a - Math.PI / 2;
+      if (i === 1) { g.position.set(25.9, 6.6, 9.0); g.rotation.y = Math.atan2(-.79, -.61); }   // the Music Dome's own sign: standing at its side like a shop sign, facing the plaza
+      scene.add(g); hang(g, (i + 3) % 8, 5.2, 0, 0, 0, i % 2 === 1); }
     for (let i = 2; i < 6; i++) { const g = new THREE.Group(), side = i % 2 ? 1 : -1; g.position.set(side * 8.4, 5.5, 26 + i * 6.5); g.rotation.y = side > 0 ? -Math.PI / 2 : Math.PI / 2; scene.add(g); hang(g, (i + 5) % 8, 4.6, 0, 0, 0, true); }
   }
 
