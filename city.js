@@ -179,6 +179,18 @@ function start() {
     };
     material.customProgramCacheKey = () => 'night-lights';
   }
+  function glassy(material) {          // the roadster's grey windscreen becomes see-through glass, so its riders show
+    const before = material.onBeforeCompile;
+    material.transparent = true;
+    material.onBeforeCompile = shader => {
+      before(shader);
+      shader.vertexShader = shader.vertexShader.replace('#include <common>', '#include <common>\nvarying float vGlassY;').replace('#include <begin_vertex>', '#include <begin_vertex>\nvGlassY = position.y;');
+      shader.fragmentShader = shader.fragmentShader.replace('#include <common>', '#include <common>\nvarying float vGlassY;')
+        .replace('#include <map_fragment>', '#include <map_fragment>\nvec3 gc = diffuseColor.rgb; float gsat = max(gc.r, max(gc.g, gc.b)) - min(gc.r, min(gc.g, gc.b)); float glum = dot(gc, vec3(0.3333));\nfloat glass = (1.0 - smoothstep(0.04, 0.09, gsat)) * smoothstep(0.08, 0.14, glum) * (1.0 - smoothstep(0.5, 0.6, glum)) * smoothstep(GLASS_FROM, GLASS_FROM + 0.04, vGlassY);\ndiffuseColor.rgb = mix(diffuseColor.rgb, vec3(0.78, 0.96, 1.0), glass * 0.7); diffuseColor.a *= mix(1.0, 0.2, glass);');
+      shader.fragmentShader = shader.fragmentShader.replace(/GLASS_FROM/g, '0.38');
+    };
+    material.customProgramCacheKey = () => 'night-lights-glass';
+  }
   function tiled(material) {
     material.onBeforeCompile = shader => {
       shader.uniforms.uTile = {value: tileTexture};
@@ -780,12 +792,19 @@ function start() {
   }
   function updateSns(dt) {
     if (!sns || !sns.el.videoWidth) return;
-    if (time > sns.next) { sns.next = time + 3 + Math.random() * 4; sns.zoomT = 1 + Math.random() * 1.1; sns.panT = Math.random(); }   // a new framing
-    const k = 1 - Math.pow(.25, dt); sns.zoom = lerp(sns.zoom, sns.zoomT, k); sns.pan = lerp(sns.pan, sns.panT, k);
+    if (time > sns.next) {
+      // Pyonpy's face is about half way up both videos. Shots that show it stay on for a while and drift slowly;
+      // shots of anything else (feet, signs, the street) are quick cuts.
+      const face = Math.random() < .68; sns.zoom = face ? 1 + Math.random() * 1.2 : 1.3 + Math.random() * 1.1;
+      sns.pan = face ? .5 + (Math.random() - .5) * .08 : Math.random() < .5 ? .08 + Math.random() * .24 : .68 + Math.random() * .24;
+      sns.zoomT = sns.zoom * (face ? .88 + Math.random() * .3 : 1); sns.panT = sns.pan + (face ? (Math.random() - .5) * .06 : 0);
+      sns.next = time + (face ? 5 + Math.random() * 4 : .55 + Math.random() * .6);
+    }
+    const k = 1 - Math.pow(.75, dt); sns.zoom = lerp(sns.zoom, sns.zoomT, k); sns.pan = lerp(sns.pan, sns.panT, k);
     const have = sns.el.videoWidth / sns.el.videoHeight;
     for (const plane of sns.planes) {
       const want = plane.userData.want; let u = 1 / sns.zoom, v = (have / want) / sns.zoom; if (v > 1) { u /= v; v = 1; }
-      const u0 = (1 - u) / 2, v0 = (1 - v) * sns.pan, uv = plane.geometry.attributes.uv;
+      const u0 = (1 - u) / 2, v0 = clamp(sns.pan - v / 2, 0, 1 - v), uv = plane.geometry.attributes.uv;
       uv.setXY(0, u0, v0 + v); uv.setXY(1, u0 + u, v0 + v); uv.setXY(2, u0, v0); uv.setXY(3, u0 + u, v0); uv.needsUpdate = true;
     }
   }
@@ -838,7 +857,7 @@ function start() {
         // Characters with a full skeleton come with a seated or dancing clip; that is their everyday pose.
         if (actions.Sit) actions.Idle = actions.Walk = actions.Sit;
         if (actions.Dance) actions.Idle = actions.Walk = actions.Dance;
-        const member = {id, spec, group, mixer, actions, active: null, d: index * 7, facing: 0, stopped: false};
+        const member = {id, spec, group, mixer, actions, active: null, d: index * 7, facing: 0, stopped: false, head: model.getObjectByName('Hips') ? model.getObjectByName('Head') : null, look: 0};
         member.proxy = new THREE.Mesh(new THREE.SphereGeometry(spec.height * .62, 10, 8)); member.proxy.userData = {kind: 'cast', id}; proxies.push(member.proxy);
         mixer.addEventListener('finished', () => playCast(member, member.stopped || spec.glide || spec.ride ? 'Idle' : spec.dance ? 'React' : 'Walk'));
         if (id === 'robot') {          // Yanavis's face is a display: six expressions that change by themselves and when it is clicked
@@ -862,7 +881,7 @@ function start() {
     if (member.active && member.active !== next) next.crossFadeFrom(member.active, .25, false);
     next.play(); member.active = next;
   }
-  const castPos = V(0, 0, 0), castNext = V(0, 0, 0);
+  const castPos = V(0, 0, 0), castNext = V(0, 0, 0), lookQ = new THREE.Quaternion(), lookQ2 = new THREE.Quaternion(), lookE = new THREE.Euler(), UP = V(0, 1, 0);
   function updateCast(dt, still) {
     if (lineup) { cast.forEach((m, i) => { m.group.position.set(-4.5 + i * 3, .3, 8.5); m.group.rotation.y = 0; if (!still) m.mixer.update(dt); }); return; }
     for (const m of cast) {
@@ -889,10 +908,22 @@ function start() {
         }
       }
       m.group.position.copy(castPos);
-      let want = m.stopped ? Math.atan2(camPos.x - castPos.x, camPos.z - castPos.z) : Math.atan2(castNext.x - castPos.x, castNext.z - castPos.z), delta = want - m.facing;
+      let want = m.stopped && !mount ? Math.atan2(camPos.x - castPos.x, camPos.z - castPos.z) : Math.atan2(castNext.x - castPos.x, castNext.z - castPos.z), delta = want - m.facing;
       while (delta > Math.PI) delta -= Math.PI * 2; while (delta < -Math.PI) delta += Math.PI * 2;
       m.facing += delta * (1 - Math.pow(.01, dt)); m.group.rotation.y = m.facing;
       if (!still) m.mixer.update(dt);
+      if (m.head && !still) {          // a character with a real skeleton turns their head to look into the camera while they are being met
+        m.look = lerp(m.look, m.stopped ? 1 : 0, 1 - Math.pow(.02, dt));
+        if (m.look > .01) {
+          m.group.updateMatrixWorld(true); m.head.getWorldPosition(tmp);
+          const dx = camPos.x - tmp.x, dy = camPos.y - tmp.y, dz = camPos.z - tmp.z;
+          let yaw = Math.atan2(dx, dz) - m.facing; while (yaw > Math.PI) yaw -= Math.PI * 2; while (yaw < -Math.PI) yaw += Math.PI * 2;
+          yaw = clamp(yaw, -1.25, 1.25) * m.look; const pitch = clamp(Math.atan2(dy, Math.hypot(dx, dz)), -.45, .45) * m.look;
+          lookQ.setFromEuler(lookE.set(-pitch, m.facing + yaw, 0, 'YXZ')).multiply(lookQ2.setFromAxisAngle(UP, -m.facing));   // a turn in world space
+          m.head.parent.getWorldQuaternion(lookQ2);
+          m.head.quaternion.premultiply(lookQ2.clone().invert().multiply(lookQ).multiply(lookQ2));
+        }
+      }
       m.proxy.position.copy(castPos); m.proxy.position.y += m.spec.height * .55; m.proxy.updateMatrixWorld();
     }
     // While a rider's profile is open, the camera keeps pace just ahead of their vehicle.
@@ -902,7 +933,40 @@ function start() {
     }
     // slide the view sideways while a profile is open, so the character stands on the right
     if (Math.abs(shiftT - shift) > .001) { shift = lerp(shift, shiftT, 1 - Math.pow(.01, dt)); applyOffset(); } else if (shift !== shiftT) { shift = shiftT; applyOffset(); }
+    updateName();
   }
+  // Finding a character under the pointer is done on the screen, with a generous circle round each of them,
+  // so a small or moving character is still easy to point at and click.
+  const nameEl = document.createElement('div'); nameEl.className = 'city-name'; nameEl.hidden = true; document.body.appendChild(nameEl);
+  let hovered = null;
+  const everyone = () => pyon ? [...cast, Object.assign(pyonMember, {group: pyon})] : cast;
+  function castAt(x, y, except) {
+    let best = null, score = 1;
+    for (const m of everyone()) {
+      if (m === except) continue;
+      m.group.getWorldPosition(tmp); tmp.y += m.spec.height * .5; const far = tmp.distanceTo(camera.position); tmp.project(camera);
+      if (tmp.z > 1 || tmp.z < -1) continue;
+      const size = m.spec.height * .7 * (innerHeight / 2) / (far * Math.tan(camera.fov * Math.PI / 360));
+      const r = Math.max(46, size), d = Math.hypot((tmp.x + 1) / 2 * innerWidth - x, (1 - tmp.y) / 2 * innerHeight - y) / r;
+      if (d < score) { score = d; best = m; }
+    }
+    return best;
+  }
+  function updateName() {             // a small name tag over whoever is pointed at, and over whoever's profile is open
+    const m = (mode === 'meet' || (mode === 'fly' && meeting)) ? (hovered || meeting) : mode === 'orbit' ? hovered : null;
+    if (!m) { nameEl.hidden = true; return; }
+    m.group.getWorldPosition(tmp); tmp.y += m.spec.height * (m.spec.ride ? .98 : 1.1); tmp.project(camera);
+    if (tmp.z > 1) { nameEl.hidden = true; return; }
+    const label = tr(m.spec.name); if (nameEl.textContent !== label) nameEl.textContent = label;
+    nameEl.classList.toggle('is-chosen', m === meeting); nameEl.hidden = false;
+    nameEl.style.transform = `translate(${((tmp.x + 1) / 2 * innerWidth).toFixed(1)}px,${((1 - tmp.y) / 2 * innerHeight).toFixed(1)}px) translate(-50%,-100%)`;
+  }
+  canvas.addEventListener('pointermove', event => {
+    if (event.pointerType !== 'mouse' || event.buttons) return;
+    hovered = mode === 'orbit' || mode === 'meet' ? castAt(event.clientX, event.clientY, mode === 'meet' ? meeting : null) : null;
+    canvas.style.cursor = hovered ? 'pointer' : '';
+  });
+  canvas.addEventListener('pointerleave', () => { hovered = null; canvas.style.cursor = ''; });
   function applyOffset() {
     const w = innerWidth, h = innerHeight;
     if (w < 760) camera.setViewOffset(w, h, 0, h * (.15 + .1 * shift), w, h);
@@ -949,8 +1013,7 @@ function start() {
   canvas.addEventListener('click', event => {
     if (mode !== 'meet' || !meeting) return;
     // Someone else in view? Clicking them goes straight over to them.
-    ndc.set(event.clientX / innerWidth * 2 - 1, -(event.clientY / innerHeight) * 2 + 1); raycaster.setFromCamera(ndc, camera);
-    const hit = raycaster.intersectObjects(proxies, false).find(h => (h.object.userData.kind === 'cast' || h.object.userData.kind === 'pyon') && h.object.userData.id !== meeting.id);
+    const other = castAt(event.clientX, event.clientY, meeting), hit = other ? {object: {userData: {id: other.id}}} : null;
     if (hit) {
       const old = meeting; old.stopped = false; playCast(old, old.spec.ride || old.spec.glide ? 'Idle' : old.spec.dance ? 'React' : 'Walk');
       profileEl.hidden = true; profileRide = false; meeting = null; mode = 'orbit'; meet(hit.object.userData.id); return;
@@ -1048,7 +1111,7 @@ function start() {
   function loadTraffic() {
     for (const [id, spec] of Object.entries(CARS)) {
       new GLTFLoader().load(`assets/city/cars/${id}.glb?v=20261118-2`, gltf => {
-        gltf.scene.traverse(node => { if (node.isMesh) (Array.isArray(node.material) ? node.material : [node.material]).forEach(m => { m.envMapIntensity = .5; m.roughness = .45; m.metalness = 0; nightLights(m); }); });
+        gltf.scene.traverse(node => { if (node.isMesh) (Array.isArray(node.material) ? node.material : [node.material]).forEach(m => { m.envMapIntensity = .5; m.roughness = .45; m.metalness = 0; nightLights(m); if (id === 'roadster') glassy(m); }); });
         FLEET.filter(f => f[0] === id).forEach(([, route, speed, start], i) => {
           const body = gltf.scene.clone(); body.scale.setScalar(spec.height); body.rotation.y = spec.yaw;
           const car = new THREE.Group(); car.add(body); scene.add(car);
@@ -1121,12 +1184,13 @@ function start() {
     if (!pointers.has(event.pointerId)) return;
     pointers.delete(event.pointerId); pinch = 0;
     if (!pointers.size) canvas.classList.remove('is-dragging');
-    if (event.type === 'pointerup' && travelled < 9 && performance.now() - downAt < 450) pick(event.clientX, event.clientY);
+    if (event.type === 'pointerup' && travelled < 16 && performance.now() - downAt < 900) pick(event.clientX, event.clientY);
   }
   canvas.addEventListener('pointerup', release); canvas.addEventListener('pointercancel', release);
   canvas.addEventListener('wheel', event => { if (mode !== 'orbit') return; event.preventDefault(); view.radT = clamp(view.radT + event.deltaY * .012, 10.5, 17); view.idle = 0; }, {passive: false});
   function pick(x, y) {
     if (mode !== 'orbit') return;
+    const someone = castAt(x, y); if (someone) { hovered = null; meet(someone.id); return; }   // characters come first
     ndc.set(x / innerWidth * 2 - 1, -(y / innerHeight) * 2 + 1); raycaster.setFromCamera(ndc, camera);
     const hit = raycaster.intersectObjects(proxies, false)[0];
     if (!hit) return;

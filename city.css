@@ -183,3 +183,12 @@ body:not(.is-loading) .city-loader{opacity:0;visibility:hidden}
 @media (min-width:760px){ .city-heading{left:max(28px,env(safe-area-inset-left,0px))} }
 @media (max-height:520px){ .city-menu ol{display:grid;grid-template-columns:repeat(3,auto)} .city-heading{top:70px} }
 @media (prefers-reduced-motion:reduce){ *{animation:none!important;transition-duration:.01s!important} }
+
+/* name tag over a character */
+.city-name{position:fixed;left:0;top:0;z-index:13;pointer-events:none;padding:5px 14px;border-radius:999px;font:800 .86rem var(--city-round);color:#3a2a63;white-space:nowrap;
+  background:rgba(255,255,255,.92);border:2px solid rgba(255,127,192,.55);box-shadow:0 6px 18px rgba(120,90,200,.25);margin-top:-12px}
+.city-name::after{content:"";position:absolute;left:50%;bottom:-8px;width:12px;height:12px;background:inherit;border-right:2px solid rgba(255,127,192,.55);border-bottom:2px solid rgba(255,127,192,.55);transform:translateX(-50%) rotate(45deg);border-radius:2px}
+.city-name.is-chosen{background:linear-gradient(90deg,#ff8cc8,#8fd8ff);color:#fff;border-color:#fff;text-shadow:0 1px 3px rgba(90,60,160,.45)}
+.city-name.is-chosen::after{background:#c4b2f0;border-color:#fff}
+.city-name[hidden]{display:none}
+body.is-loading .city-name{display:none}
