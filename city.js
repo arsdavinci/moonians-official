@@ -413,16 +413,15 @@ function start() {
       m.userData.ring = {a, r: 46, y: 11 + (i % 3) * 3};
     });
     // Painted clouds drifting between the towers.
-    textures.load('assets/city/clouds.webp', texture => {
-      texture.colorSpace = THREE.SRGBColorSpace;
-      for (let i = 0; i < 12; i++) {
-        const map = texture.clone(); map.repeat.set(1 / 3, .5); map.offset.set((i % 3) / 3, Math.floor(i / 3) % 2 * .5); map.needsUpdate = true;
+    for (let i = 0; i < 12; i++) {            // each cloud is its own picture, so none is cut off at an edge
+      textures.load(`assets/city/cloud-${i % 5 + 1}.webp`, map => {
+        map.colorSpace = THREE.SRGBColorSpace;
         const sprite = new THREE.Sprite(new THREE.SpriteMaterial({map, transparent: true, depthWrite: false, fog: true}));
-        const a = (i / 12) * Math.PI * 2 + i, r = 90 + (i * 53) % 110;
-        sprite.userData = {a, r, y: 26 + (i * 17) % 60}; sprite.scale.set(70, 46, 1);
+        const a = (i / 12) * Math.PI * 2 + i, r = 90 + (i * 53) % 110, w = 62 + (i * 7) % 20;
+        sprite.userData = {a, r, y: 26 + (i * 17) % 60}; sprite.scale.set(w, w * map.image.height / map.image.width, 1);
         scene.add(sprite); paintedClouds.push(sprite);
-      }
-    });
+      });
+    }
   }
 
   function setShutters(closed) {
@@ -539,7 +538,9 @@ function start() {
     location.href = link.href;
   }
 
+  let hotGame = false;
   function hot(id, turn = true) {
+    hotGame = id === 'game' && turn;
     links.forEach(a => a.classList.toggle('is-hot', a.dataset.place === id));
     for (const place of Object.values(PLACES)) if (place.el) place.el.classList.toggle('is-hot', place.id === id);
     if (!id || !turn || mode !== 'orbit' || !PLACES[id].node) return;
@@ -549,7 +550,7 @@ function start() {
     while (target - view.azT > Math.PI) target -= Math.PI * 2;
     while (target - view.azT < -Math.PI) target += Math.PI * 2;
     view.azT = target; view.idle = 0;
-    if (id === 'game' || id === 'roadmap') view.tiltT = id === 'game' ? .95 : .75; else view.tiltT = .12;
+    if (id === 'game' || id === 'roadmap') view.tiltT = id === 'game' ? .34 : .75; else view.tiltT = .12;
   }
 
   links.forEach(link => {
@@ -621,6 +622,42 @@ function start() {
     playPyon(name, true);
     if (name === 'Idle') setTimeout(() => { if (pyonActive === pyonActions.Idle && !pyonTurning) dance(); }, 1600);
   }
+  /* ── monitors: clips from the site play on every screen; the big Moon Vision screen loops the 3D anime ── */
+  const CLIPS = ['capsule/clip-11', 'capsule/clip-12', 'capsule/clip-16', 'capsule/clip-23', 'capsule/clip-05', 'capsule/clip-03', 'capsule2/clip-01'];
+  const videos = [];
+  function videoScreen(src, w, h) {
+    let entry = videos.find(v => v.src === src);
+    if (!entry) {
+      const el = document.createElement('video');
+      el.src = 'assets/' + src + '.mp4'; el.muted = true; el.loop = true; el.playsInline = true; el.preload = 'auto'; el.crossOrigin = 'anonymous';
+      const texture = new THREE.VideoTexture(el); texture.colorSpace = THREE.SRGBColorSpace;
+      entry = {src, el, texture, planes: []}; videos.push(entry);
+      el.addEventListener('loadedmetadata', () => entry.planes.forEach(fit));
+      el.play().catch(() => { /* starts on the first tap */ });
+    }
+    const plane = new THREE.Mesh(new THREE.PlaneGeometry(w, h), new THREE.MeshBasicMaterial({map: entry.texture, toneMapped: false}));
+    plane.userData = {w, h, entry}; entry.planes.push(plane); if (entry.el.videoWidth) fit(plane);
+    return plane;
+  }
+  function fit(plane) {             // crop the clip to the screen's shape (tall clips are trimmed top and bottom)
+    const {w, h, entry} = plane.userData, have = entry.el.videoWidth / entry.el.videoHeight, want = w / h, uv = plane.geometry.attributes.uv;
+    let u = 1, v = 1; if (have > want) u = want / have; else v = have / want;
+    const u0 = (1 - u) / 2, v0 = (1 - v) / 2;
+    uv.setXY(0, u0, v0 + v); uv.setXY(1, u0 + u, v0 + v); uv.setXY(2, u0, v0); uv.setXY(3, u0 + u, v0); uv.needsUpdate = true;
+  }
+  function loadScreens() {
+    let i = 0;
+    for (const [name, node] of Object.entries(N)) {
+      if (!/^Scr\d+$/.test(name) || !node.userData.w) continue;
+      const plane = videoScreen(CLIPS[i++ % CLIPS.length], node.userData.w, node.userData.h);
+      node.add(plane);
+    }
+    const anchor = PLACES.anime.node, big = videoScreen('anime/uchu-ramen', 11.9, 6.7);
+    const holder = new THREE.Group(); holder.position.copy(anchor.position); holder.quaternion.copy(anchor.quaternion);
+    big.position.set(0, 10.5, 5.8); holder.add(big); scene.add(holder);
+    addEventListener('pointerdown', () => videos.forEach(v => { if (v.el.paused) v.el.play().catch(() => {}); }), {passive: true});
+  }
+
   /* ── traffic: hover cars on the roads and bridges, the lower town, and drones in the air ── */
   // Each route returns a position for a distance travelled; cars face along it and bob as they hover.
   const TAU = Math.PI * 2;
@@ -751,7 +788,7 @@ function start() {
     await wait(.72);
     body.classList.remove('is-loading');
     wipeEl.classList.remove('is-on');
-    loadPyonpy(); loadLandmarks(); loadTraffic();
+    loadPyonpy(); loadLandmarks(); loadTraffic(); loadScreens();
     const token = ++introToken;
     if (motionOff()) { finishIntro(); return; }
     mode = 'intro';
@@ -793,7 +830,7 @@ function start() {
     setShutters(boost.shutter); jobs.clear(); orbitPose(camPos, camLook); mode = 'orbit';
   });
 
-  new GLTFLoader().load('assets/city/pastel-moon-city.glb?v=20261118-3', gltf => {
+  new GLTFLoader().load('assets/city/pastel-moon-city.glb?v=20261118-4', gltf => {
     try { build(gltf); } catch (error) { console.error(error); fail(); return; }
     progress = 1;
   }, event => { progress = Math.min(.98, event.loaded / (event.total || 3460872)); }, () => fail());
@@ -869,6 +906,11 @@ function start() {
     beams.forEach((m, i) => { m.material.opacity = (1 - night) * (.07 + .07 * (Math.sin(time * .35 + i * 1.7) * .5 + .5)); m.visible = night < .98; });
     if (mode === 'orbit') {
       view.idle += dt;
+      if (hotGame && N.UFO) {          // keep following the UFO while its menu item is pointed at
+        let target = Math.atan2(N.UFO.position.x, N.UFO.position.z) + Math.PI;
+        while (target - view.azT > Math.PI) target -= Math.PI * 2; while (target - view.azT < -Math.PI) target += Math.PI * 2;
+        view.azT = target; view.tiltT = .34; view.idle = 0;
+      }
       if (view.idle > 6 && !still && !pointers.size) view.azT += dt * .045;
       const k = 1 - Math.pow(.0015, dt);
       view.az = lerp(view.az, view.azT, k); view.tilt = lerp(view.tilt, view.tiltT, k); view.rad = lerp(view.rad, view.radT, k);
