@@ -131,6 +131,42 @@ function start() {
   let panoReady = false;
   textures.load('assets/city/sky-panorama.jpg', texture => { texture.colorSpace = THREE.SRGBColorSpace; texture.wrapS = THREE.RepeatWrapping; sky.material.uniforms.pano.value = texture; panoReady = true; });
   const tileTexture = textures.load('assets/city/floor-tile.jpg', texture => { texture.colorSpace = THREE.SRGBColorSpace; texture.wrapS = texture.wrapT = THREE.RepeatWrapping; texture.anisotropy = 4; });
+  // Building skins: the facade pictures are wrapped onto walls by world position (side walls) and roofs get
+  // the rooftop picture, so the merged low-poly city needs no UVs. At night the pictures glow a little.
+  const uSkinGlow = {value: 0};
+  const skinTextures = {};
+  const skinTexture = name => skinTextures[name] || (skinTextures[name] = textures.load(`assets/city/tex/${name}.jpg`, t => { t.colorSpace = THREE.SRGBColorSpace; t.wrapS = t.wrapT = THREE.RepeatWrapping; t.anisotropy = 4; }));
+  function skinned(source, wall, roof, size) {
+    const material = source.clone(); material.color.set(0xffffff);
+    material.onBeforeCompile = shader => {
+      shader.uniforms.uWall = {value: skinTexture(wall)}; shader.uniforms.uRoof = {value: skinTexture(roof)}; shader.uniforms.uSkinGlow = uSkinGlow; shader.uniforms.uSkinSize = {value: 1 / size};
+      shader.vertexShader = shader.vertexShader.replace('#include <common>', '#include <common>\nvarying vec3 vSkinPos; varying vec3 vSkinNormal;')
+        .replace('#include <project_vertex>', '#include <project_vertex>\nvSkinPos = (modelMatrix * vec4(transformed, 1.0)).xyz; vSkinNormal = normalize(mat3(modelMatrix) * objectNormal);');
+      shader.fragmentShader = shader.fragmentShader.replace('#include <common>', '#include <common>\nuniform sampler2D uWall; uniform sampler2D uRoof; uniform float uSkinGlow; uniform float uSkinSize; varying vec3 vSkinPos; varying vec3 vSkinNormal; vec3 skinColor;')
+        .replace('#include <map_fragment>', '#include <map_fragment>\nvec3 sn = normalize(vSkinNormal);\nif (abs(sn.y) > 0.75) skinColor = texture2D(uRoof, vSkinPos.xz * uSkinSize).rgb;\nelse skinColor = texture2D(uWall, vec2(vSkinPos.x * sn.z - vSkinPos.z * sn.x, vSkinPos.y) * uSkinSize).rgb;\nskinColor = pow(skinColor, vec3(2.2));\ndiffuseColor.rgb = skinColor;')
+        .replace('#include <emissivemap_fragment>', '#include <emissivemap_fragment>\ntotalEmissiveRadiance += skinColor * uSkinGlow;');
+    };
+    material.customProgramCacheKey = () => 'skin-' + wall + roof + size;
+    return material;
+  }
+  const SKINS = [   // material name pattern -> wall picture, roof picture, metres covered by one picture
+    [/M_LAV$|M_SKY$/, 'B01', 'B12', 13], [/M_PINK$|M_PINK_D$/, 'B02', 'B12', 13], [/M_MINT$/, 'B03', 'B12', 13], [/M_CREAM$|M_YEL$/, 'B04', 'B12', 13],
+    [/M_LAV_D$/, 'B05', 'B12', 11], [/M_PEARL$|M_LAV_L$|M_WHITE$/, 'B06', 'B07', 11], [/M_PURPLE$|M_D_/, 'B08', 'B12', 14]
+  ];
+  function skinCity() {
+    const cache = new Map();
+    const dress = (node, rules, hideWindows) => node && node.traverse(o => {
+      if (!o.isMesh) return;
+      const name = o.material.name || '';
+      if (hideWindows && /M_W_/.test(name)) { o.visible = false; return; }
+      const rule = rules.find(r => r[0].test(name)); if (!rule) return;
+      const key = name + rule[1]; if (!cache.has(key)) cache.set(key, skinned(o.material, rule[1], rule[2], rule[3]));
+      o.material = cache.get(key);
+    });
+    dress(N.City_Far, SKINS, true);
+    dress(N.City_Lower, [[/M_D_/, 'B09', 'B12', 9], [/M_LOWGROUND$/, 'B10', 'B10', 16]], false);
+  }
+
   // Floors take the tile picture by world position, so the merged model needs no UVs.
   function tiled(material) {
     material.onBeforeCompile = shader => {
@@ -227,6 +263,8 @@ function start() {
     scene.environment = k > .5 ? envNight : envDay;
     uGlow.value = lerp(1, 1.75, k);
     sk.panoMix.value = panoReady ? 1 - k : 0;
+    uSkinGlow.value = k * .6; if (N.skylineDay) { N.skylineDay.material.opacity = 1 - k; N.skylineNight.material.opacity = k; N.skylineNight.visible = k > .01; N.skylineDay.visible = k < .99; }
+    if (N.plazaArt) N.plazaArt.material.color.setScalar(lerp(1, .55, k));
     stars.material.opacity = k; moonDisc.material.opacity = k * .95; sunDisc.material.opacity = (1 - k) * .95;
     if (keep.cloud) keep.cloud.emissiveIntensity = lerp(.34, .04, k);
     if (keep.mist) keep.mist.opacity = lerp(.13, .3, k);
@@ -397,6 +435,16 @@ function start() {
     sparkle = new THREE.Points(geometry, new THREE.PointsMaterial({size: .55, map: dot, vertexColors: true, transparent: true, opacity: .9, depthWrite: false, blending: THREE.AdditiveBlending, fog: false}));
     scene.add(sparkle);
     setShutters(boost.shutter);
+    skinCity();
+    // The plaza floor and Pyonpy's stage get their own round pictures.
+    const disc = (file, radius, y) => { const m = new THREE.Mesh(new THREE.CircleGeometry(radius, 64), new THREE.MeshBasicMaterial({map: textures.load(file, t => { t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 8; }), transparent: true, depthWrite: false, toneMapped: false}));
+      m.rotation.x = -Math.PI / 2; m.position.y = y; m.renderOrder = 1; scene.add(m); return m; };
+    N.plazaArt = disc('assets/city/plaza-floor.webp', 17.2, .285); N.stageArt = disc('assets/city/stage-emblem.webp', 2.62, .7);
+    // Far skyline: a painted band right round the horizon, day and night versions.
+    const band = file => { const map = textures.load(file, t => { t.colorSpace = THREE.SRGBColorSpace; t.wrapS = THREE.RepeatWrapping; }); map.repeat.set(3, 1);
+      const m = new THREE.Mesh(new THREE.CylinderGeometry(310, 310, 216, 96, 1, true), new THREE.MeshBasicMaterial({map, transparent: true, side: THREE.BackSide, depthWrite: false, toneMapped: false, fog: true}));
+      m.position.y = -70 + 108; m.renderOrder = -5; scene.add(m); return m; };
+    N.skylineDay = band('assets/city/skyline-day.webp'); N.skylineNight = band('assets/city/skyline-night.webp');
 
     // Holographic neon icons: one turning above each landmark, the rest circling the inner ring bridge.
     const atlas = textures.load('assets/city/neon-icons.jpg', texture => { texture.colorSpace = THREE.SRGBColorSpace; });
@@ -675,6 +723,9 @@ function start() {
               text: '翻訳酸素カプセルから聞こえる声の主。ぴょんぴーのムーニアン語を、日本語に同時翻訳してくれる人工知能です。'}
   };
   const cast = [], profileEl = $('#city-profile');
+  // Pyonpy stays on his stage, but meets you the same way as the others.
+  const pyonMember = {id: 'pyon', actions: {}, stopped: false, spec: {height: 2.3, kicker: 'PYONPY', role: 'ボケ担当', name: 'ぴょんぴー',
+    text: '超ポジティブで、みんなの兄貴分。月と地球を笑いでつなぐ、もふもふのボケ担当。'}};
   let meeting = null, shift = 0, shiftT = 0;
   function loadCast() {
     Object.entries(CAST).forEach(([id, spec], index) => {
@@ -745,7 +796,7 @@ function start() {
     camera.updateProjectionMatrix();
   }
   async function meet(id) {
-    const m = cast.find(x => x.id === id); if (!m || mode !== 'orbit') return;
+    const m = id === 'pyon' ? (pyon ? Object.assign(pyonMember, {group: pyon}) : null) : cast.find(x => x.id === id); if (!m || mode !== 'orbit') return;
     mode = 'fly'; meeting = m; m.stopped = true; body.classList.add('is-meeting');
     hintEl.classList.remove('is-on'); bubbleEl.hidden = true;
     sound.fx.select(); playCast(m, 'Idle');
@@ -757,6 +808,7 @@ function start() {
     if (motionOff()) { camPos.copy(p).addScaledVector(away, reach).add(V(0, eye + lift, 0)); camLook.copy(p).add(V(0, eye, 0)); }
     else await fly(p.clone().addScaledVector(away, reach).add(V(0, eye + lift, 0)), p.clone().add(V(0, eye, 0)), 1.5, 1.2);
     playCast(m, 'React', true); sound.fx.pop(); sound.fx.arrive();
+    if (m === pyonMember) playPyon(pyonActions.Cheer ? 'Cheer' : 'Jump', true);
     if (m.face) { m.face.set(3, .7); setTimeout(() => m.face && m.face.set(0, 4), 700); }
     burst(p.clone().add(V(0, m.spec.height * .9, 0)), PASTEL, 46, 5, .7);
     $('#profile-kicker').textContent = m.spec.kicker; $('#profile-role').textContent = tr(m.spec.role);
@@ -778,7 +830,7 @@ function start() {
     event.preventDefault(); const href = event.currentTarget.href;
     sound.fx.select(); wipeEl.classList.add('is-on'); setTimeout(() => { location.href = href; }, 720);
   });
-  canvas.addEventListener('click', () => { if (mode === 'meet' && meeting) { playCast(meeting, 'React', true); sound.fx.pop(); burst(meeting.group.position.clone().add(V(0, meeting.spec.height * .9, 0)), PASTEL, 30, 5, .7); } });
+  canvas.addEventListener('click', () => { if (mode === 'meet' && meeting) { playCast(meeting, 'React', true); if (meeting === pyonMember) playPyon(pyonActions.Jump ? 'Jump' : 'Cheer', true); sound.fx.pop(); burst(meeting.group.position.clone().add(V(0, meeting.spec.height * .9, 0)), PASTEL, 30, 5, .7); } });
 
   /* ── traffic: hover cars on the roads and bridges, the lower town, and drones in the air ── */
   // Each route returns a position for a distance travelled; cars face along it and bob as they hover.
@@ -896,7 +948,7 @@ function start() {
     const hit = raycaster.intersectObjects(proxies, false)[0];
     if (!hit) return;
     const {kind, id} = hit.object.userData;
-    if (kind === 'place') go(id); else if (kind === 'cast') meet(id); else if (kind === 'pyon') { if (pyon) tapPyon(); } else if (kind === 'statue') { statueBounce = 1; sound.fx.pop(); burst(N.Statue.position.clone().add(V(0, 4, 0)), [0xff9bd0, 0xffffff], 40, 6, .8); }
+    if (kind === 'place') go(id); else if (kind === 'cast') meet(id); else if (kind === 'pyon') { if (pyon) meet('pyon'); } else if (kind === 'statue') { statueBounce = 1; sound.fx.pop(); burst(N.Statue.position.clone().add(V(0, 4, 0)), [0xff9bd0, 0xffffff], 40, 6, .8); }
   }
 
   /* ── entering the city ── */
@@ -1096,6 +1148,7 @@ function start() {
     }
     for (const c of paintedClouds) { const a = c.userData.a + time * .006; c.position.set(Math.cos(a) * c.userData.r, c.userData.y, Math.sin(a) * c.userData.r); c.material.opacity = .95 - night * .7; }
     updateTraffic(dt, still); updateCast(dt, still);
+    if (N.stageArt && !still) N.stageArt.rotation.z += dt * .25;
     updateBursts(dt);
 
     // Labels and Pyonpy's speech bubble follow their spots on screen.

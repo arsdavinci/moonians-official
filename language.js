@@ -5,6 +5,7 @@
     'ムーニアンズ ロードマップ｜月の内側のあるきかた':'Moonians Roadmap | A guide to the inner Moon', '街のホーム':'City home',
     'パステルムーンシティ。ムーニアンズが暮らす月の内側の街を3Dで見回して、行きたい場所をえらべます。':'Pastel Moon City. Look around the Moonians’ city inside the Moon in 3D and choose where to go.',
     '夜にする':'Night', '昼にする':'Day',
+    '超ポジティブで、みんなの兄貴分。月と地球を笑いでつなぐ、もふもふのボケ担当。':'Super positive, and everyone’s big brother. The fluffy funny man who links the Moon and Earth with laughter.',
     '他の仲間たちを見る':'Meet the other friends', '街にもどる':'Back to the city', 'うさぎロボ':'Bunny Robot', '街の案内ロボ':'City guide robot',
     '街を走りまわる、うさぎ型の案内ロボ。困っている人を見つけると、すぐにかけつけます。名前は、まだ調査中です。':'A rabbit-shaped guide robot that rolls around the city and hurries over to anyone who needs help. Its name is still being researched.',
     '地球人とムーニアンのハーフ。自分の「好き」を形にする、クリエイターなツッコミ担当。':'Half Earthling, half Moonian. The straight man of the duo, and a creator who turns what he loves into something real.',
