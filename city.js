@@ -948,6 +948,27 @@ function start() {
     });
   }
 
+  /* ── neon signs: glowing outlines in moon letters, hung all over the city (black parts of the pictures add no light) ── */
+  const signs = [];
+  function loadSigns() {
+    const maps = [1, 2, 3, 4, 5, 6, 7, 8].map(n => textures.load(`assets/city/signs/wide-${n}.jpg`, t => { t.colorSpace = THREE.SRGBColorSpace; }));
+    const ratio = [2.99, 2.9, 3.06, 3.18, 2.44, 2.4, 2.88, 2.5];
+    const hang = (parent, k, width, x, y, z, upright) => {
+      const m = new THREE.Mesh(new THREE.PlaneGeometry(width, width / ratio[k]), new THREE.MeshBasicMaterial({map: maps[k], transparent: true, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide, fog: false, toneMapped: false}));
+      m.position.set(x, y, z); if (upright) m.rotation.z = Math.PI / 2;    // a wide sign turned on end makes a tall one
+      m.userData.phase = signs.length * 1.7; parent.add(m); signs.push(m); return m;
+    };
+    // one above or beside every monitor in the city
+    Object.entries(N).filter(([name, node]) => /^Scr\d+$/.test(name) && node.userData.w).forEach(([, node], i) => {
+      const w = node.userData.w, h = node.userData.h, k = i % 8;
+      if (i % 3 === 0) hang(node, k, Math.max(3.2, h * 1.5), -w / 2 - .9, 0, .05, true);          // tall sign down the left edge
+      else hang(node, k, Math.max(3, w * .95), 0, h / 2 + .75, .05, false);                      // wide sign over the top
+    });
+    // a ring of signs round the plaza, and tall ones along the main road
+    for (let i = 0; i < 8; i++) { const a = i / 8 * Math.PI * 2 + .39, g = new THREE.Group(); g.position.set(Math.cos(a) * 25.2, 6.2 + (i % 2) * 1.6, Math.sin(a) * 25.2); g.rotation.y = -a - Math.PI / 2; scene.add(g); hang(g, (i + 3) % 8, 5.2, 0, 0, 0, i % 2 === 1); }
+    for (let i = 0; i < 6; i++) { const g = new THREE.Group(), side = i % 2 ? 1 : -1; g.position.set(side * 8.4, 5.5, 26 + i * 6.5); g.rotation.y = side > 0 ? -Math.PI / 2 : Math.PI / 2; scene.add(g); hang(g, (i + 5) % 8, 4.6, 0, 0, 0, true); }
+  }
+
   /* ── traffic: hover cars on the roads and bridges, the lower town, and drones in the air ── */
   // Each route returns a position for a distance travelled; cars face along it and bob as they hover.
   const TAU = Math.PI * 2;
@@ -1083,7 +1104,7 @@ function start() {
     await wait(.72);
     body.classList.remove('is-loading');
     wipeEl.classList.remove('is-on');
-    loadPyonpy(); loadLandmarks(); loadTraffic(); loadScreens(); loadCast(); loadPlants();
+    loadPyonpy(); loadLandmarks(); loadTraffic(); loadScreens(); loadCast(); loadPlants(); loadSigns();
     const token = ++introToken;
     if (motionOff()) { finishIntro(); return; }
     mode = 'intro';
@@ -1270,6 +1291,7 @@ function start() {
     }
     for (const c of paintedClouds) { const a = c.userData.a + time * .006; c.position.set(Math.cos(a) * c.userData.r, c.userData.y, Math.sin(a) * c.userData.r); c.material.opacity = .95 - night * .7; }
     updateTraffic(dt, still); updateCast(dt, still);
+    for (const m of signs) m.material.opacity = (.45 + .5 * night) * (.86 + .14 * Math.sin(time * 3.1 + m.userData.phase)) * (Math.sin(time * .7 + m.userData.phase * 2.3) > .985 ? .35 : 1);   // steady glow with a rare flicker
     if (N.stageArt && !still) N.stageArt.rotation.z += dt * .25;
     updateBursts(dt);
 
