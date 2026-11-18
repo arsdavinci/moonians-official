@@ -407,6 +407,7 @@ function start() {
   let sparkle = null, pyon = null, pyonMixer = null, pyonActions = {}, pyonActive = null, statueBounce = 0;
   const ufoBase = V(0, 0, 0), shutterBase = {};
   let ufoAngle = 2.4, ufoRise = 1, airshipStart = null;
+  const UFO_R = 66, UFO_Y = 34, UFO_TURN = .16;      // the UFO's circle: radius, height, radians a second
 
   function build(gltf) {
     const root = gltf.scene; scene.add(root);
@@ -1409,10 +1410,9 @@ function start() {
     await wait(.72);
     body.classList.remove('is-loading');
     wipeEl.classList.remove('is-on');
-    loadPyonpy(); loadLandmarks(); loadTraffic(); loadScreens(); loadCast(); loadPlants(); loadSigns();
     const token = ++introToken;
-    if (motionOff()) { finishIntro(); return; }
-    mode = 'intro';
+    if (motionOff()) { fliersFor(0); finishIntro(); return; }
+    mode = 'intro'; fliersFor(WELCOME_AT);
     camPos.set(46, 105, 205); camLook.set(0, 12, 0);
     sound.fx.whoosh(3);
     await fly(V(1.2, 2.7, 47), V(-1, 12, 0), 3.4, 0);
@@ -1428,12 +1428,30 @@ function start() {
   function finishIntro() {
     orbitPose(camPos, camLook);
     mode = 'orbit'; body.classList.add('is-exploring');
-    ufoAngle = 3.927; ufoRise = 0; const ship0 = traffic.find(t => t.id === 'airship'); if (ship0) ship0.d = -176.7; else airshipStart = -176.7;
+  }
+  // The welcome shot (the pause at the end of the dive in) should show the UFO left of the Moon Tower and the airship
+  // at the upper right. Both are already flying, so they are put back along their own paths by exactly the time
+  // left until that shot, and simply arrive there.
+  const WELCOME_AT = 3.95, WELCOME_POS = V(1.2, 2.7, 47), WELCOME_LOOK = V(-1, 12, 0);
+  function fliersFor(secondsLeft) {
+    const cam = camera.clone(); cam.position.copy(WELCOME_POS); cam.lookAt(WELCOME_LOOK); cam.updateMatrixWorld(true);
+    const wide = innerWidth > innerHeight, wantUfo = wide ? .345 : .2, wantShip = wide ? .74 : .8;   // where across the screen each should be
+    const skyR = ROUTES.sky.length / (Math.PI * 2), ship = traffic.find(t => t.id === 'airship'), shipSpeed = ship ? ship.speed : -3.5;
+    ROUTES.sky.at(0, tmp2); const shipY = tmp2.y + 42;
+    let aUfo = 4.1, aShip = 5.26, eUfo = 9, eShip = 9;
+    for (let a = 3.3; a < 6.1; a += .004) {
+      const r = UFO_R + Math.sin(a * 2.3) * 3;
+      tmp.set(Math.cos(a) * r, UFO_Y, Math.sin(a) * r).project(cam); if (tmp.z < 1 && Math.abs((tmp.x + 1) / 2 - wantUfo) < eUfo) { eUfo = Math.abs((tmp.x + 1) / 2 - wantUfo); aUfo = a; }
+      tmp.set(Math.cos(a) * skyR, shipY, Math.sin(a) * skyR).project(cam); if (tmp.z < 1 && Math.abs((tmp.x + 1) / 2 - wantShip) < eShip) { eShip = Math.abs((tmp.x + 1) / 2 - wantShip); aShip = a; }
+    }
+    ufoAngle = aUfo - UFO_TURN * secondsLeft; ufoRise = 1;
+    const d = aShip * skyR - shipSpeed * secondsLeft; if (ship) ship.d = d; else airshipStart = d;
   }
   gateEl.addEventListener('submit', event => { event.preventDefault(); enter(!event.submitter || event.submitter.value !== 'off'); });
 
   function ready() {
     loaded = true; mode = 'gate';
+    loadPyonpy(); loadLandmarks(); loadTraffic(); loadScreens(); loadCast(); loadPlants(); loadSigns();
     let returning = false;
     // Only someone coming back from one of this site's own pages skips the question; opening or reloading the home always asks.
     try {
@@ -1554,10 +1572,10 @@ function start() {
     if (N.UFO) {
       const u = N.UFO;
       // The UFO circles high over the city; it holds still while the camera flies anywhere, so it is easy to reach.
-      if (mode !== 'fly' && !still) { ufoAngle += dt * .16; ufoRise = Math.min(1, ufoRise + dt / 14); }
+      if (mode !== 'fly' && !still) { ufoAngle += dt * UFO_TURN; ufoRise = Math.min(1, ufoRise + dt / 14); }
       const towerSide = Math.atan2(Math.sin(ufoAngle + Math.PI / 2), Math.cos(ufoAngle + Math.PI / 2));   // 0 when it is level with the Moon Tower
-      const ufoR = 60 + Math.sin(ufoAngle * 2.3) * 3 - 0 * towerSide;    // out beyond the landmarks, just above their roofs
-      u.position.set(Math.cos(ufoAngle) * ufoR, lerp(18, 31, easeInOut(ufoRise)) + Math.sin(time * .7) * 1.6 * ufoRise + Math.sin(time * 2.6) * .6, Math.sin(ufoAngle) * ufoR);
+      const ufoR = UFO_R + Math.sin(ufoAngle * 2.3) * 3 - 0 * towerSide;    // out beyond the landmarks, just above their roofs
+      u.position.set(Math.cos(ufoAngle) * ufoR, lerp(18, UFO_Y, easeInOut(ufoRise)) + Math.sin(time * .7) * 1.6 * ufoRise + Math.sin(time * 2.6) * .6, Math.sin(ufoAngle) * ufoR);
       u.rotation.y += dt * .35 * boost.ufo; u.rotation.z = Math.sin(time * .9) * .06; u.rotation.x = Math.cos(time * .7) * .05;
       if (N.ufoProxy) { N.ufoProxy.position.copy(u.position); N.ufoProxy.updateMatrixWorld(); }
       if (N.UFO_BeamMesh) N.UFO_BeamMesh.traverse(o => { if (o.isMesh) { o.material.opacity = boost.beam * (.8 + Math.sin(time * 22) * .2); o.visible = boost.beam > .01; } });
