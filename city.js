@@ -411,6 +411,40 @@ function start() {
   }
 
   const holos = [], paintedClouds = [];
+  // Soft shadows: a dark, blurred disc under every character and car. Almost free, and it puts them on the ground.
+  const shadows = new THREE.Group(); shadows.renderOrder = 2; scene.add(shadows);
+  const shadowMap = (() => { const c = document.createElement('canvas'); c.width = c.height = 64; const g = c.getContext('2d'), grad = g.createRadialGradient(32, 32, 2, 32, 32, 32);
+    grad.addColorStop(0, 'rgba(255,255,255,1)'); grad.addColorStop(.55, 'rgba(255,255,255,.55)'); grad.addColorStop(1, 'rgba(255,255,255,0)'); g.fillStyle = grad; g.fillRect(0, 0, 64, 64); return new THREE.CanvasTexture(c); })();
+  const shadowGeo = new THREE.PlaneGeometry(1, 1).rotateX(-Math.PI / 2);
+  function blobShadow(size, depth = 1) {
+    const m = new THREE.Mesh(shadowGeo, new THREE.MeshBasicMaterial({map: shadowMap, color: 0x1c1245, transparent: true, opacity: .4, depthWrite: false, toneMapped: false, fog: false}));
+    m.scale.set(size, 1, size * depth); m.renderOrder = 2; shadows.add(m); return m;
+  }
+  // The plaza floor as a faint mirror: the city is drawn once more from underneath the floor and laid over the floor's picture.
+  // It costs about as much as drawing the city a second time, so it is only switched on where the device has room to spare.
+  const mirror = {on: false, tried: false, target: null, k: {value: 0}, matrix: {value: new THREE.Matrix4()}, tex: {value: null},
+    cam: new THREE.PerspectiveCamera(), n: V(0, 1, 0), at: V(0, .285, 0), a: V(0, 0, 0), b: V(0, 0, 0), c: V(0, 0, 0), rot: new THREE.Matrix4(), plane: new THREE.Plane(), clip: new THREE.Vector4(), q: new THREE.Vector4()};
+  function setMirror(on) {
+    if (on && !mirror.target) { const size = renderer.getDrawingBufferSize(new THREE.Vector2()); mirror.target = new THREE.WebGLRenderTarget(Math.max(256, Math.round(size.x / 2)), Math.max(256, Math.round(size.y / 2)), {depthBuffer: true}); mirror.tex.value = mirror.target.texture; }
+    mirror.on = on; if (!on) mirror.k.value = 0;
+  }
+  function drawMirror() {
+    const floor = N.plazaArt; if (!mirror.on || !floor || camera.position.y <= mirror.at.y + .2) { mirror.k.value = 0; return; }
+    const {cam, n, at, a, b, c, rot} = mirror;
+    a.copy(at).sub(camera.position).reflect(n).negate().add(at);                                   // the camera, mirrored through the floor
+    rot.extractRotation(camera.matrixWorld); b.set(0, 0, -1).applyMatrix4(rot).add(camera.position); c.copy(at).sub(b).reflect(n).negate().add(at);
+    cam.position.copy(a); cam.up.set(0, 1, 0).applyMatrix4(rot).reflect(n); cam.lookAt(c); cam.far = camera.far; cam.updateMatrixWorld(); cam.projectionMatrix.copy(camera.projectionMatrix);
+    mirror.matrix.value.set(.5, 0, 0, .5, 0, .5, 0, .5, 0, 0, .5, .5, 0, 0, 0, 1).multiply(cam.projectionMatrix).multiply(cam.matrixWorldInverse).multiply(floor.matrixWorld);
+    // cut away everything under the floor, so only what stands on it is mirrored
+    mirror.plane.setFromNormalAndCoplanarPoint(n, at).applyMatrix4(cam.matrixWorldInverse);
+    const clip = mirror.clip.set(mirror.plane.normal.x, mirror.plane.normal.y, mirror.plane.normal.z, mirror.plane.constant), pm = cam.projectionMatrix, q = mirror.q;
+    q.x = (Math.sign(clip.x) + pm.elements[8]) / pm.elements[0]; q.y = (Math.sign(clip.y) + pm.elements[9]) / pm.elements[5]; q.z = -1; q.w = (1 + pm.elements[10]) / pm.elements[14];
+    clip.multiplyScalar(2 / clip.dot(q)); pm.elements[2] = clip.x; pm.elements[6] = clip.y; pm.elements[10] = clip.z + 1 - .003; pm.elements[14] = clip.w;
+    const stage = N.stageArt; floor.visible = false; shadows.visible = false; if (stage) stage.visible = false;
+    renderer.setRenderTarget(mirror.target); renderer.clear(); renderer.render(scene, cam); renderer.setRenderTarget(null);
+    floor.visible = true; shadows.visible = true; if (stage) stage.visible = true;
+    mirror.k.value = lerp(mirror.k.value, lerp(.2, .42, uNight.value), .08);                         // fades in; stronger at night, when the neon is worth mirroring
+  }
   let sparkle = null, pyon = null, pyonMixer = null, pyonActions = {}, pyonActive = null, statueBounce = 0;
   const ufoBase = V(0, 0, 0), shutterBase = {};
   let ufoAngle = 2.4, ufoRise = 1, airshipStart = null;
@@ -505,11 +539,12 @@ function start() {
     {   // At night only the parts marked white in the plaza's light map shine (rings, moons, rabbits, the rim's dots); the rest of the floor goes dim.
       const glowMap = textures.load('assets/city/plaza-glow.jpg');
       N.plazaArt.material.onBeforeCompile = shader => {
-        shader.uniforms.uNight = uNight; shader.uniforms.uGlowMap = {value: glowMap};
-        shader.fragmentShader = shader.fragmentShader.replace('#include <common>', '#include <common>\nuniform float uNight; uniform sampler2D uGlowMap;')
-          .replace('#include <map_fragment>', '#include <map_fragment>\nfloat lit = smoothstep(0.25, 0.75, texture2D(uGlowMap, vMapUv).r);\ndiffuseColor.rgb = mix(diffuseColor.rgb, mix(diffuseColor.rgb * 0.34, diffuseColor.rgb * 1.35 + 0.14, lit), uNight);');
+        shader.uniforms.uNight = uNight; shader.uniforms.uGlowMap = {value: glowMap}; shader.uniforms.uMirror = mirror.tex; shader.uniforms.uMirrorK = mirror.k; shader.uniforms.uMirrorMatrix = mirror.matrix;
+        shader.vertexShader = shader.vertexShader.replace('#include <common>', '#include <common>\nuniform mat4 uMirrorMatrix; varying vec4 vMirror;').replace('#include <begin_vertex>', '#include <begin_vertex>\nvMirror = uMirrorMatrix * vec4(position, 1.0);');
+        shader.fragmentShader = shader.fragmentShader.replace('#include <common>', '#include <common>\nuniform float uNight; uniform sampler2D uGlowMap; uniform sampler2D uMirror; uniform float uMirrorK; varying vec4 vMirror;')
+          .replace('#include <map_fragment>', '#include <map_fragment>\nfloat lit = smoothstep(0.25, 0.75, texture2D(uGlowMap, vMapUv).r);\ndiffuseColor.rgb = mix(diffuseColor.rgb, mix(diffuseColor.rgb * 0.34, diffuseColor.rgb * 1.35 + 0.14, lit), uNight);\nif (uMirrorK > 0.001) { vec3 seen = texture2DProj(uMirror, vMirror).rgb; diffuseColor.rgb = mix(diffuseColor.rgb, diffuseColor.rgb * 0.82 + seen * 0.9, uMirrorK); }');
       };
-      N.plazaArt.material.customProgramCacheKey = () => 'plaza-night';
+      N.plazaArt.material.customProgramCacheKey = () => 'plaza-night-mirror';
     }
     // Far skyline: a painted band right round the horizon, day and night versions.
     const band = file => { const map = textures.load(file, t => { t.colorSpace = THREE.SRGBColorSpace; t.wrapS = THREE.RepeatWrapping; }); map.repeat.set(3, 1);
@@ -772,7 +807,7 @@ function start() {
       model.scale.setScalar(scale);
       model.position.set(-(box.min.x + size.x / 2) * scale, -box.min.y * scale, -(box.min.z + size.z / 2) * scale);
       model.traverse(node => { if (node.isMesh) { node.frustumCulled = false; (Array.isArray(node.material) ? node.material : [node.material]).forEach(m => { m.envMapIntensity = .5; }); } });
-      pyon = new THREE.Group(); pyon.position.set(0, .68, 0); pyon.add(model); scene.add(pyon);
+      pyon = new THREE.Group(); pyon.position.set(0, .68, 0); pyon.add(model); scene.add(pyon); pyonShadow = blobShadow(1.0);
       pyonMixer = new THREE.AnimationMixer(model);
       gltf.animations.forEach(clip => {
         clip.tracks = clip.tracks.filter(track => !/^(root|RootNode)\.position$/.test(track.name));
@@ -847,6 +882,7 @@ function start() {
   // (cheer, jump, talk), the others are made here by swinging his arms, chest and hips in time, with spins and side steps.
   const MOVES = [{n: 'wave', d: 4, clip: 'Idle'}, {n: 'point', d: 4, clip: 'Idle'}, {n: 'Cheer', once: true}, {n: 'spin', d: 3, clip: 'Idle'}, {n: 'side', d: 4, clip: 'Idle'},
     {n: 'Jump', once: true}, {n: 'run', d: 4, clip: 'Run'}, {n: 'pump', d: 4, clip: 'Idle'}, {n: 'Talk', once: true}, {n: 'spin', d: 3, clip: 'Idle'}];
+  let pyonShadow = null;
   const PB = {}, danceAxis = V(0, 0, 0), danceQ = new THREE.Quaternion(), danceP = new THREE.Quaternion();
   let moveIndex = -1, move = null, moveT = 0, moveD = 0, pyonTurning = false, pyonFacing = 0;
   function dance() {
@@ -888,7 +924,8 @@ function start() {
       } else if (move.n === 'run') { hop = Math.abs(s1) * .08; sway = s2 * .55; }   // running on the spot, turning from side to side
     }
     pyon.rotation.y = pyonFacing + spin + sway; pyon.rotation.z = lean;
-    pyon.position.set(slide * .7, .68 + hop * .6, 0);   // he is small now, so his hops and steps are smaller too
+    pyon.position.set(slide * .7, .68 + hop * .6, 0);
+    if (pyonShadow) { pyonShadow.position.set(pyon.position.x, .725, 0); const k = 1 - hop * 1.4; pyonShadow.scale.set(k, 1, k); }   // he is small now, so his hops and steps are smaller too
   }
   /* ── monitors: clips from the site play on every screen; the big Moon Vision screen loops the 3D anime ── */
   const CLIPS = ['11', '03', '16', '05', '23', '01', '12', '09', '20', '14', '22', '07', '18', '25', '02', '27'].map(n => 'capsule/clip-' + n).concat(['capsule2/clip-01']);
@@ -1098,6 +1135,7 @@ function start() {
           const faceBone = model.getObjectByName('chest'); if (faceBone) { group.updateMatrixWorld(true); faceBone.attach(face); }
           member.face = {map, now: 0, until: 0, set(i, seconds) { this.now = i; this.until = time + seconds; map.offset.x = i / 6; }};
         }
+        if (!spec.holo && !spec.ride) member.shadow = blobShadow(spec.height * .62);
         if (spec.zombie) {
           const bone = n => model.getObjectByName('mixamorig' + n) || model.getObjectByName('mixamorig:' + n);
           member.zb = Object.fromEntries(['Spine', 'Spine2', 'Head', 'LeftArm', 'LeftForeArm', 'LeftHand', 'RightArm', 'RightForeArm', 'RightHand', 'LeftUpLeg', 'LeftLeg', 'LeftFoot', 'RightUpLeg', 'RightLeg', 'RightFoot'].map(n => [n, bone(n)]));
@@ -1142,7 +1180,7 @@ function start() {
   function updateCast(dt, still) {
     if (lineup) { cast.forEach((m, i) => { m.group.position.set(-4.5 + i * 3, .3, 8.5); m.group.rotation.y = 0; if (!still) m.mixer.update(dt); }); return; }
     for (const m of cast) {
-      if (m.spec.night) { m.group.visible = uNight.value > .5; if (!m.group.visible) { m.stopped = false; continue; } }
+      if (m.spec.night) { m.group.visible = uNight.value > .5; if (!m.group.visible) { m.stopped = false; if (m.shadow) m.shadow.visible = false; continue; } }
       if (m.face && time > m.face.until) { const happy = m.face.now !== 0; m.face.set(happy ? 0 : [1, 2, 3, 4, 5, 1, 2][Math.floor(Math.random() * 7)], happy ? 3 + Math.random() * 4 : 1.6 + Math.random() * 1.4); }
       // A rider goes wherever their vehicle goes (Ranpyon on the plaza scooter); everyone else walks their own route.
       const mount = m.spec.ride ? traffic.find(t => t.id === m.spec.ride && t.routeName === 'plaza') : null;
@@ -1168,6 +1206,7 @@ function start() {
       }
       if (m.hop > 0) { m.hop = Math.max(0, m.hop - dt * 1.1); castPos.y += Math.abs(Math.sin(m.hop * Math.PI * 2)) * .2 * m.hop * m.spec.height / 2; }   // "me?" - two small hops
       m.group.position.copy(castPos);
+      if (m.shadow) { m.spec.route.at(m.d, tmp); m.shadow.position.set(castPos.x, tmp.y + .04, castPos.z); m.shadow.visible = m.group.visible; }
       let want = m.stopped && !mount ? Math.atan2(camPos.x - castPos.x, camPos.z - castPos.z) : Math.atan2(castNext.x - castPos.x, castNext.z - castPos.z), delta = want - m.facing;
       while (delta > Math.PI) delta -= Math.PI * 2; while (delta < -Math.PI) delta += Math.PI * 2;
       m.facing += delta * (1 - Math.pow(.01, dt)); m.group.rotation.y = m.facing;
@@ -1490,7 +1529,7 @@ function start() {
             }
           }
           if (id === 'airship') { const p = new THREE.Mesh(new THREE.SphereGeometry(45, 10, 8)); p.userData = {kind: 'airship', id}; proxies.push(p); car.userData.proxy = p; }
-          traffic.push({id, car, body, routeName: route, route: ROUTES[route], speed, d: id === 'airship' && airshipStart !== null ? airshipStart : start, phase: Math.random() * 6, air: /air|lift/.test(route)});
+          traffic.push({id, car, body, routeName: route, route: ROUTES[route], speed, d: id === 'airship' && airshipStart !== null ? airshipStart : start, phase: Math.random() * 6, air: /air|lift/.test(route), shadow: /air|lift|sky/.test(route) ? null : blobShadow(spec.height * 1.5)});
         });
       }, undefined, () => { /* traffic is optional */ });
     }
@@ -1509,6 +1548,7 @@ function start() {
       }
       if (!still && !t.halt) t.d += t.speed * dt * (t.ease ?? 1);
       t.route.at(t.d, carPos); carPos.y += t.dodge ?? 0; t.route.at(t.d + Math.sign(t.speed) * .6, carNext);
+      if (t.shadow) t.shadow.position.set(carPos.x, carPos.y + .035, carPos.z);
       t.car.position.copy(carPos); t.car.position.y += (t.air ? .5 : .12) * Math.sin(time * (t.air ? 1.6 : 2.4) + t.phase) + (t.air ? 0 : .25);
       t.car.rotation.y = Math.atan2(carNext.x - carPos.x, carNext.z - carPos.z);
       t.body.rotation.z = Math.sin(time * 1.7 + t.phase) * (t.id === 'airship' ? .012 : .04);
@@ -1672,6 +1712,8 @@ function start() {
 
   const clock = new THREE.Clock();
   let time = 0, slow = 0, frames = 0, frame = 0;
+  const FX = new URL(location.href).searchParams.get('fx') || 'auto';     // ?fx=on / ?fx=off force the mirror; otherwise the device decides
+  if (FX === 'on') setMirror(true);
   function tick() {
     frame = 0;
     step(Math.min(clock.getDelta(), .05));
@@ -1697,11 +1739,16 @@ function start() {
       renderer.render(loadScene, loadCam);
     } else {
       update(dt);
+      drawMirror();
       renderer.render(scene, camera);
       if (mode === 'orbit') {           // drop quality if this device struggles
         slow += dt; frames++;
         if (frames === 90) {
           const average = slow / frames;
+          if (FX === 'auto') {            // the mirror is tried once, where frames are coming easily, and dropped for good if they stop
+            if (mirror.on && average > .025) { setMirror(false); slow = 0; frames = 0; return; }
+            if (!mirror.on && !mirror.tried && average < .0195 && !motionOff()) { mirror.tried = true; setMirror(true); }
+          }
           if (average > .027) { if (dpr > 1) { dpr = Math.max(1, dpr - .5); renderer.setPixelRatio(dpr); } else if (N.City_Lower && N.City_Lower.visible && average > .04) N.City_Lower.visible = false; }
           slow = 0; frames = 0;
         }
