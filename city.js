@@ -265,6 +265,7 @@ function start() {
     sk.panoMix.value = panoReady ? 1 - k : 0;
     uSkinGlow.value = lerp(.42, .55, k);   // the pictures light themselves a little, so shading does not darken their pastel colours if (N.skylineDay) { N.skylineDay.material.opacity = 1 - k; N.skylineNight.material.opacity = k; N.skylineNight.visible = k > .01; N.skylineDay.visible = k < .99; }
     if (N.plazaArt) N.plazaArt.material.color.setScalar(lerp(1, .55, k));
+    if (N.mistLayers) N.mistLayers.forEach(m => m.material.color.setRGB(lerp(.925, .2, k), lerp(.894, .16, k), lerp(1, .42, k), THREE.SRGBColorSpace));
     stars.material.opacity = k; moonDisc.material.opacity = k * .95; sunDisc.material.opacity = (1 - k) * .95;
     if (keep.cloud) keep.cloud.emissiveIntensity = lerp(.34, .04, k);
     if (keep.mist) keep.mist.opacity = lerp(.13, .3, k);
@@ -436,6 +437,16 @@ function start() {
     scene.add(sparkle);
     setShutters(boost.shutter);
     skinCity();
+    // The lower level lies in mist: layers of haze thicken with depth, so nothing below is cut off sharply,
+    // and only the lights of the town underneath shine up through it.
+    N.mistLayers = [-4, -9, -15, -22, -30, -40, -52].map((y, i) => { const m = new THREE.Mesh(new THREE.CircleGeometry(460, 48), new THREE.MeshBasicMaterial({color: 0xece4ff, transparent: true, opacity: .2 + i * .02, depthWrite: false, fog: false}));
+      m.rotation.x = -Math.PI / 2; m.position.y = y; m.renderOrder = 3; scene.add(m); return m; });
+    const glowing = new Map();
+    for (const part of [N.City_Lower]) if (part) part.traverse(o => {
+      if (!o.isMesh || !/M_(N_|W_)/.test(o.material.name || '')) return;
+      if (!glowing.has(o.material)) { const c = o.material.clone(); c.onBeforeCompile = o.material.onBeforeCompile; c.customProgramCacheKey = o.material.customProgramCacheKey; c.transparent = true; c.depthWrite = false; c.fog = false; glowing.set(o.material, c); }
+      o.material = glowing.get(o.material); o.renderOrder = 6;
+    });
     // The plaza floor and Pyonpy's stage get their own round pictures.
     const disc = (file, radius, y) => { const m = new THREE.Mesh(new THREE.CircleGeometry(radius, 64), new THREE.MeshBasicMaterial({map: textures.load(file, t => { t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 8; }), transparent: true, depthWrite: false, toneMapped: false}));
       m.rotation.x = -Math.PI / 2; m.position.y = y; m.renderOrder = 1; scene.add(m); return m; };
