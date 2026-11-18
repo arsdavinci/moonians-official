@@ -1333,3 +1333,11 @@ html[lang=en] .g-card h4>small{display:none}
 .character-dialog-nav.is-prev{left:10px}.character-dialog-nav.is-next{right:10px}
 .character-dialog-nav:hover,.character-dialog-nav:focus-visible{background:var(--c-accent,#b9a5ff);color:#120f26}
 @media(max-width:560px){.character-dialog-nav{top:auto;bottom:14px;width:40px;height:40px}}
+
+/* a friend's card opened as a profile sheet */
+.friend-dialog .friend-sheet{display:block;border:0;border-radius:0;background:transparent;box-shadow:none;margin:0;backdrop-filter:none;-webkit-backdrop-filter:none}
+.friend-dialog .friend-sheet .friend-image{aspect-ratio:auto;min-height:0;max-height:62dvh;display:grid;place-items:center;background:var(--c-bg-2,#120f26)}
+.friend-dialog .friend-sheet .friend-image img{width:100%;height:auto;max-height:62dvh;object-fit:contain}
+.friend-dialog .friend-sheet .friend-body{padding:26px 30px 34px}
+.friend-dialog .friend-open{display:none}
+.friend-open{align-self:flex-start;margin-top:16px}

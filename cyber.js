@@ -391,10 +391,20 @@
   }
 
   // Home character cards: compact cards, tap one to open the full profile.
+  const sheets = [];   // every profile on the page, in order, so one can step to the next from inside it
+  const addSheetNav = sheet => {
+    for (const [dir, label, mark] of [[-1, '前のキャラクターへ', '‹'], [1, '次のキャラクターへ', '›']]) {
+      const step = document.createElement('button');
+      step.type = 'button'; step.className = 'character-dialog-nav ' + (dir < 0 ? 'is-prev' : 'is-next'); step.setAttribute('aria-label', label); step.textContent = mark;
+      step.addEventListener('click', () => { const next = sheets[(sheets.indexOf(sheet) + dir + sheets.length) % sheets.length]; if (next === sheet) return; sheet.close(); next.showModal(); next.querySelector('.character-dialog-scroll').scrollTop = 0; document.body.classList.add('character-open-lock'); });
+      sheet.append(step);
+    }
+    sheet.addEventListener('keydown', event => { if (event.key === 'ArrowRight') sheet.querySelector('.is-next').click(); else if (event.key === 'ArrowLeft') sheet.querySelector('.is-prev').click(); });
+    sheets.push(sheet);
+  };
   const characterGrid = document.querySelector('.character-grid');
   if (characterGrid && characterGrid.querySelector('.character-detail')) {
     characterGrid.classList.add('is-cards');
-    const sheets = [];   // every profile, in order, so one can step to the next from inside it
     characterGrid.querySelectorAll('.character').forEach(card => {
       const detail = card.querySelector('.character-detail');
       const info = card.querySelector('.character-info');
@@ -425,14 +435,7 @@
       scroller.className = 'character-dialog-scroll';
       scroller.append(article);
       sheet.append(close, scroller);
-      for (const [dir, label, mark] of [[-1, '前のキャラクターへ', '‹'], [1, '次のキャラクターへ', '›']]) {
-        const step = document.createElement('button');
-        step.type = 'button'; step.className = 'character-dialog-nav ' + (dir < 0 ? 'is-prev' : 'is-next'); step.setAttribute('aria-label', label); step.textContent = mark;
-        step.addEventListener('click', () => { const next = sheets[(sheets.indexOf(sheet) + dir + sheets.length) % sheets.length]; if (next === sheet) return; sheet.close(); next.showModal(); next.querySelector('.character-dialog-scroll').scrollTop = 0; document.body.classList.add('character-open-lock'); });
-        sheet.append(step);
-      }
-      sheet.addEventListener('keydown', event => { if (event.key === 'ArrowRight') sheet.querySelector('.is-next').click(); else if (event.key === 'ArrowLeft') sheet.querySelector('.is-prev').click(); });
-      sheets.push(sheet);
+      addSheetNav(sheet);
       document.body.append(sheet);
       const more = detail.querySelector(':scope>details');
       if (more) more.open = true;
@@ -451,6 +454,28 @@
       });
     });
   }
+
+  // The friends page: each friend's card also opens as a profile sheet, in the same run as the two Moonians.
+  document.querySelectorAll('.friends .friend').forEach(card => {
+    const bodyEl = card.querySelector('.friend-body'), nameEl = card.querySelector('h4'); if (!bodyEl || !nameEl) return;
+    const sheet = document.createElement('dialog');
+    sheet.className = 'character-dialog friend-dialog';
+    sheet.setAttribute('aria-label', `${nameEl.textContent}のプロフィール`);
+    const close = document.createElement('button');
+    close.type = 'button'; close.className = 'character-dialog-close'; close.setAttribute('aria-label', 'プロフィールを閉じる'); close.textContent = '×';
+    const copy = card.cloneNode(true); copy.removeAttribute('id'); copy.className = 'friend friend-sheet';
+    // buttons in the copy (model sheets) hand the click to the real ones, which already know what to open
+    const real = [...card.querySelectorAll('[data-photo]')]; copy.querySelectorAll('[data-photo]').forEach((b, i) => b.addEventListener('click', () => real[i] && real[i].click()));
+    const scroller = document.createElement('div'); scroller.className = 'character-dialog-scroll'; scroller.append(copy);
+    sheet.append(close, scroller); addSheetNav(sheet); document.body.append(sheet);
+    const open = document.createElement('button');
+    open.type = 'button'; open.className = 'character-open friend-open'; open.innerHTML = 'くわしく見る <span aria-hidden="true">＋</span>'; open.setAttribute('aria-haspopup', 'dialog');
+    bodyEl.append(open);
+    open.addEventListener('click', () => { sheet.showModal(); scroller.scrollTop = 0; close.focus({preventScroll: true}); document.body.classList.add('character-open-lock'); });
+    close.addEventListener('click', () => sheet.close());
+    sheet.addEventListener('click', event => { if (event.target === sheet) sheet.close(); });
+    sheet.addEventListener('close', () => { if (!document.querySelector('dialog.character-dialog[open]')) document.body.classList.remove('character-open-lock'); });
+  });
 
   // Keep the current page visible in the sideways-scrolling sub-page nav.
   const pageNav = document.querySelector('.page-nav'), currentLink = pageNav && pageNav.querySelector('[aria-current=page]');
