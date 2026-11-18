@@ -665,8 +665,9 @@ function start() {
               text: '三日月大使館（クレッセントエンバシー）の偉い人。らんぴょんとぴょんぴーの上司です。胸には三日月、手にはマイク。二人の地球での活動を、おだやかな笑顔で見守っています。'},
     kaguya:  {height: 2.7, yaw: 0, route: segment(3.9, 22, 3.9, 42, .22), speed: .6, view: [-1, -.35], kicker: 'PRINCESS KAGUYA', role: '月の宮の皇族', name: 'かぐや様',
               text: '月の宮に住む、皇族のお姫さま。三日月の髪飾りに、竹と月の模様の衣をまとい、手には扇。そして、ぴょんぴーの好きな人です。'},
-    robot:   {height: 1.9, yaw: 0, route: segment(-3.9, 24, -3.9, 58, .22), speed: 1.6, view: [1, -.35], kicker: 'BUNNY ROBOT', role: '街の案内ロボ', name: 'うさぎロボ',
-              text: '街を走りまわる、うさぎ型の案内ロボ。困っている人を見つけると、すぐにかけつけます。名前は、まだ調査中です。'}
+    // Yanavis rolls on wheels: a smooth glide round the outer ring of the plaza, with a little bump now and then.
+    robot:   {height: 1.9, yaw: 0, route: circle(16, .3), speed: 1.7, glide: true, kicker: 'Y.A.N.A.V.I.S', role: '人工知能', name: 'ヤナビス',
+              text: '翻訳酸素カプセルから聞こえる声の主。ぴょんぴーのムーニアン語を、日本語に同時翻訳してくれる人工知能です。'}
   };
   const cast = [], profileEl = $('#city-profile');
   let meeting = null, shift = 0, shiftT = 0;
@@ -680,7 +681,7 @@ function start() {
         gltf.animations.forEach(clip => { actions[clip.name] = mixer.clipAction(clip); });
         const member = {id, spec, group, mixer, actions, active: null, d: index * 7, facing: 0, stopped: false};
         member.proxy = new THREE.Mesh(new THREE.SphereGeometry(spec.height * .62, 10, 8)); member.proxy.userData = {kind: 'cast', id}; proxies.push(member.proxy);
-        mixer.addEventListener('finished', () => playCast(member, member.stopped ? 'Idle' : 'Walk'));
+        mixer.addEventListener('finished', () => playCast(member, member.stopped || spec.glide || spec.ride ? 'Idle' : 'Walk'));
         playCast(member, 'Walk'); cast.push(member);
       }, undefined, () => { /* the city works without them */ });
     });
@@ -704,6 +705,11 @@ function start() {
       } else {
         if (!m.stopped && !still) m.d += m.spec.speed * dt;
         m.spec.route.at(m.d, castPos); m.spec.route.at(m.d + .4, castNext);
+        if (m.spec.glide) {            // wheels: no walking sway, just an occasional "koton, koton" over an imagined pebble
+          if (m.active === m.actions.Walk) playCast(m, 'Idle');
+          const p = (m.d / m.spec.speed) % 5.2;
+          if (!m.stopped) castPos.y += p < .14 ? Math.sin(p / .14 * Math.PI) * .07 : p > .24 && p < .36 ? Math.sin((p - .24) / .12 * Math.PI) * .045 : 0;
+        }
       }
       m.group.position.copy(castPos);
       let want = m.stopped ? Math.atan2(camPos.x - castPos.x, camPos.z - castPos.z) : Math.atan2(castNext.x - castPos.x, castNext.z - castPos.z), delta = want - m.facing;
@@ -745,7 +751,7 @@ function start() {
     const m = meeting; profileEl.hidden = true; mode = 'fly'; shiftT = 0;
     orbitPose(tmp, tmp2);
     if (!motionOff()) await fly(tmp.clone(), tmp2.clone(), 1.3, 1);
-    m.stopped = false; playCast(m, m.spec.ride ? 'Idle' : 'Walk'); meeting = null; body.classList.remove('is-meeting'); mode = 'orbit';
+    m.stopped = false; playCast(m, m.spec.ride || m.spec.glide ? 'Idle' : 'Walk'); meeting = null; body.classList.remove('is-meeting'); mode = 'orbit';
   }
   $('#profile-close').addEventListener('click', leave);
   addEventListener('keydown', event => { if (event.key === 'Escape') leave(); });
