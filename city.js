@@ -191,6 +191,16 @@ function start() {
     };
     material.customProgramCacheKey = () => 'night-lights-glass';
   }
+  function shipLights(material) {      // on the airship only the yellow ornaments (stars, crescent, beads) shine at night; the hull stays dark
+    if (!material.map) return;
+    material.onBeforeCompile = shader => {
+      shader.uniforms.uNight = uNight;
+      shader.fragmentShader = shader.fragmentShader.replace('#include <common>', '#include <common>\nuniform float uNight;')
+        .replace('#include <emissivemap_fragment>', '#include <emissivemap_fragment>\n#ifdef USE_MAP\nvec3 lit = texture2D(map, vMapUv).rgb;\ntotalEmissiveRadiance += lit * smoothstep(0.42, 0.56, min(lit.r, lit.g) - lit.b) * uNight * 1.25;\n#endif');
+    };
+    material.customProgramCacheKey = () => 'ship-lights';
+    material.transparent = true;       // drawn after the drifting sparkles, so none of them shows in front of the ship
+  }
   function tiled(material) {
     material.onBeforeCompile = shader => {
       shader.uniforms.uTile = {value: tileTexture};
@@ -461,7 +471,7 @@ function start() {
     const geometry = new THREE.BufferGeometry();
     geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3)); geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
     sparkle = new THREE.Points(geometry, new THREE.PointsMaterial({size: .55, map: dot, vertexColors: true, transparent: true, opacity: .9, depthWrite: false, blending: THREE.AdditiveBlending, fog: false}));
-    scene.add(sparkle);
+    sparkle.renderOrder = -1; scene.add(sparkle);
     setShutters(boost.shutter);
     skinCity();
     // The lower level lies in mist: layers of haze thicken with depth, so nothing below is cut off sharply,
@@ -1154,7 +1164,7 @@ function start() {
   function loadTraffic() {
     for (const [id, spec] of Object.entries(CARS)) {
       new GLTFLoader().load(`assets/city/cars/${id}.glb?v=20261118-2`, gltf => {
-        gltf.scene.traverse(node => { if (node.isMesh) (Array.isArray(node.material) ? node.material : [node.material]).forEach(m => { m.envMapIntensity = .5; m.roughness = .45; m.metalness = 0; if (id !== 'airship') nightLights(m); if (id === 'roadster') glassy(m); }); });
+        gltf.scene.traverse(node => { if (node.isMesh) (Array.isArray(node.material) ? node.material : [node.material]).forEach(m => { m.envMapIntensity = .5; m.roughness = .45; m.metalness = 0; if (id !== 'airship') nightLights(m); else shipLights(m); if (id === 'roadster') glassy(m); if (id === 'airship') node.renderOrder = -.5; }); });
         FLEET.filter(f => f[0] === id).forEach(([, route, speed, start], i) => {
           const body = gltf.scene.clone(); body.scale.setScalar(spec.height); body.rotation.y = spec.yaw;
           const car = new THREE.Group(); car.add(body); scene.add(car);
