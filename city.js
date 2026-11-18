@@ -655,12 +655,25 @@ function start() {
     if (!motionOff()) { sound.fx.whoosh(1.7); await fly(target.pos, target.look, 1.9, 5); }
     else { camPos.copy(target.pos); camLook.copy(target.look); }
     asking = {id, place, link};
-    $('#enter-name').textContent = tr(place.label); $('#enter-where').textContent = tr(link.querySelector('.where').textContent);
+    askText(tr(link.querySelector('.where').textContent), tr(place.label));
+    body.classList.remove('is-travelling'); body.classList.add('is-asking'); enterEl.hidden = false; mode = 'ask';
+    $('#enter-yes').focus({preventScroll: true});
+  }
+  const askText = (where, name, question = 'ここに入りますか？', yes = '入る') => { $('#enter-where').textContent = where; $('#enter-name').textContent = name; document.querySelector('.city-enter-ask').textContent = tr(question); $('#enter-yes').textContent = tr(yes); };
+  const noLink = document.createElement('a');
+  async function openLink(id) {         // fly up to it, then ask: open the other site, or back to the city
+    const item = LINKS[id]; if (!item || mode !== 'orbit') return;
+    mode = 'fly'; shiftT = -1; body.classList.add('is-travelling'); hintEl.classList.remove('is-on'); bubbleEl.hidden = true; sound.fx.select();
+    const pos = item.centre.clone().addScaledVector(item.out, 15).add(V(0, -1.5, 0));
+    if (!motionOff()) { sound.fx.whoosh(1.7); await fly(pos, item.centre.clone(), 1.9, 5); } else { camPos.copy(pos); camLook.copy(item.centre); }
+    asking = {id: 'link', link: noLink, url: item.url};
+    askText(tr(item.where), tr(item.name), item.question, item.yes);
     body.classList.remove('is-travelling'); body.classList.add('is-asking'); enterEl.hidden = false; mode = 'ask';
     $('#enter-yes').focus({preventScroll: true});
   }
   async function enterPlace() {
     if (mode !== 'ask' || !asking) return;
+    if (asking.url) { window.open(asking.url, '_blank', 'noopener'); backToCity(); return; }   // the other site opens in a new tab; the city stays
     const {id, place, link} = asking; enterEl.hidden = true; shiftT = 0; body.classList.add('is-travelling'); mode = 'fly'; sound.fx.select();
     if (id === 'sns') { await enterSns(); return; }
     if (!motionOff() && await SHOW[id](place)) { location.href = link.href; return; }
@@ -707,7 +720,7 @@ function start() {
     }
     // the same question as every other place: go in, or back to the city
     asking = {id: 'sns', link: snsLink, ship};
-    const where = snsLink.querySelector('.where'); $('#enter-name').textContent = 'SNS'; $('#enter-where').textContent = where ? tr(where.textContent) : '';
+    const where = snsLink.querySelector('.where'); askText(where ? tr(where.textContent) : '', 'SNS');
     body.classList.remove('is-travelling'); body.classList.add('is-asking'); enterEl.hidden = false; mode = 'ask';
     $('#enter-yes').focus({preventScroll: true});
   }
@@ -902,6 +915,7 @@ function start() {
   // starts on the other clip, part-way through, so the two never show the same picture.
   const snsPlayers = {};
   const QUIET_SCREENS = ['Scr005', 'Scr006'];
+  const LINKS = {};                     // things in the city that open another site when clicked (after asking)
   const RAMUNE_CLIPS = ['assets/city/ramune/1.mp4', 'assets/city/ramune/2.mp4'];
   function snsScreen(w, h, key = 'ship', startClip = 0, startAt = 0, clips = SNS_CLIPS, faceAt = .5) {
     let sns = snsPlayers[key];
@@ -951,7 +965,13 @@ function start() {
         const back = new THREE.Mesh(new THREE.PlaneGeometry(w + .36, h + .36), new THREE.MeshBasicMaterial({color: 0x2b2a55, toneMapped: false})); back.position.set(0, drop, 1.75);
         const rim = new THREE.Mesh(new THREE.PlaneGeometry(w + .6, h + .6), new THREE.MeshBasicMaterial({color: 0x7fe6d8, toneMapped: false})); rim.position.set(0, drop, 1.72);
         const tall = snsScreen(w, h, 'ramune', 0, 0, RAMUNE_CLIPS, .66); snsPlayers.ramune.full = true; tall.position.set(0, drop, 1.8);   // out in front of the building's rounded face
-        node.add(rim, back, tall); return;
+        node.add(rim, back, tall);
+        node.updateWorldMatrix(true, false);
+        const hit = new THREE.Mesh(new THREE.BoxGeometry(w + 1, h + 1, 1.2)); hit.position.copy(node.localToWorld(V(0, drop, 1.8))); node.getWorldQuaternion(hit.quaternion); hit.updateMatrixWorld();
+        hit.userData = {kind: 'link', id: 'ramune'}; proxies.push(hit);
+        LINKS.ramune = {centre: hit.position.clone(), out: V(0, 0, 1).applyQuaternion(hit.quaternion).setY(0).normalize(), top: h / 2 + 1,
+          where: 'DJ RAMUNE', name: 'DJらむねのTikTok', question: 'らむねのTikTokを見ますか？', yes: '見る', label: 'DJらむね TikTok', url: 'https://www.tiktok.com/@ramuneshuwarunaria'};
+        return;
       }   // DJ Ramune's own videos, framed on her face
       if (node.name === 'Scr001') { node.add(snsScreen(node.userData.w, node.userData.h, 'town', 1, 6)); return; }   // the wide monitor by the workshop plays the dance videos, out of step with the airship
       const here = node.getWorldPosition(V(0, 0, 0)); let pick = 0, best = -1;
@@ -1331,7 +1351,7 @@ function start() {
       else hang(node, k, Math.max(3, w * .95), 0, h / 2 + .75, .05, false);                      // wide sign over the top
     });
     // a ring of signs round the plaza, and tall ones along the main road
-    for (let i = 0; i < 8; i++) { if (i === 2 || i === 7) continue; const a = i / 8 * Math.PI * 2 + .39, g = new THREE.Group(); g.position.set(Math.cos(a) * 25.2, 6.2 + (i % 2) * 1.6, Math.sin(a) * 25.2); g.rotation.y = -a - Math.PI / 2; scene.add(g); hang(g, (i + 3) % 8, 5.2, 0, 0, 0, i % 2 === 1); }
+    for (let i = 0; i < 8; i++) { if (i === 2 || i === 7) continue; const a = i === 1 ? .62 : i / 8 * Math.PI * 2 + .39, g = new THREE.Group(); g.position.set(Math.cos(a) * 25.2, 6.2 + (i % 2) * 1.6, Math.sin(a) * 25.2); g.rotation.y = -a - Math.PI / 2; scene.add(g); hang(g, (i + 3) % 8, 5.2, 0, 0, 0, i % 2 === 1); }
     for (let i = 2; i < 6; i++) { const g = new THREE.Group(), side = i % 2 ? 1 : -1; g.position.set(side * 8.4, 5.5, 26 + i * 6.5); g.rotation.y = side > 0 ? -Math.PI / 2 : Math.PI / 2; scene.add(g); hang(g, (i + 5) % 8, 4.6, 0, 0, 0, true); }
   }
 
@@ -1483,7 +1503,7 @@ function start() {
     const hit = raycaster.intersectObjects(proxies, false)[0];
     if (!hit) return;
     const {kind, id} = hit.object.userData;
-    if (kind === 'place') go(id); else if (kind === 'cast') meet(id); else if (kind === 'airship') openSns(); else if (kind === 'pyon') { if (pyon) meet('pyon'); } else if (kind === 'statue') { statueBounce = 1; sound.fx.pop(); burst(N.Statue.position.clone().add(V(0, 4, 0)), [0xff9bd0, 0xffffff], 40, 6, .8); }
+    if (kind === 'place') go(id); else if (kind === 'cast') meet(id); else if (kind === 'airship') openSns(); else if (kind === 'link') openLink(id); else if (kind === 'pyon') { if (pyon) meet('pyon'); } else if (kind === 'statue') { statueBounce = 1; sound.fx.pop(); burst(N.Statue.position.clone().add(V(0, 4, 0)), [0xff9bd0, 0xffffff], 40, 6, .8); }
   }
 
   /* ── entering the city ── */
@@ -1717,6 +1737,13 @@ function start() {
     }
     {                                    // the airship carries an "SNS" label of its own, like the places do
       const ship = traffic.find(t => t.id === 'airship');
+      for (const [id, item] of Object.entries(LINKS)) {
+        if (!item.el) { item.el = document.createElement('button'); item.el.type = 'button'; item.el.className = 'city-label'; item.el.textContent = tr(item.label); item.el.addEventListener('click', () => openLink(id)); labelsEl.append(item.el); }
+        tmp.copy(item.centre); tmp.y += item.top; tmp.project(camera);
+        const on = showLabels && tmp.z < 1 && Math.abs(tmp.x) < 1.05 && tmp.y < 1 && tmp.y > -.9;
+        item.el.classList.toggle('is-on', on);
+        if (on) item.el.style.transform = `translate(${((tmp.x + 1) / 2 * innerWidth).toFixed(1)}px,${((1 - tmp.y) / 2 * innerHeight).toFixed(1)}px) translate(-50%,-100%)`;
+      }
       if (ship && !snsLabel) { snsLabel = document.createElement('button'); snsLabel.type = 'button'; snsLabel.className = 'city-label'; snsLabel.textContent = 'SNS'; snsLabel.addEventListener('click', () => openSns()); labelsEl.append(snsLabel); }
       if (ship) {
         tmp.copy(ship.car.position); tmp.y += 62; tmp.project(camera);
