@@ -307,7 +307,6 @@ function start() {
     sk.panoMix.value = panoReady ? 1 - k : 0;
     uSkinGlow.value = lerp(.42, .16, k); uNight.value = k;   // the pictures light themselves a little, so shading does not darken their pastel colours
     if (N.skylineDay) { N.skylineDay.material.opacity = 1 - k; N.skylineNight.material.opacity = k; N.skylineNight.visible = k > .01; N.skylineDay.visible = k < .99; }
-    if (N.plazaArt) N.plazaArt.material.color.setScalar(lerp(1, .72, k));
     if (N.mistLayers) N.mistLayers.forEach(m => m.material.color.setRGB(lerp(.925, .3, k), lerp(.894, .25, k), lerp(1, .52, k), THREE.SRGBColorSpace));
     stars.material.opacity = k; moonDisc.material.opacity = k * .95; sunDisc.material.opacity = (1 - k) * .95;
     if (keep.cloud) keep.cloud.emissiveIntensity = lerp(.34, .04, k);
@@ -495,6 +494,15 @@ function start() {
     const disc = (file, radius, y) => { const m = new THREE.Mesh(new THREE.CircleGeometry(radius, 64), new THREE.MeshBasicMaterial({map: textures.load(file, t => { t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 8; }), alphaTest: .5, toneMapped: false, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2}));   // solid, so clouds in front of it hide it
       m.rotation.x = -Math.PI / 2; m.position.y = y; m.renderOrder = 1; scene.add(m); return m; };
     N.plazaArt = disc('assets/city/plaza-floor.webp', 17.2, .285); N.stageArt = disc('assets/city/stage-emblem.webp', 2.62, .7);
+    {   // At night only the parts marked white in the plaza's light map shine (rings, moons, rabbits, the rim's dots); the rest of the floor goes dim.
+      const glowMap = textures.load('assets/city/plaza-glow.jpg');
+      N.plazaArt.material.onBeforeCompile = shader => {
+        shader.uniforms.uNight = uNight; shader.uniforms.uGlowMap = {value: glowMap};
+        shader.fragmentShader = shader.fragmentShader.replace('#include <common>', '#include <common>\nuniform float uNight; uniform sampler2D uGlowMap;')
+          .replace('#include <map_fragment>', '#include <map_fragment>\nfloat lit = smoothstep(0.25, 0.75, texture2D(uGlowMap, vMapUv).r);\ndiffuseColor.rgb = mix(diffuseColor.rgb, mix(diffuseColor.rgb * 0.34, diffuseColor.rgb * 1.35 + 0.14, lit), uNight);');
+      };
+      N.plazaArt.material.customProgramCacheKey = () => 'plaza-night';
+    }
     // Far skyline: a painted band right round the horizon, day and night versions.
     const band = file => { const map = textures.load(file, t => { t.colorSpace = THREE.SRGBColorSpace; t.wrapS = THREE.RepeatWrapping; }); map.repeat.set(3, 1);
       const m = new THREE.Mesh(new THREE.CylinderGeometry(310, 310, 216, 96, 1, true), new THREE.MeshBasicMaterial({map, transparent: true, side: THREE.BackSide, depthWrite: false, toneMapped: false, fog: true}));
