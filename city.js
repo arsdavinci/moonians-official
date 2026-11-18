@@ -805,10 +805,11 @@ function start() {
   function bend(name, ax, ay, az, angle) {      // turn one of his bones about an axis given in his own frame (x = his left, y = up, z = his front)
     const bone = PB[name]; if (!bone || !angle) return;
     danceQ.setFromAxisAngle(danceAxis.set(ax, ay, az).normalize().applyQuaternion(pyon.quaternion), angle); bone.parent.getWorldQuaternion(danceP);
-    bone.quaternion.premultiply(danceP.clone().invert().multiply(danceQ).multiply(danceP));
+    bone.quaternion.premultiply(danceP.clone().invert().multiply(danceQ).multiply(danceP)); bone.userData.mine.copy(bone.quaternion);
   }
   function updateDance(dt) {
     if (!move) return;
+    for (const bone of Object.values(PB)) if (bone) clipPose(bone);
     moveT += dt; if (moveT > moveD) { dance(); }
     let spin = 0, slide = 0, hop = Math.abs(Math.sin(time * Math.PI * 2)) * .09, lean = Math.sin(time * Math.PI) * .07, sway = Math.sin(time * Math.PI) * .2;
     if (!move.once) {
@@ -991,6 +992,12 @@ function start() {
     if (member.active && member.active !== next) next.crossFadeFrom(member.active, .25, false);
     next.play(); member.active = next;
   }
+  function clipPose(bone) {            // put the bone back to what its clip last gave it, and remember that pose
+    const u = bone.userData; if (!u.base) { u.base = new THREE.Quaternion(); u.mine = new THREE.Quaternion(9, 9, 9, 9); }
+    if (u.stamp === time) return u;
+    if (bone.quaternion.equals(u.mine)) bone.quaternion.copy(u.base); else u.base.copy(bone.quaternion);
+    u.stamp = time; return u;
+  }
   const castPos = V(0, 0, 0), castNext = V(0, 0, 0), lookQ = new THREE.Quaternion(), lookQ2 = new THREE.Quaternion(), lookE = new THREE.Euler(), UP = V(0, 1, 0);
   function updateCast(dt, still) {
     if (lineup) { cast.forEach((m, i) => { m.group.position.set(-4.5 + i * 3, .3, 8.5); m.group.rotation.y = 0; if (!still) m.mixer.update(dt); }); return; }
@@ -1025,6 +1032,7 @@ function start() {
       m.facing += delta * (1 - Math.pow(.01, dt)); m.group.rotation.y = m.facing;
       if (!still) m.mixer.update(dt);
       if (m.head && !still) {          // a character with a real skeleton turns to look into the camera while they are the one chosen
+        clipPose(m.head); if (m.chest) clipPose(m.chest);
         m.look = lerp(m.look, m.stopped || meeting === m ? 1 : 0, 1 - Math.pow(.02, dt));   // riders are chosen without being stopped
         if (m.look > .01) {
           m.group.updateMatrixWorld(true); m.head.getWorldPosition(tmp);
@@ -1033,7 +1041,7 @@ function start() {
           yaw = clamp(yaw, -1.75, 1.75) * m.look; const pitch = clamp(Math.atan2(dy, Math.hypot(dx, dz)), -.45, .45) * m.look;
           const turnBone = (bone, y, p) => {     // a turn in world space, whatever way the bone itself lies
             lookQ.setFromEuler(lookE.set(-p, m.facing + y, 0, 'YXZ')).multiply(lookQ2.setFromAxisAngle(UP, -m.facing));
-            bone.parent.getWorldQuaternion(lookQ2); bone.quaternion.premultiply(lookQ2.clone().invert().multiply(lookQ).multiply(lookQ2));
+            bone.parent.getWorldQuaternion(lookQ2); bone.quaternion.premultiply(lookQ2.clone().invert().multiply(lookQ).multiply(lookQ2)); bone.userData.mine.copy(bone.quaternion);
           };
           if (m.chest) { turnBone(m.chest, yaw * .28, 0); m.chest.updateMatrixWorld(true); turnBone(m.head, yaw * .72, pitch); }   // the shoulders come round too
           else turnBone(m.head, yaw, pitch);
@@ -1503,7 +1511,7 @@ function start() {
     const channel = new MessageChannel(); let wake = null;
     channel.port1.onmessage = () => { if (wake) wake(); };
     window.__city = {
-      get mode() { return mode; }, get debug() { return {signs, N, camera, landmarkModels, traffic, jump(i, t) { moveIndex = i - 1; dance(); moveT = t; }}; },
+      get mode() { return mode; }, get debug() { return {signs, N, camera, landmarkModels, traffic, cast, jump(i, t) { moveIndex = i - 1; dance(); moveT = t; }}; },
       lineup(on) { lineup = on; }, enter() { return enterPlace(); }, back() { return backToCity(); }, meet(id) { return meet(id); }, leave() { return leave(); },
       async advance(seconds) { for (let t = 0; t < seconds; t += 1 / 30) { step(1 / 30); await new Promise(resolve => { wake = resolve; channel.port2.postMessage(0); }); } return mode; }
     };
