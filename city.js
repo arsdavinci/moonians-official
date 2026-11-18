@@ -665,6 +665,11 @@ function start() {
               text: '三日月大使館（クレッセントエンバシー）の偉い人。らんぴょんとぴょんぴーの上司です。胸には三日月、手にはマイク。二人の地球での活動を、おだやかな笑顔で見守っています。'},
     kaguya:  {height: 2.7, yaw: 0, route: segment(3.9, 22, 3.9, 42, .22), speed: .6, view: [-1, -.35], kicker: 'PRINCESS KAGUYA', role: '月の宮の皇族', name: 'かぐや様',
               text: '月の宮に住む、皇族のお姫さま。三日月の髪飾りに、竹と月の模様の衣をまとい、手には扇。そして、ぴょんぴーの好きな人です。'},
+    // DJ Ramune and PT ride in the plaza roadster, side by side.
+    ramune:  {height: 2.0, yaw: 0, route: circle(4.4, .3), speed: .9, ride: 'roadster', seat: [-.5, .5, -.05], kicker: 'DJ RAMUNE', role: 'らんぴょんの妹', name: 'DJらむね',
+              text: 'らんぴょんの妹。月でDJをしています。'},
+    pt:      {height: 1.1, yaw: 0, route: circle(4.4, .3), speed: .9, ride: 'roadster', seat: [.5, .98, -.05], kicker: 'PTPUTY / PT', role: 'らむねの相方', name: 'ピーティープティ',
+              text: 'ニックネームは「PT」。DJらむねの相方で、親友。好きなのは、ぴょんぴー。身長はおよそ45cm。'},
     // Yanavis rolls on wheels: a smooth glide round the outer ring of the plaza, with a little bump now and then.
     robot:   {height: 1.9, yaw: 0, route: circle(16, .3), speed: 1.7, glide: true, kicker: 'Y.A.N.A.V.I.S', role: '人工知能', name: 'ヤナビス',
               text: '翻訳酸素カプセルから聞こえる声の主。ぴょんぴーのムーニアン語を、日本語に同時翻訳してくれる人工知能です。'}
@@ -686,6 +691,8 @@ function start() {
           const map = textures.load('assets/city/yanavis-faces.webp', t => { t.colorSpace = THREE.SRGBColorSpace; }); map.repeat.set(1 / 6, 1);
           const face = new THREE.Mesh(new THREE.CircleGeometry(.158, 40), new THREE.MeshBasicMaterial({map, transparent: true, toneMapped: false}));
           face.position.set(0, .612, .268); model.add(face);
+          // fix it to the head bone, so it moves exactly with the head when the body sways or hops
+          const headBone = model.getObjectByName('head'); if (headBone) { group.updateMatrixWorld(true); headBone.attach(face); }
           member.face = {map, now: 0, until: 0, set(i, seconds) { this.now = i; this.until = time + seconds; map.offset.x = i / 6; }};
         }
         playCast(member, 'Walk'); cast.push(member);
@@ -706,7 +713,9 @@ function start() {
       // A rider goes wherever their vehicle goes (Ranpyon on the plaza scooter); everyone else walks their own route.
       const mount = m.spec.ride ? traffic.find(t => t.id === m.spec.ride && t.routeName === 'plaza') : null;
       if (mount) {
-        mount.halt = m.stopped; castPos.copy(mount.car.position); castPos.y += .42;
+        if (m.stopped) mount.halt = true; else if (!cast.some(o => o.stopped && o.spec.ride === m.spec.ride)) mount.halt = false;
+        const seat = m.spec.seat || [0, .42, 0], yaw = mount.car.rotation.y;
+        castPos.copy(mount.car.position); castPos.x += Math.cos(yaw) * seat[0] + Math.sin(yaw) * seat[2]; castPos.z += -Math.sin(yaw) * seat[0] + Math.cos(yaw) * seat[2]; castPos.y += seat[1];
         castNext.copy(castPos).add(tmp.set(Math.sin(mount.car.rotation.y), 0, Math.cos(mount.car.rotation.y)));
         if (m.active === m.actions.Walk) playCast(m, 'Idle');
       } else {
@@ -743,9 +752,10 @@ function start() {
     const p = m.group.position.clone(), eye = m.spec.height * .58;
     // stand where the view is clear: a set side for those on the roads, otherwise wherever the camera already is
     const away = (m.spec.view ? V(m.spec.view[0], 0, m.spec.view[1]) : camPos.clone().sub(p).setY(0)).normalize();
+    const reach = m.spec.ride === 'roadster' ? 6.2 : m.spec.height * 2.5, lift = m.spec.ride === 'roadster' ? 1.6 : 0;   // riders in the car are seen from a little further back and above
     shiftT = 1;
-    if (motionOff()) { camPos.copy(p).addScaledVector(away, m.spec.height * 2.5).add(V(0, eye, 0)); camLook.copy(p).add(V(0, eye, 0)); }
-    else await fly(p.clone().addScaledVector(away, m.spec.height * 2.5).add(V(0, eye, 0)), p.clone().add(V(0, eye, 0)), 1.5, 1.2);
+    if (motionOff()) { camPos.copy(p).addScaledVector(away, reach).add(V(0, eye + lift, 0)); camLook.copy(p).add(V(0, eye, 0)); }
+    else await fly(p.clone().addScaledVector(away, reach).add(V(0, eye + lift, 0)), p.clone().add(V(0, eye, 0)), 1.5, 1.2);
     playCast(m, 'React', true); sound.fx.pop(); sound.fx.arrive();
     if (m.face) { m.face.set(3, .7); setTimeout(() => m.face && m.face.set(0, 4), 700); }
     burst(p.clone().add(V(0, m.spec.height * .9, 0)), PASTEL, 46, 5, .7);
