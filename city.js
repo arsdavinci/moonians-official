@@ -365,12 +365,12 @@ function start() {
   /* ── the city ── */
   const N = {};                     // named nodes from the model
   const PLACES = {
-    anime:   {anchor: 'Anchor_Anime',   label: '3Dアニメ',       labelY: 9, dist: 27, h: 7,   lookY: 14},
-    game:    {anchor: 'Anchor_Game',    label: 'ゲーム',         labelY: 3.4, dist: 17, h: -5, lookY: 0},
-    music:   {anchor: 'Anchor_Music',   label: '音楽',           labelY: 6, dist: 25, h: 4.4, lookY: 6.2},
-    friends: {anchor: 'Anchor_Friends', label: '愉快な仲間たち', labelY: 9, dist: 18, h: 4.6, lookY: 7},
-    lab:     {anchor: 'Anchor_Lab',     label: '制作ラボ',       labelY: 7, dist: 20, h: 4.2, lookY: 6},
-    roadmap: {anchor: 'Anchor_Roadmap', label: 'ロードマップ',   labelY: 9, dist: 31, h: 6.5, lookY: 25}
+    anime:   {anchor: 'Anchor_Anime',   label: '3Dアニメ',       labelY: 9, dist: 27, h: 7,   lookY: 14, ask: [.55, 25, 2.0, 12.5]},
+    game:    {anchor: 'Anchor_Game',    label: 'ゲーム',         labelY: 3.4, dist: 17, h: -5, lookY: 0, ask: [.6, 13, -6.5, .4]},
+    music:   {anchor: 'Anchor_Music',   label: '音楽',           labelY: 6, dist: 25, h: 4.4, lookY: 6.2, ask: [-.55, 22, 1.9, 6.6]},
+    friends: {anchor: 'Anchor_Friends', label: '愉快な仲間たち', labelY: 9, dist: 18, h: 4.6, lookY: 7, ask: [.5, 17.5, 1.8, 7.6]},
+    lab:     {anchor: 'Anchor_Lab',     label: '制作ラボ',       labelY: 7, dist: 20, h: 4.2, lookY: 6, ask: [-.5, 17.5, 1.8, 6.6]},
+    roadmap: {anchor: 'Anchor_Roadmap', label: 'ロードマップ',   labelY: 9, dist: 31, h: 6.5, lookY: 25, ask: [.42, 33, 1.7, 30]}
   };
   const proxies = [];               // invisible pick targets
   const tmp = V(0, 0, 0), tmp2 = V(0, 0, 0);
@@ -612,8 +612,11 @@ function start() {
   };
 
   function vantage(place) {
-    if (place.id === 'game') { const ufo = N.UFO.position; return {pos: ufo.clone().addScaledVector(front(place), place.dist).add(V(0, place.h, 0)), look: ufo.clone()}; }
-    return {pos: at(place, place.dist, place.h), look: at(place, 0, place.lookY)};
+    const [turn, dist, eye, lookY] = place.ask;
+    // the UFO is looked at from the tower's side, so the big airship can never drift in between
+    const dir = (place.id === 'game' ? N.UFO.position.clone().setY(0).normalize().negate() : front(place)).applyAxisAngle(V(0, 1, 0), turn);
+    const base = place.id === 'game' ? N.UFO.position : place.node.position;
+    return {pos: base.clone().addScaledVector(dir, dist).add(V(0, eye, 0)), look: base.clone().add(V(0, lookY, 0))};
   }
 
   // Choosing a place flies the camera there and stops. You then decide: go in, or back to the city.
@@ -621,7 +624,7 @@ function start() {
   async function go(id) {
     const place = PLACES[id], link = links.find(a => a.dataset.place === id);
     if (!place || !link || mode !== 'orbit') return;
-    mode = 'fly';
+    mode = 'fly'; shiftT = -1;
     body.classList.add('is-travelling'); link.classList.add('is-going');
     hintEl.classList.remove('is-on'); bubbleEl.hidden = true;
     sound.fx.select();
@@ -635,14 +638,14 @@ function start() {
   }
   async function enterPlace() {
     if (mode !== 'ask' || !asking) return;
-    const {id, place, link} = asking; enterEl.hidden = true; body.classList.add('is-travelling'); mode = 'fly'; sound.fx.select();
+    const {id, place, link} = asking; enterEl.hidden = true; shiftT = 0; body.classList.add('is-travelling'); mode = 'fly'; sound.fx.select();
     if (id === 'sns') { await enterSns(); return; }
     if (!motionOff() && await SHOW[id](place)) { location.href = link.href; return; }
     wipeEl.classList.add('is-on'); await wait(.72); location.href = link.href;
   }
   async function backToCity() {
     if (mode !== 'ask' || !asking) return;
-    const {link, ship} = asking; asking = null; enterEl.hidden = true; link.classList.remove('is-going'); mode = 'fly'; if (ship) ship.halt = false;
+    const {link, ship} = asking; asking = null; enterEl.hidden = true; link.classList.remove('is-going'); mode = 'fly'; shiftT = 0; if (ship) ship.halt = false;
     orbitPose(tmp, tmp2);
     if (!motionOff()) await fly(tmp.clone(), tmp2.clone(), 1.5, 4);
     body.classList.remove('is-asking', 'is-travelling'); mode = 'orbit';
@@ -669,7 +672,7 @@ function start() {
   const snsEl = $('#city-sns'), snsLink = document.querySelector('.city-menu a[data-sns]');
   async function openSns() {
     if (mode !== 'orbit') return;
-    mode = 'fly'; body.classList.add('is-travelling'); snsLink.classList.add('is-going'); hintEl.classList.remove('is-on'); bubbleEl.hidden = true;
+    mode = 'fly'; shiftT = -1; body.classList.add('is-travelling'); snsLink.classList.add('is-going'); hintEl.classList.remove('is-on'); bubbleEl.hidden = true;
     sound.fx.select();
     const ship = traffic.find(t => t.id === 'airship');
     if (ship && !motionOff()) {
@@ -1022,8 +1025,8 @@ function start() {
   canvas.addEventListener('pointerleave', () => { hovered = null; canvas.style.cursor = ''; });
   function applyOffset() {
     const w = innerWidth, h = innerHeight;
-    if (w < 760) camera.setViewOffset(w, h, 0, h * (.15 + .1 * shift), w, h);
-    else if (shift > 0) camera.setViewOffset(w, h, -w * .2 * shift, 0, w, h);
+    if (w < 760) camera.setViewOffset(w, h, 0, h * (.15 + .1 * Math.abs(shift)), w, h);
+    else if (shift !== 0) camera.setViewOffset(w, h, -w * (shift > 0 ? .2 : .17) * shift, 0, w, h);   // profile: character on the right; question: place on the left
     else camera.clearViewOffset();
     camera.updateProjectionMatrix();
   }
@@ -1466,6 +1469,7 @@ function start() {
     }
     for (const c of paintedClouds) { const a = c.userData.a + time * .006; c.position.set(Math.cos(a) * c.userData.r, c.userData.y, Math.sin(a) * c.userData.r); c.material.opacity = .95 - night * .7; }
     updateTraffic(dt, still); updateCast(dt, still); updateSns(dt); updateBigFace(dt);
+    if (mode === 'ask' && asking && asking.id === 'game') { const v = vantage(asking.place), k = 1 - Math.pow(.02, dt); camPos.lerp(v.pos, k); camLook.lerp(v.look, k); }   // the UFO keeps flying, so the camera keeps up with it
     for (const m of signs) m.material.opacity = (.45 + .5 * night) * (.86 + .14 * Math.sin(time * 3.1 + m.userData.phase)) * (Math.sin(time * .7 + m.userData.phase * 2.3) > .985 ? .35 : 1);   // steady glow with a rare flicker
     if (N.stageArt && !still) N.stageArt.rotation.z += dt * .25;
     updateBursts(dt);

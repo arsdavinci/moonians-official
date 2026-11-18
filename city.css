@@ -192,3 +192,14 @@ body:not(.is-loading) .city-loader{opacity:0;visibility:hidden}
 .city-name.is-chosen::after{background:#c4b2f0;border-color:#fff}
 .city-name[hidden]{display:none}
 body.is-loading .city-name{display:none}
+
+/* the "go in?" card stands at the right on wide screens, turned a little so it has depth */
+@media (min-width:760px){
+  .city-enter{left:auto;right:clamp(28px,7vw,130px);top:50%;bottom:auto;width:min(440px,36vw);padding:30px 30px 28px;text-align:left;transform-origin:100% 50%;
+    transform:perspective(1100px) translateY(-50%) rotateY(-19deg) rotateX(3deg);box-shadow:-26px 30px 60px rgba(98,74,190,.36),0 0 0 1px rgba(255,255,255,.5) inset;
+    animation:city-enter-in .55s cubic-bezier(.2,1.2,.35,1) both}
+  .city-enter h2{font-size:2.3rem;line-height:1.15}
+  .city-enter-ask{font-size:1rem}
+  .city-enter .city-profile-actions{margin-top:20px}
+}
+@keyframes city-enter-in{from{opacity:0;transform:perspective(1100px) translateY(-50%) translateX(70px) rotateY(-46deg) rotateX(3deg)}}
