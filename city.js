@@ -1008,7 +1008,17 @@ function start() {
     robot:   {height: 1.9, yaw: 0, route: circle(16, .3), speed: -1.7, glide: true, view: 'out', kicker: 'Y.A.N.A.V.I.S', role: '人工知能', name: 'ヤナビス',
               text: '翻訳酸素カプセルから聞こえる声の主。ぴょんぴーのムーニアン語を、日本語に同時翻訳してくれる人工知能です。'}
   };
-  const PHOTOS = {ranpyon: 1, pyon: 1, luva: 1, kaguya: 1, ramune: 1, pt: 1, robot: 1, grouper: 1};   // close-up face pictures in assets/city/faces
+  // Zompy only comes out at night: four of them shamble round the plaza and along the main road.
+  const ZOMPY = {height: 1.75, yaw: 0, speed: .5, file: 'zombie', fit: true, night: true, zombie: true, photo: 'zombie', sheet: 'zombie-bunny',
+    kicker: 'ZOMPY', role: '夜の住人', name: 'ゾンピー', text: 'ミントグリーンの毛並みに、つぎはぎと舌ぺろ。夜になると、どこからともなく街に現れて、ふらふら歩き回ります。ちょっとこわいけど、どこかにくめないやつ。'};
+  const ring = (r, wobble, turns, phase) => tour(Array.from({length: 12}, (_, i) => { const a = i / 12 * Math.PI * 2 * turns + phase, rr = r + Math.sin(i * 2.1 + phase) * wobble; return [Math.cos(a) * rr, .3, Math.sin(a) * rr]; }));
+  Object.assign(CAST, {
+    zombie1: {...ZOMPY, route: ring(11, 1.6, 1, .4)},
+    zombie2: {...ZOMPY, route: ring(19, 1.2, -1, 2.2), speed: .42},
+    zombie3: {...ZOMPY, route: ring(13.5, 2, -1, 4.1), speed: .56},
+    zombie4: {...ZOMPY, route: tour([[5.4, .25, 26], [5.8, .25, 40], [5.2, .25, 56], [-5.2, .25, 57], [-5.8, .25, 42], [-5.4, .25, 27]]), speed: .46}
+  });
+  const PHOTOS = {zombie: 1, ranpyon: 1, pyon: 1, luva: 1, kaguya: 1, ramune: 1, pt: 1, robot: 1, grouper: 1};   // close-up face pictures in assets/city/faces
   const cast = [], profileEl = $('#city-profile');
   // Pyonpy stays on his stage, but meets you the same way as the others.
   const pyonMember = {id: 'pyon', actions: {}, stopped: false, spec: {height: 2.3, view: [.35, 1], kicker: 'PYONPY', role: 'ボケ担当', name: 'ぴょんぴー',
@@ -1016,8 +1026,13 @@ function start() {
   let meeting = null, shift = 0, shiftT = 0, profileRide = false;
   function loadCast() {
     Object.entries(CAST).forEach(([id, spec], index) => {
-      new GLTFLoader().load(`assets/city/cast/${id}.glb?v=20261118-3`, gltf => {
+      new GLTFLoader().load(`assets/city/cast/${spec.file || id}.glb?v=20261118-3`, gltf => {
         const model = gltf.scene; model.scale.setScalar(spec.height); model.rotation.y = spec.yaw;
+        if (spec.fit) {                // a model in its own units: stand it on the ground at the wanted height
+          model.scale.setScalar(1); model.updateMatrixWorld(true);
+          const box = new THREE.Box3().setFromObject(model), size = box.getSize(V(0, 0, 0)), k = spec.height / size.y;
+          model.scale.setScalar(k); model.position.set(-(box.min.x + size.x / 2) * k, -box.min.y * k, -(box.min.z + size.z / 2) * k);
+        }
         model.traverse(node => { if (node.isMesh) { node.frustumCulled = false; (Array.isArray(node.material) ? node.material : [node.material]).forEach(m => { m.envMapIntensity = .5; m.roughness = .55; m.metalness = 0; }); } });
         const group = new THREE.Group(); group.add(model); scene.add(group);
         if (spec.holo) {               // a projected figure: see-through, blue-tinted, scan lines, a flicker, and a beam of light under her feet
@@ -1039,6 +1054,15 @@ function start() {
         // Characters with a full skeleton come with a seated or dancing clip; that is their everyday pose.
         if (actions.Sit) actions.Idle = actions.Walk = actions.Sit;
         if (actions.Dance) actions.Idle = actions.Walk = actions.Dance;
+        if (spec.zombie) {             // glowing parts: wherever the model is painted green, it shines like an LED
+          model.traverse(node => { if (!node.isMesh) return; const mat = node.material;
+            mat.onBeforeCompile = shader => { shader.uniforms.uTime = uTime;
+              shader.fragmentShader = shader.fragmentShader.replace('#include <common>', '#include <common>\nuniform float uTime;')
+                .replace('#include <color_fragment>', '#include <color_fragment>\ndiffuseColor.rgb *= vec3(0.74, 1.2, 0.98) * 1.3;')   // the model is painted grey-green: lift it to his mint colour
+                .replace('#include <emissivemap_fragment>', '#include <emissivemap_fragment>\n#ifdef USE_COLOR\nfloat led = smoothstep(0.03, 0.12, vColor.g - max(vColor.r, vColor.b));\ntotalEmissiveRadiance += vColor.rgb * (0.16 + led * (1.5 + 0.5 * sin(uTime * 3.0)));\n#endif'); };
+            mat.customProgramCacheKey = () => 'zompy-led'; });
+          const scream = gltf.animations[0]; if (scream) actions.React = mixer.clipAction(scream);
+        }
         const member = {id, spec, group, mixer, actions, active: null, d: index * 7, facing: 0, stopped: false, head: model.getObjectByName('Hips') ? model.getObjectByName('Head') : null, chest: model.getObjectByName('Hips') ? (model.getObjectByName('Spine02') || model.getObjectByName('Spine')) : null, look: 0, hop: 0};
         member.proxy = new THREE.Mesh(new THREE.SphereGeometry(spec.height * .62, 10, 8)); member.proxy.userData = {kind: 'cast', id}; proxies.push(member.proxy);
         mixer.addEventListener('finished', () => playCast(member, member.stopped || spec.glide || spec.ride ? 'Idle' : spec.dance ? 'React' : 'Walk'));
@@ -1052,6 +1076,13 @@ function start() {
           // Its face sits on the body section of the rig (the "head" bone of this model only carries the ears), so fix it there.
           const faceBone = model.getObjectByName('chest'); if (faceBone) { group.updateMatrixWorld(true); faceBone.attach(face); }
           member.face = {map, now: 0, until: 0, set(i, seconds) { this.now = i; this.until = time + seconds; map.offset.x = i / 6; }};
+        }
+        if (spec.zombie) {
+          const bone = n => model.getObjectByName('mixamorig' + n) || model.getObjectByName('mixamorig:' + n);
+          member.zb = Object.fromEntries(['Spine', 'Spine2', 'Head', 'LeftArm', 'LeftForeArm', 'LeftHand', 'RightArm', 'RightForeArm', 'RightHand', 'LeftUpLeg', 'LeftLeg', 'LeftFoot', 'RightUpLeg', 'RightLeg', 'RightFoot'].map(n => [n, bone(n)]));
+          member.rest = []; model.traverse(o => { if (o.isBone) member.rest.push([o, o.quaternion.clone()]); });
+          member.d = index * 11; group.visible = false;
+          mixer.addEventListener('finished', () => { if (actions.React) actions.React.stop(); member.active = null; });
         }
         playCast(member, 'Walk'); cast.push(member);
       }, undefined, () => { /* the city works without them */ });
@@ -1069,10 +1100,28 @@ function start() {
     if (bone.quaternion.equals(u.mine)) bone.quaternion.copy(u.base); else u.base.copy(bone.quaternion);
     u.stamp = time; return u;
   }
+  // Zompy's walk is made here, bone by bone: leaning forward, arms out in front, one leg dragging.
+  const zF = V(0, 0, 0), zL = V(0, 0, 0), zDir = V(0, 0, 0), zA = V(0, 0, 0), zB = V(0, 0, 0), zQ = new THREE.Quaternion(), zP = new THREE.Quaternion(), zUp = V(0, 1, 0);
+  function shamble(m) {
+    for (const [bone, q] of m.rest) bone.quaternion.copy(q);                 // start from the model's own pose every frame
+    const b = m.zb, f = m.facing, ph = m.d * 5.2, s = Math.sin(ph), sway = Math.sin(ph * .5);
+    zF.set(Math.sin(f), 0, Math.cos(f)); zL.set(Math.cos(f), 0, -Math.sin(f));   // his front and his left, in the city
+    const spin = (bone, axis, angle) => { if (!bone) return; bone.parent.updateWorldMatrix(true, false); bone.parent.getWorldQuaternion(zP); zQ.setFromAxisAngle(axis, angle); bone.quaternion.premultiply(zP.clone().invert().multiply(zQ).multiply(zP)); };
+    const aim = (bone, child, fw, up, left) => { if (!bone || !child) return;
+      bone.updateWorldMatrix(true, false); zA.setFromMatrixPosition(bone.matrixWorld); zB.copy(child.position).applyMatrix4(bone.matrixWorld).sub(zA).normalize();
+      zDir.set(0, 0, 0).addScaledVector(zF, fw).addScaledVector(zUp, up).addScaledVector(zL, left).normalize();
+      bone.parent.getWorldQuaternion(zP); zQ.setFromUnitVectors(zB, zDir); bone.quaternion.premultiply(zP.clone().invert().multiply(zQ).multiply(zP)); };
+    spin(b.Spine, zL, .3 + Math.abs(s) * .05); spin(b.Spine, zF, sway * .12); spin(b.Head, zF, .28 + sway * .1); spin(b.Head, zL, -.12);
+    aim(b.LeftArm, b.LeftForeArm, 1, -.08 + sway * .1, .22); aim(b.LeftForeArm, b.LeftHand, 1, -.3 + sway * .12, .05);
+    aim(b.RightArm, b.RightForeArm, .85, -.4 - sway * .1, -.25); aim(b.RightForeArm, b.RightHand, .7, -.75, -.05);
+    aim(b.LeftUpLeg, b.LeftLeg, s * .4, -1, .07); aim(b.LeftLeg, b.LeftFoot, -.34 * Math.max(0, Math.cos(ph)), -1, .03);
+    aim(b.RightUpLeg, b.RightLeg, -s * .2, -1, -.1); aim(b.RightLeg, b.RightFoot, -.12, -1, -.03);            // the right leg drags
+  }
   const castPos = V(0, 0, 0), castNext = V(0, 0, 0), lookQ = new THREE.Quaternion(), lookQ2 = new THREE.Quaternion(), lookE = new THREE.Euler(), UP = V(0, 1, 0);
   function updateCast(dt, still) {
     if (lineup) { cast.forEach((m, i) => { m.group.position.set(-4.5 + i * 3, .3, 8.5); m.group.rotation.y = 0; if (!still) m.mixer.update(dt); }); return; }
     for (const m of cast) {
+      if (m.spec.night) { m.group.visible = uNight.value > .5; if (!m.group.visible) { m.stopped = false; continue; } }
       if (m.face && time > m.face.until) { const happy = m.face.now !== 0; m.face.set(happy ? 0 : [1, 2, 3, 4, 5, 1, 2][Math.floor(Math.random() * 7)], happy ? 3 + Math.random() * 4 : 1.6 + Math.random() * 1.4); }
       // A rider goes wherever their vehicle goes (Ranpyon on the plaza scooter); everyone else walks their own route.
       const mount = m.spec.ride ? traffic.find(t => t.id === m.spec.ride && t.routeName === 'plaza') : null;
@@ -1102,6 +1151,7 @@ function start() {
       while (delta > Math.PI) delta -= Math.PI * 2; while (delta < -Math.PI) delta += Math.PI * 2;
       m.facing += delta * (1 - Math.pow(.01, dt)); m.group.rotation.y = m.facing;
       if (!still) m.mixer.update(dt);
+      if (m.zb && !still && !(m.active && m.active.isRunning())) shamble(m);
       if (m.head && !still) {          // a character with a real skeleton turns to look into the camera while they are the one chosen
         clipPose(m.head); if (m.chest) clipPose(m.chest);
         m.look = lerp(m.look, m.stopped || meeting === m ? 1 : 0, 1 - Math.pow(.02, dt));   // riders are chosen without being stopped
@@ -1137,7 +1187,7 @@ function start() {
   function castAt(x, y, except) {
     let best = null, score = 1;
     for (const m of everyone()) {
-      if (m === except) continue;
+      if (m === except || !m.group.visible) continue;
       m.group.getWorldPosition(tmp); tmp.y += m.spec.height * .5; const far = tmp.distanceTo(camera.position); tmp.project(camera);
       if (tmp.z > 1 || tmp.z < -1) continue;
       const size = m.spec.height * .7 * (innerHeight / 2) / (far * Math.tan(camera.fov * Math.PI / 360));
@@ -1230,7 +1280,7 @@ function start() {
     return best;
   }
   async function meet(id) {
-    const m = id === 'pyon' ? (pyon ? Object.assign(pyonMember, {group: pyon}) : null) : cast.find(x => x.id === id); if (!m || mode !== 'orbit') return;
+    const m = id === 'pyon' ? (pyon ? Object.assign(pyonMember, {group: pyon}) : null) : cast.find(x => x.id === id); if (!m || mode !== 'orbit' || !m.group.visible) return;
     mode = 'fly'; meeting = m; m.stopped = !m.spec.ride; body.classList.add('is-meeting');   // riders keep driving; the camera rides along
     hintEl.classList.remove('is-on'); bubbleEl.hidden = true;
     sound.fx.select(); playCast(m, 'Idle'); m.hop = 1;
@@ -1255,10 +1305,10 @@ function start() {
     if (m === pyonMember) playPyon(pyonActions.Cheer ? 'Cheer' : 'Jump', true);
     if (m.face) { m.face.set(3, .7); setTimeout(() => m.face && m.face.set(0, 4), 700); }
     burst(p.clone().add(V(0, m.spec.height * .9, 0)), PASTEL, 46, 5, .7);
-    const photo = $('#profile-photo'); photo.hidden = !PHOTOS[m.id]; if (PHOTOS[m.id]) { photo.src = 'assets/city/faces/' + m.id + '.jpg?v=2'; photo.alt = tr(m.spec.name); }
+    const photo = $('#profile-photo'); const face = m.spec.photo || m.id; photo.hidden = !PHOTOS[face]; if (PHOTOS[face]) { photo.src = 'assets/city/faces/' + face + '.jpg?v=2'; photo.alt = tr(m.spec.name); }
     $('#profile-kicker').textContent = m.spec.kicker; $('#profile-role').textContent = tr(m.spec.role);
     $('#profile-name').textContent = tr(m.spec.name); $('#profile-text').textContent = tr(m.spec.text);
-    { const key = {pyon: 'pyonpy', luva: 'zaluva', pt: 'ptputy', robot: 'yanabisu'}[m.id] || m.id, lang = new URL(location.href).searchParams.get('lang') || document.documentElement.lang || 'ja';
+    { const key = m.spec.sheet || {pyon: 'pyonpy', luva: 'zaluva', pt: 'ptputy', robot: 'yanabisu'}[m.id] || m.id, lang = new URL(location.href).searchParams.get('lang') || document.documentElement.lang || 'ja';
       $('#profile-more').href = `friends.html?open=${key}&lang=${lang}`; }   // their full profile, opened
     profileEl.hidden = false; mode = 'meet'; profileRide = !!m.spec.ride;
     $('#profile-link').focus({preventScroll: true});
