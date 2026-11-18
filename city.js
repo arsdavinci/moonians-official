@@ -750,7 +750,7 @@ function start() {
               text: '地球人とムーニアンのハーフ。自分の「好き」を形にする、クリエイターなツッコミ担当。'},
     luva:    {height: 3.1, yaw: 0, route: segment(-1.3, -19.5, -1.3, -33, .22), speed: .7, view: [.25, 1], kicker: 'ZA-LUVA SELES', role: '二人の上司', name: 'ザ・ルーヴァ・セレス',
               text: '三日月大使館（クレッセントエンバシー）の偉い人。らんぴょんとぴょんぴーの上司です。胸には三日月、手にはマイク。二人の地球での活動を、おだやかな笑顔で見守っています。'},
-    kaguya:  {height: 2.7, yaw: 0, route: circle(11.6, .3), speed: -.55, view: 'out', kicker: 'PRINCESS KAGUYA', role: '月の宮の皇族', name: 'かぐや様',
+    kaguya:  {height: 2.7, yaw: 0, route: circle(1.9, .22, -18.6, 3.45), speed: .5, view: [1, -.25], kicker: 'PRINCESS KAGUYA', role: '月の宮の皇族', name: 'かぐや様',
               text: '月の宮に住む、皇族のお姫さま。三日月の髪飾りに、竹と月の模様の衣をまとい、手には扇。そして、ぴょんぴーの好きな人です。'},
     // DJ Ramune and PT ride in the plaza roadster, side by side.
     ramune:  {height: 2.0, yaw: 0, route: circle(4.4, .3), speed: .9, ride: 'roadster', seat: [-.5, .5, -.05], kicker: 'DJ RAMUNE', role: 'らんぴょんの妹', name: 'DJらむね',
@@ -758,7 +758,7 @@ function start() {
     pt:      {height: 1.1, yaw: 0, route: circle(4.4, .3), speed: .9, ride: 'roadster', seat: [.5, .98, -.05], kicker: 'PTPUTY / PT', role: 'らむねの相方', name: 'ピーティープティ',
               text: 'ニックネームは「PT」。DJらむねの相方で、親友。好きなのは、ぴょんぴー。身長はおよそ45cm。'},
     // Grouper grooves on the spot in front of the Music Dome.
-    grouper: {height: 3.0, yaw: 0, route: circle(.7, .22, 14.2, 11), speed: .35, dance: true, view: [-.8, -.6], kicker: 'GROUPER', role: '音楽の星のエイリアン', name: 'グルーパー',
+    grouper: {height: 3.0, yaw: 0, route: circle(.6, .22, 20.4, 6.5), speed: .35, dance: true, view: [-.75, -.65], kicker: 'GROUPER', role: '音楽の星のエイリアン', name: 'グルーパー',
               text: '音楽の星「グルーヴィア星」から来た、機械の体のエイリアン。「地球の音楽はクソすぎる！」と地球を破壊しに来たけれど、ぴょんぴーとのラップバトルでそのバイブスに感化され、まさかの友達に。地球滅亡は、ギリギリで回避されました。'},
     // Yanavis rolls on wheels: a smooth glide round the outer ring of the plaza, with a little bump now and then.
     robot:   {height: 1.9, yaw: 0, route: circle(16, .3), speed: 1.7, glide: true, view: 'out', kicker: 'Y.A.N.A.V.I.S', role: '人工知能', name: 'ヤナビス',
@@ -817,7 +817,7 @@ function start() {
         if (m.active === m.actions.Walk) playCast(m, 'Idle');
       } else {
         if (!m.stopped && !still) m.d += m.spec.speed * dt;
-        m.spec.route.at(m.d, castPos); m.spec.route.at(m.d + .4, castNext);
+        m.spec.route.at(m.d, castPos); m.spec.route.at(m.d + Math.sign(m.spec.speed) * .4, castNext);   // look the way they are actually going
         if (m.spec.dance) {            // riding the rhythm: a looping hop-and-nod, a bounce and a sway, always facing the plaza
           if (m.active !== m.actions.React && !m.stopped) playCast(m, 'React');
           castPos.y += Math.abs(Math.sin(time * 4.6)) * .14; castNext.set(castPos.x - castPos.x * .1 + Math.sin(time * 2.3) * .5, 0, castPos.z - castPos.z * .1);
