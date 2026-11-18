@@ -366,7 +366,7 @@ function start() {
   const N = {};                     // named nodes from the model
   const PLACES = {
     anime:   {anchor: 'Anchor_Anime',   label: '3Dアニメ',       labelY: 9, dist: 27, h: 7,   lookY: 14, ask: [-.55, 25, 2.0, 12.5]},
-    game:    {anchor: 'Anchor_Game',    label: 'ゲーム',         labelY: 3.4, dist: 17, h: -5, lookY: 0, ask: [.6, 13, -6.5, .4]},
+    game:    {anchor: 'Anchor_Game',    label: 'ゲーム',         labelY: 5.6, dist: 17, h: -5, lookY: 0, ask: [.6, 21, -9.5, .6]},
     music:   {anchor: 'Anchor_Music',   label: '音楽',           labelY: 6, dist: 25, h: 4.4, lookY: 6.2, ask: [-.55, 22, 1.9, 6.6]},
     friends: {anchor: 'Anchor_Friends', label: '愉快な仲間たち', labelY: 9, dist: 18, h: 4.6, lookY: 7, ask: [-.5, 17.5, 1.8, 7.6]},
     lab:     {anchor: 'Anchor_Lab',     label: '制作ラボ',       labelY: 7, dist: 20, h: 4.2, lookY: 6, ask: [-.5, 17.5, 1.8, 6.6]},
@@ -737,7 +737,7 @@ function start() {
     friends: {height: 17,  hide: ['Proc_Friends', 'Friends_EarL', 'Friends_EarR', 'Friends_Face']},
     lab:     {height: 14,  hide: ['Proc_Lab', 'Gear_A', 'Gear_B', 'Lab_Bubbles']},
     roadmap: {height: 72,  hide: ['Proc_Roadmap', 'Tower_Ring1', 'Tower_Ring2', 'Tower_Ring3', 'Tower_Crescent']},
-    game:    {height: 6.2, hide: []}
+    game:    {height: 10, hide: []}
   };
   const landmarkModels = {};
   function loadLandmarks() {
@@ -1537,8 +1537,8 @@ function start() {
       // The UFO circles high over the city; it holds still while the camera flies anywhere, so it is easy to reach.
       if (mode !== 'fly' && !still) { ufoAngle += dt * .16; ufoRise = Math.min(1, ufoRise + dt / 14); }
       const towerSide = Math.atan2(Math.sin(ufoAngle + Math.PI / 2), Math.cos(ufoAngle + Math.PI / 2));   // 0 when it is level with the Moon Tower
-      const ufoR = 40 + Math.sin(ufoAngle * 2.3) * 2.5 - 15 * Math.exp(-((towerSide / .45) ** 2));    // out beyond the landmarks, just above their roofs
-      u.position.set(Math.cos(ufoAngle) * ufoR, lerp(15, 25, easeInOut(ufoRise)) + Math.sin(time * .7) * 1.6 * ufoRise + Math.sin(time * 2.6) * .6, Math.sin(ufoAngle) * ufoR);
+      const ufoR = 60 + Math.sin(ufoAngle * 2.3) * 3 - 0 * towerSide;    // out beyond the landmarks, just above their roofs
+      u.position.set(Math.cos(ufoAngle) * ufoR, lerp(18, 31, easeInOut(ufoRise)) + Math.sin(time * .7) * 1.6 * ufoRise + Math.sin(time * 2.6) * .6, Math.sin(ufoAngle) * ufoR);
       u.rotation.y += dt * .35 * boost.ufo; u.rotation.z = Math.sin(time * .9) * .06; u.rotation.x = Math.cos(time * .7) * .05;
       if (N.ufoProxy) { N.ufoProxy.position.copy(u.position); N.ufoProxy.updateMatrixWorld(); }
       if (N.UFO_BeamMesh) N.UFO_BeamMesh.traverse(o => { if (o.isMesh) { o.material.opacity = boost.beam * (.8 + Math.sin(time * 22) * .2); o.visible = boost.beam > .01; } });
