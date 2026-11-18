@@ -378,7 +378,7 @@ function start() {
   const holos = [], paintedClouds = [];
   let sparkle = null, pyon = null, pyonMixer = null, pyonActions = {}, pyonActive = null, statueBounce = 0;
   const ufoBase = V(0, 0, 0), shutterBase = {};
-  let ufoAngle = 2.4;
+  let ufoAngle = 2.4, ufoRise = 1, airshipStart = null;
 
   function build(gltf) {
     const root = gltf.scene; scene.add(root);
@@ -744,7 +744,15 @@ function start() {
       el.addEventListener('loadedmetadata', () => entry.planes.forEach(fit));
       el.play().catch(() => { /* starts on the first tap */ });
     }
-    const plane = new THREE.Mesh(new THREE.PlaneGeometry(w, h), new THREE.MeshBasicMaterial({map: entry.texture, toneMapped: false}));
+    // Hologram look: see-through, scan lines sliding up, a soft tint, bright edges and an occasional flicker.
+    const material = new THREE.MeshBasicMaterial({map: entry.texture, toneMapped: false, transparent: true, opacity: .86, side: THREE.DoubleSide, depthWrite: false});
+    material.onBeforeCompile = shader => {
+      shader.uniforms.uTime = uTime; shader.uniforms.uSeed = {value: videos.length * 1.37 + entry.planes.length * .61};
+      shader.fragmentShader = shader.fragmentShader.replace('#include <common>', '#include <common>\nuniform float uTime; uniform float uSeed;')
+        .replace('#include <map_fragment>', '#include <map_fragment>\nfloat hy = vMapUv.y; float scan = 0.82 + 0.18 * sin(hy * 240.0 - uTime * 9.0);\nfloat band = smoothstep(0.0, 0.06, abs(fract(hy * 1.3 - uTime * 0.22 + uSeed) - 0.5) - 0.44);\nfloat flick = 0.9 + 0.1 * sin(uTime * 31.0 + uSeed * 7.0) - 0.35 * step(0.985, fract(sin(floor(uTime * 7.0) + uSeed) * 43758.5));\nvec2 edge = smoothstep(vec2(0.0), vec2(0.07), vMapUv) * smoothstep(vec2(0.0), vec2(0.07), 1.0 - vMapUv);\ndiffuseColor.rgb = mix(diffuseColor.rgb, diffuseColor.rgb * vec3(0.72, 1.0, 1.12) + vec3(0.05, 0.1, 0.16), 0.5) * scan * flick + band * vec3(0.25, 0.5, 0.55);\ndiffuseColor.a *= (0.55 + 0.45 * edge.x * edge.y) * flick;');
+    };
+    material.customProgramCacheKey = () => 'holo-screen';
+    const plane = new THREE.Mesh(new THREE.PlaneGeometry(w, h), material);
     plane.userData = {w, h, entry}; entry.planes.push(plane); if (entry.el.videoWidth) fit(plane);
     return plane;
   }
@@ -768,16 +776,16 @@ function start() {
   /* ── the cast: characters who walk about the city. Click one to meet them. ── */
   const segment = (x0, z0, x1, z1, y) => { const L = Math.hypot(x1 - x0, z1 - z0); return {length: L * 2, at: (d, out) => { d = ((d % (L * 2)) + L * 2) % (L * 2); const k = (d < L ? d : L * 2 - d) / L; out.set(lerp(x0, x1, k), y, lerp(z0, z1, k)); }}; };
   const CAST = {
-    ranpyon: {height: 2.3, yaw: 0, route: circle(4.4, .3), speed: .9, ride: 'scooter', kicker: 'RANPYON', role: 'ツッコミ担当', name: 'らんぴょん',
+    ranpyon: {height: 2.3, yaw: 0, route: circle(4.4, .3), speed: .9, ride: 'scooter', seat: [0, .3, -.12], kicker: 'RANPYON', role: 'ツッコミ担当', name: 'らんぴょん',
               text: '地球人とムーニアンのハーフ。自分の「好き」を形にする、クリエイターなツッコミ担当。'},
     luva:    {height: 3.1, yaw: 0, route: segment(-1.3, -19.5, -1.3, -33, .22), speed: .7, view: [.25, 1], kicker: 'ZA-LUVA SELES', role: '二人の上司', name: 'ザ・ルーヴァ・セレス',
               text: '三日月大使館（クレッセントエンバシー）の偉い人。らんぴょんとぴょんぴーの上司です。胸には三日月、手にはマイク。二人の地球での活動を、おだやかな笑顔で見守っています。'},
     kaguya:  {height: 2.7, yaw: 0, route: circle(1.9, .22, -18.6, 3.45), speed: .5, view: [1, -.25], kicker: 'PRINCESS KAGUYA', role: '月の宮の皇族', name: 'かぐや様',
               text: '月の宮に住む、皇族のお姫さま。三日月の髪飾りに、竹と月の模様の衣をまとい、手には扇。そして、ぴょんぴーの好きな人です。'},
     // DJ Ramune and PT ride in the plaza roadster, side by side.
-    ramune:  {height: 2.0, yaw: 0, route: circle(4.4, .3), speed: .9, ride: 'roadster', seat: [-.5, .5, -.05], kicker: 'DJ RAMUNE', role: 'らんぴょんの妹', name: 'DJらむね',
+    ramune:  {height: 2.0, yaw: 0, route: circle(4.4, .3), speed: .9, ride: 'roadster', seat: [-.5, .42, -.2], kicker: 'DJ RAMUNE', role: 'らんぴょんの妹', name: 'DJらむね',
               text: 'らんぴょんの妹。月でDJをしています。'},
-    pt:      {height: 1.1, yaw: 0, route: circle(4.4, .3), speed: .9, ride: 'roadster', seat: [.5, .98, -.05], kicker: 'PTPUTY / PT', role: 'らむねの相方', name: 'ピーティープティ',
+    pt:      {height: 1.1, yaw: 0, route: circle(4.4, .3), speed: .9, ride: 'roadster', seat: [.5, .62, -.2], kicker: 'PTPUTY / PT', role: 'らむねの相方', name: 'ピーティープティ',
               text: 'ニックネームは「PT」。DJらむねの相方で、親友。好きなのは、ぴょんぴー。身長はおよそ45cm。'},
     // Grouper grooves on the spot in front of the Music Dome.
     grouper: {height: 3.0, yaw: 0, route: circle(.6, .22, 20.4, 6.5), speed: .35, dance: true, view: [-.75, -.65], kicker: 'GROUPER', role: '音楽の星のエイリアン', name: 'グルーパー',
@@ -794,12 +802,15 @@ function start() {
   let meeting = null, shift = 0, shiftT = 0, profileRide = false;
   function loadCast() {
     Object.entries(CAST).forEach(([id, spec], index) => {
-      new GLTFLoader().load(`assets/city/cast/${id}.glb?v=20261118-1`, gltf => {
+      new GLTFLoader().load(`assets/city/cast/${id}.glb?v=20261118-2`, gltf => {
         const model = gltf.scene; model.scale.setScalar(spec.height); model.rotation.y = spec.yaw;
         model.traverse(node => { if (node.isMesh) { node.frustumCulled = false; (Array.isArray(node.material) ? node.material : [node.material]).forEach(m => { m.envMapIntensity = .5; m.roughness = .55; m.metalness = 0; }); } });
         const group = new THREE.Group(); group.add(model); scene.add(group);
         const mixer = new THREE.AnimationMixer(model), actions = {};
         gltf.animations.forEach(clip => { actions[clip.name] = mixer.clipAction(clip); });
+        // Characters with a full skeleton come with a seated or dancing clip; that is their everyday pose.
+        if (actions.Sit) actions.Idle = actions.Walk = actions.Sit;
+        if (actions.Dance) actions.Idle = actions.Walk = actions.Dance;
         const member = {id, spec, group, mixer, actions, active: null, d: index * 7, facing: 0, stopped: false};
         member.proxy = new THREE.Mesh(new THREE.SphereGeometry(spec.height * .62, 10, 8)); member.proxy.userData = {kind: 'cast', id}; proxies.push(member.proxy);
         mixer.addEventListener('finished', () => playCast(member, member.stopped || spec.glide || spec.ride ? 'Idle' : spec.dance ? 'React' : 'Walk'));
@@ -841,7 +852,7 @@ function start() {
         if (!m.stopped && !still) m.d += m.spec.speed * dt;
         m.spec.route.at(m.d, castPos); m.spec.route.at(m.d + Math.sign(m.spec.speed) * .4, castNext);   // look the way they are actually going
         if (m.spec.dance) {            // riding the rhythm: a looping hop-and-nod, a bounce and a sway, always facing the plaza
-          if (m.active !== m.actions.React && !m.stopped) playCast(m, 'React');
+          if (m.active !== m.actions.Walk && m.active !== m.actions.React && !m.stopped) playCast(m, 'Walk');
           castPos.y += Math.abs(Math.sin(time * 4.6)) * .14; castNext.set(castPos.x - castPos.x * .1 + Math.sin(time * 2.3) * .5, 0, castPos.z - castPos.z * .1);
         }
         if (m.spec.glide) {            // wheels: no walking sway, just an occasional "koton, koton" over an imagined pebble
@@ -925,7 +936,7 @@ function start() {
     const spots = Object.entries(N).filter(([name]) => /^P[bt]\d+$/.test(name)).map(([name, node]) => ({tree: name[1] === 't', p: node.getWorldPosition(V(0, 0, 0)), s: node.scale.x || 1}));
     for (let i = 0; i < 18; i++) { const a = i / 18 * Math.PI * 2 + .2; spots.push({tree: true, far: true, p: V(Math.cos(a) * 75, .05, Math.sin(a) * 75), s: 1.3}); }   // a ring of picture trees on the outer bridge
     const near = spots.filter(o => !o.far && Math.hypot(o.p.x, o.p.z) < 34), far = spots.filter(o => !near.includes(o));
-    const KINDS = {bush: [['bush-pink', 1.5], ['bush-yellow', 1.5]], tree: [['tree-round', 5.2], ['tree-tall', 6], ['tree-fruit', 5]]};
+    const KINDS = {bush: [['bush-pink', 1.5], ['bush-yellow', 1.5]], tree: [['tree-tall', 6], ['tree-fruit', 5]]};
     const dummy = new THREE.Object3D();
     for (const group of ['bush', 'tree']) {
       const mine = near.filter(o => o.tree === (group === 'tree'));
@@ -1016,7 +1027,7 @@ function start() {
           const car = new THREE.Group(); car.add(body); scene.add(car);
           if (id === 'airship') { for (const side of [1, -1]) { const screen = videoScreen(side > 0 ? 'capsule/complete' : 'capsule/clip-12', .40, .215); screen.position.set(.02, .585, .268 * side); if (side < 0) screen.rotation.y = Math.PI; body.add(screen); } }
           if (id === 'airship') { const p = new THREE.Mesh(new THREE.SphereGeometry(16, 10, 8)); p.userData = {kind: 'airship', id}; proxies.push(p); car.userData.proxy = p; }
-          traffic.push({id, car, body, routeName: route, route: ROUTES[route], speed, d: start, phase: Math.random() * 6, air: /air|lift/.test(route)});
+          traffic.push({id, car, body, routeName: route, route: ROUTES[route], speed, d: id === 'airship' && airshipStart !== null ? airshipStart : start, phase: Math.random() * 6, air: /air|lift/.test(route)});
         });
       }, undefined, () => { /* traffic is optional */ });
     }
@@ -1126,6 +1137,7 @@ function start() {
   function finishIntro() {
     orbitPose(camPos, camLook);
     mode = 'orbit'; body.classList.add('is-exploring');
+    ufoAngle = 3.927; ufoRise = 0; const ship0 = traffic.find(t => t.id === 'airship'); if (ship0) ship0.d = -66.4; else airshipStart = -66.4;
     hintEl.classList.add('is-on');
     setTimeout(() => { if (mode === 'orbit') hintEl.textContent = tr('ぴょんぴーをタップしてみてね。'); }, 7000);
     setTimeout(() => hintEl.classList.remove('is-on'), 14000);
@@ -1249,9 +1261,9 @@ function start() {
     if (N.UFO) {
       const u = N.UFO;
       // The UFO circles high over the city; it holds still while the camera flies anywhere, so it is easy to reach.
-      if (mode !== 'fly' && !still) ufoAngle += dt * .16;
+      if (mode !== 'fly' && !still) { ufoAngle += dt * .16; ufoRise = Math.min(1, ufoRise + dt / 14); }
       const ufoR = 25 + Math.sin(ufoAngle * 2.3) * 5;   // stays inside the Moon Tower's reach and above every roof
-      u.position.set(Math.cos(ufoAngle) * ufoR, 40 + Math.sin(time * .7) * 4.5 + Math.sin(time * 2.6) * 1.1, Math.sin(ufoAngle) * ufoR);
+      u.position.set(Math.cos(ufoAngle) * ufoR, lerp(20, 40, easeInOut(ufoRise)) + Math.sin(time * .7) * 4.5 * ufoRise + Math.sin(time * 2.6) * 1.1, Math.sin(ufoAngle) * ufoR);
       u.rotation.y += dt * .35 * boost.ufo; u.rotation.z = Math.sin(time * .9) * .06; u.rotation.x = Math.cos(time * .7) * .05;
       if (N.ufoProxy) { N.ufoProxy.position.copy(u.position); N.ufoProxy.updateMatrixWorld(); }
       if (N.UFO_BeamMesh) N.UFO_BeamMesh.traverse(o => { if (o.isMesh) { o.material.opacity = boost.beam * (.8 + Math.sin(time * 22) * .2); o.visible = boost.beam > .01; } });
