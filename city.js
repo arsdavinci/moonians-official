@@ -193,6 +193,9 @@ function start() {
   const camera = new THREE.PerspectiveCamera(50, 1, .3, 2000);
   const hemi = new THREE.HemisphereLight(0xf4f6ff, 0xe2d4ff, 2.5); scene.add(hemi);
   const sun = new THREE.DirectionalLight(0xfff2ea, 2.6); sun.position.set(-45, 80, 50); scene.add(sun);
+  // The glowing stage lights Pyonpy from below, and spills softly onto everyone on the plaza. Strongest at night.
+  const stageLight = new THREE.PointLight(0xffd6f2, 0, 30, 1.5); stageLight.position.set(0, 1.1, 0); scene.add(stageLight);
+  const stageFill = new THREE.PointLight(0xbfe9ff, 0, 34, 1.4); stageFill.position.set(0, 6.5, 0); scene.add(stageFill);
   const pmrem = new THREE.PMREMGenerator(renderer);
   const envScene = new THREE.Scene(); envScene.add(makeSky(SKY));
   const dot = (() => { const c = document.createElement('canvas'); c.width = c.height = 64; const g = c.getContext('2d'), r = g.createRadialGradient(32, 32, 0, 32, 32, 32);
@@ -273,6 +276,7 @@ function start() {
     sun.color.copy(sunDay).lerp(sunNight, k); sun.intensity = lerp(2.6, .55, k);
     scene.environment = k > .5 ? envNight : envDay;
     uGlow.value = lerp(1, 1.75, k);
+    stageLight.intensity = lerp(6, 70, k); stageFill.intensity = lerp(0, 55, k);
     sk.panoMix.value = panoReady ? 1 - k : 0;
     uSkinGlow.value = lerp(.42, .02, k); uNight.value = k;   // the pictures light themselves a little, so shading does not darken their pastel colours if (N.skylineDay) { N.skylineDay.material.opacity = 1 - k; N.skylineNight.material.opacity = k; N.skylineNight.visible = k > .01; N.skylineDay.visible = k < .99; }
     if (N.plazaArt) N.plazaArt.material.color.setScalar(lerp(1, .55, k));
