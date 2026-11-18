@@ -208,3 +208,16 @@ body.is-loading .city-name{display:none}
 .city-menu,.city-menu ol,.city-menu li,.city-sns,.city-hint{pointer-events:none}
 .city-menu a,.city-sns a{pointer-events:auto}
 body.is-meeting .city-menu a,body.is-asking .city-menu a,body.is-meeting .city-sns a,body.is-asking .city-sns a,body.is-travelling .city-sns a{pointer-events:none}
+
+/* edit mode (?edit): camera angle sliders */
+.city-edit-open{pointer-events:auto;margin-left:12px;margin-right:auto;align-self:center;padding:8px 14px;border-radius:999px;border:2px dashed #ff7fc0;background:rgba(255,255,255,.9);color:#3a2a63;font:800 .8rem var(--city-round);cursor:pointer}
+.city-edit{position:fixed;z-index:40;left:14px;bottom:14px;width:min(340px,calc(100vw - 28px));padding:14px 16px;border-radius:18px;background:rgba(255,255,255,.95);border:2px solid #ff7fc0;color:#3a2a63;font:700 .78rem var(--city-round);box-shadow:0 12px 30px rgba(98,74,190,.3);display:grid;gap:7px}
+.city-edit[hidden]{display:none}
+.city-edit select,.city-edit textarea{width:100%;font:inherit;padding:5px 8px;border-radius:9px;border:1.5px solid #cdbdf5;background:#fff;color:inherit}
+.city-edit textarea{font:.72rem ui-monospace,monospace;resize:none}
+.city-edit label{display:grid;grid-template-columns:8.2em 1fr 3.2em;align-items:center;gap:6px}
+.city-edit input{width:100%}
+.city-edit output{text-align:right;font-variant-numeric:tabular-nums}
+.city-edit div{display:flex;flex-wrap:wrap;gap:6px}
+.city-edit button{flex:1;padding:7px 8px;border-radius:999px;border:0;background:linear-gradient(90deg,#ff8cc8,#8fd8ff);color:#fff;font:inherit;cursor:pointer;white-space:nowrap}
+.city-edit p{margin:0;font-weight:500;opacity:.75}

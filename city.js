@@ -665,7 +665,7 @@ function start() {
     while (target - view.azT > Math.PI) target -= Math.PI * 2;
     while (target - view.azT < -Math.PI) target += Math.PI * 2;
     view.azT = target; view.idle = 0;
-    if (id === 'game' || id === 'roadmap') view.tiltT = id === 'game' ? .34 : .75; else view.tiltT = .12;
+    if (id === 'game' || id === 'roadmap') view.tiltT = id === 'game' ? .2 : .75; else view.tiltT = .12;
   }
 
   // 07 SNS: look up at the airship and open the row of SNS buttons (the airship itself does the same when clicked).
@@ -677,8 +677,8 @@ function start() {
     const ship = traffic.find(t => t.id === 'airship');
     if (ship && !motionOff()) {
       ship.halt = true; sound.fx.whoosh(2.2);
-      const p = ship.car.position.clone().add(V(0, 33, 0)), out = p.clone().setY(0).normalize();
-      await fly(p.clone().addScaledVector(out, -112).add(V(0, -14, 0)), p, 2.3, 8);
+      const p = ship.car.position.clone().add(V(0, 39, 0)), out = p.clone().setY(0).normalize();
+      await fly(p.clone().addScaledVector(out, -132).add(V(0, -16, 0)), p, 2.3, 8);
       burst(p, PASTEL, 90, 14, 1.4); sound.fx.arrive();
     }
     // the same question as every other place: go in, or back to the city
@@ -689,7 +689,7 @@ function start() {
   }
   async function enterSns() {
     const {ship} = asking;
-    if (ship && !motionOff()) { const p = ship.car.position.clone().add(V(0, 33, 0)), out = p.clone().setY(0).normalize(); await fly(p.clone().addScaledVector(out, -62).add(V(0, -5, 0)), p, 1.1, 0); }
+    if (ship && !motionOff()) { const p = ship.car.position.clone().add(V(0, 39, 0)), out = p.clone().setY(0).normalize(); await fly(p.clone().addScaledVector(out, -73).add(V(0, -6, 0)), p, 1.1, 0); }
     wipeEl.classList.add('is-on'); await wait(.72); location.href = snsLink.href;
   }
   snsLink.addEventListener('pointerenter', () => { hotSns = true; snsLink.classList.add('is-hot'); sound.fx.hover(); });
@@ -1039,6 +1039,35 @@ function start() {
     canvas.style.cursor = hovered ? 'pointer' : '';
   });
   canvas.addEventListener('pointerleave', () => { hovered = null; canvas.style.cursor = ''; });
+  let editPlace = null;
+  if (new URL(location.href).searchParams.has('edit')) {
+    try { const saved = JSON.parse(localStorage.getItem('moonians.city-angles') || '{}'); for (const [id, ask] of Object.entries(saved)) if (PLACES[id] && Array.isArray(ask) && ask.length === 4) PLACES[id].ask = ask; } catch { /* optional */ }
+    const open = document.createElement('button'); open.type = 'button'; open.className = 'city-edit-open'; open.textContent = 'アングル編集';
+    (document.querySelector('.city-top .city-logo') || document.querySelector('.city-top').firstElementChild).insertAdjacentElement('afterend', open);
+    const panel = document.createElement('div'); panel.className = 'city-edit'; panel.hidden = true;
+    const FIELDS = [['向き（まわりこみ）', -3.14, 3.14, .01], ['距離', 5, 70, .1], ['カメラの高さ', -12, 45, .1], ['見る高さ', -6, 70, .1]];
+    panel.innerHTML = '<strong>アングル編集</strong><select></select>' + FIELDS.map(([label, min, max, step]) => `<label><span>${label}</span><input type="range" min="${min}" max="${max}" step="${step}"><output></output></label>`).join('') +
+      '<textarea readonly rows="7"></textarea><div><button type="button" data-do="copy">数字をコピー</button><button type="button" data-do="reset">この場所を元にもどす</button><button type="button" data-do="close">終わる</button></div><p>スライダーで決めて「数字をコピー」→ チャットに貼ってください。</p>';
+    document.body.appendChild(panel);
+    const pick = panel.querySelector('select'), ranges = [...panel.querySelectorAll('input')], outs = [...panel.querySelectorAll('output')], text = panel.querySelector('textarea');
+    const original = Object.fromEntries(Object.entries(PLACES).map(([id, p]) => [id, [...p.ask]]));
+    for (const [id, p] of Object.entries(PLACES)) pick.add(new Option(p.label, id));
+    const show = () => {
+      editPlace = PLACES[pick.value]; editPlace.ask.forEach((v, i) => { ranges[i].value = v; outs[i].textContent = (+v).toFixed(2); });
+      text.value = Object.entries(PLACES).map(([id, p]) => `${id}: [${p.ask.map(v => +(+v).toFixed(2)).join(', ')}]`).join('\n');
+      $('#enter-name').textContent = tr(editPlace.label); $('#enter-where').textContent = '';
+      try { localStorage.setItem('moonians.city-angles', JSON.stringify(Object.fromEntries(Object.entries(PLACES).map(([id, p]) => [id, p.ask])))); } catch { /* optional */ }
+    };
+    ranges.forEach((r, i) => r.addEventListener('input', () => { editPlace.ask[i] = +r.value; show(); }));
+    pick.addEventListener('change', show);
+    open.addEventListener('click', () => { if (mode !== 'orbit') return; mode = 'edit'; shiftT = -1; panel.hidden = false; enterEl.hidden = false; body.classList.add('is-asking'); show(); });
+    panel.addEventListener('click', event => {
+      const act = event.target.dataset.do; if (!act) return;
+      if (act === 'copy') { text.select(); navigator.clipboard?.writeText(text.value).then(() => { event.target.textContent = 'コピーしました'; setTimeout(() => { event.target.textContent = '数字をコピー'; }, 1500); }).catch(() => { document.execCommand('copy'); }); }
+      if (act === 'reset') { editPlace.ask = [...original[editPlace.id]]; show(); }
+      if (act === 'close') { editPlace = null; panel.hidden = true; enterEl.hidden = true; body.classList.remove('is-asking'); shiftT = 0; orbitPose(camPos, camLook); mode = 'orbit'; }
+    });
+  }
   function applyOffset() {
     const w = innerWidth, h = innerHeight;
     if (w < 760) camera.setViewOffset(w, h, 0, h * (.15 + .1 * Math.abs(shift)), w, h);
@@ -1167,7 +1196,7 @@ function start() {
   const ROUTES = {
     plaza: circle(6.6, .32), road: stadium(2.1, 21, 62, .22), ringA: circle(46, .06), ringB: circle(75, .06),
     low1: circle(34, -69.9), low2: circle(50, -69.9), low3: circle(22, -69.9),
-    air1: circle(20, 27), air2: circle(38, 22), air3: circle(58, 12), lift: helix(29, -62, 9, 3), sky: circle(62, 50),
+    air1: circle(20, 27), air2: circle(38, 22), air3: circle(58, 12), lift: helix(29, -62, 9, 3), sky: circle(90, 20),
     // Delivery rounds: each courier has its own winding path laid out in advance, at its own heights.
     airTourA: tour([[0, 11, -16], [14, 13, -6], [10, 10, 14], [5, 12, 34], [6, 15, 56], [-6, 17, 56], [-5, 13, 32], [-12, 11, 12], [-14, 14, -6]]),   // plaza, down the main road and back
     airTourB: tour([[-17, 19, 0], [-7, 23, 13], [5, 19, 6], [17, 22, -3], [9, 24, -15], [-3, 20, -7], [-12, 23, -16]]),                             // criss-crossing above the plaza
@@ -1177,7 +1206,7 @@ function start() {
   const CARS = {
     roadster: {height: 1.7, yaw: Math.PI / 2}, bubble: {height: 2.3, yaw: 0}, bus: {height: 3.1, yaw: Math.PI / 2}, van: {height: 2.7, yaw: Math.PI / 2},
     scooter: {height: 1.8, yaw: 0}, patrol: {height: 1.9, yaw: 0}, delivery: {height: 2.6, yaw: 0}, cart: {height: 2.9, yaw: Math.PI / 2},
-    airship: {height: 66, yaw: Math.PI / 2}        // the giant SNS airship
+    airship: {height: 78, yaw: Math.PI / 2}        // the giant SNS airship
   };
   const FLEET = [   // model, route, speed (m/s; negative = the other way), starting distance
     ['roadster', 'plaza', 3.2, 0], ['scooter', 'plaza', 3.2, 21],
@@ -1185,7 +1214,7 @@ function start() {
     ['bus', 'ringA', 6, 0], ['bubble', 'ringA', 6, 120], ['van', 'ringA', -5, 60], ['bus', 'ringB', -6, 0], ['scooter', 'ringB', 7, 200],
     ['cart', 'low1', 3.5, 0], ['van', 'low1', 3.5, 90], ['roadster', 'low2', -6, 0], ['cart', 'low2', -3, 130], ['scooter', 'low3', 4, 0], ['bubble', 'low2', -6, 240],
     ['patrol', 'air1', 4, 0], ['patrol', 'air2', 5, 80], ['patrol', 'air3', 6, 200], ['delivery', 'lift', 7, 0], ['delivery', 'airTourA', 5, 0], ['delivery', 'airTourB', 4.4, 30], ['delivery', 'airTourC', 4.8, 60],
-    ['airship', 'sky', -1.6, 40]
+    ['airship', 'sky', -2.1, 58]
   ];
   const traffic = []; let lineup = false;
   function loadTraffic() {
@@ -1206,7 +1235,7 @@ function start() {
               body.add(set);
             }
           }
-          if (id === 'airship') { const p = new THREE.Mesh(new THREE.SphereGeometry(38, 10, 8)); p.userData = {kind: 'airship', id}; proxies.push(p); car.userData.proxy = p; }
+          if (id === 'airship') { const p = new THREE.Mesh(new THREE.SphereGeometry(45, 10, 8)); p.userData = {kind: 'airship', id}; proxies.push(p); car.userData.proxy = p; }
           traffic.push({id, car, body, routeName: route, route: ROUTES[route], speed, d: id === 'airship' && airshipStart !== null ? airshipStart : start, phase: Math.random() * 6, air: /air|lift/.test(route)});
         });
       }, undefined, () => { /* traffic is optional */ });
@@ -1229,7 +1258,7 @@ function start() {
       t.car.position.copy(carPos); t.car.position.y += (t.air ? .5 : .12) * Math.sin(time * (t.air ? 1.6 : 2.4) + t.phase) + (t.air ? 0 : .25);
       t.car.rotation.y = Math.atan2(carNext.x - carPos.x, carNext.z - carPos.z);
       t.body.rotation.z = Math.sin(time * 1.7 + t.phase) * (t.id === 'airship' ? .012 : .04);
-      if (t.car.userData.proxy) { t.car.userData.proxy.position.copy(t.car.position); t.car.userData.proxy.position.y += 12; t.car.userData.proxy.updateMatrixWorld(); }
+      if (t.car.userData.proxy) { t.car.userData.proxy.position.copy(t.car.position); t.car.userData.proxy.position.y += 39; t.car.userData.proxy.updateMatrixWorld(); }
     }
   }
 
@@ -1326,7 +1355,7 @@ function start() {
   function finishIntro() {
     orbitPose(camPos, camLook);
     mode = 'orbit'; body.classList.add('is-exploring');
-    ufoAngle = 3.927; ufoRise = 0; const ship0 = traffic.find(t => t.id === 'airship'); if (ship0) ship0.d = -66.4; else airshipStart = -66.4;
+    ufoAngle = 3.927; ufoRise = 0; const ship0 = traffic.find(t => t.id === 'airship'); if (ship0) ship0.d = -96.4; else airshipStart = -96.4;
     hintEl.classList.add('is-on');
     setTimeout(() => { if (mode === 'orbit') hintEl.textContent = tr('ぴょんぴーをタップしてみてね。'); }, 7000);
     setTimeout(() => hintEl.classList.remove('is-on'), 14000);
@@ -1435,7 +1464,7 @@ function start() {
         const ship = traffic.find(t => t.id === 'airship');
         if (ship) { let target = Math.atan2(ship.car.position.x, ship.car.position.z) + Math.PI;
           while (target - view.azT > Math.PI) target -= Math.PI * 2; while (target - view.azT < -Math.PI) target += Math.PI * 2;
-          view.azT = target; view.tiltT = .62; view.idle = 0; }
+          view.azT = target; view.tiltT = .36; view.idle = 0; }
       }
       if (hotGame && N.UFO) {          // keep following the UFO while its menu item is pointed at
         let target = Math.atan2(N.UFO.position.x, N.UFO.position.z) + Math.PI;
@@ -1456,8 +1485,9 @@ function start() {
       const u = N.UFO;
       // The UFO circles high over the city; it holds still while the camera flies anywhere, so it is easy to reach.
       if (mode !== 'fly' && !still) { ufoAngle += dt * .16; ufoRise = Math.min(1, ufoRise + dt / 14); }
-      const ufoR = 25 + Math.sin(ufoAngle * 2.3) * 5;   // stays inside the Moon Tower's reach and above every roof
-      u.position.set(Math.cos(ufoAngle) * ufoR, lerp(20, 40, easeInOut(ufoRise)) + Math.sin(time * .7) * 4.5 * ufoRise + Math.sin(time * 2.6) * 1.1, Math.sin(ufoAngle) * ufoR);
+      const towerSide = Math.atan2(Math.sin(ufoAngle + Math.PI / 2), Math.cos(ufoAngle + Math.PI / 2));   // 0 when it is level with the Moon Tower
+      const ufoR = 40 + Math.sin(ufoAngle * 2.3) * 2.5 - 15 * Math.exp(-((towerSide / .45) ** 2));    // out beyond the landmarks, just above their roofs
+      u.position.set(Math.cos(ufoAngle) * ufoR, lerp(15, 25, easeInOut(ufoRise)) + Math.sin(time * .7) * 1.6 * ufoRise + Math.sin(time * 2.6) * .6, Math.sin(ufoAngle) * ufoR);
       u.rotation.y += dt * .35 * boost.ufo; u.rotation.z = Math.sin(time * .9) * .06; u.rotation.x = Math.cos(time * .7) * .05;
       if (N.ufoProxy) { N.ufoProxy.position.copy(u.position); N.ufoProxy.updateMatrixWorld(); }
       if (N.UFO_BeamMesh) N.UFO_BeamMesh.traverse(o => { if (o.isMesh) { o.material.opacity = boost.beam * (.8 + Math.sin(time * 22) * .2); o.visible = boost.beam > .01; } });
@@ -1506,6 +1536,7 @@ function start() {
     }
     for (const c of paintedClouds) { const a = c.userData.a + time * .006; c.position.set(Math.cos(a) * c.userData.r, c.userData.y, Math.sin(a) * c.userData.r); c.material.opacity = .95 - night * .7; }
     updateTraffic(dt, still); updateCast(dt, still); updateSns(dt); updateBigFace(dt);
+    if (mode === 'edit' && editPlace) { const v = vantage(editPlace); camPos.copy(v.pos); camLook.copy(v.look); }
     if (mode === 'ask' && asking && asking.id === 'game') { const v = vantage(asking.place), k = 1 - Math.pow(.02, dt); camPos.lerp(v.pos, k); camLook.lerp(v.look, k); }   // the UFO keeps flying, so the camera keeps up with it
     for (const m of signs) m.material.opacity = (.45 + .5 * night) * (.86 + .14 * Math.sin(time * 3.1 + m.userData.phase)) * (Math.sin(time * .7 + m.userData.phase * 2.3) > .985 ? .35 : 1);   // steady glow with a rare flicker
     if (N.stageArt && !still) N.stageArt.rotation.z += dt * .25;
