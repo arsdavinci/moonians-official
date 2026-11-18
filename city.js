@@ -901,6 +901,7 @@ function start() {
   // Each player is its own video with its own framing. The airship has one; a monitor in town has another that
   // starts on the other clip, part-way through, so the two never show the same picture.
   const snsPlayers = {};
+  const QUIET_SCREENS = ['Scr005', 'Scr006'];
   const RAMUNE_CLIPS = ['assets/city/ramune/1.mp4', 'assets/city/ramune/2.mp4'];
   function snsScreen(w, h, key = 'ship', startClip = 0, startAt = 0, clips = SNS_CLIPS, faceAt = .5) {
     let sns = snsPlayers[key];
@@ -943,7 +944,14 @@ function start() {
     // showing is furthest away, so the same footage is never seen side by side (or even in the same view).
     const shown = CLIPS.map(() => []);
     screens.forEach(node => {
-      if (node.name === 'Scr002') { node.add(snsScreen(node.userData.w, node.userData.h, 'ramune', 0, 0, RAMUNE_CLIPS, .68)); return; }   // DJ Ramune's own videos, framed on her face
+      if (QUIET_SCREENS.includes(node.name)) return;   // too many monitors on this side: these two stay blank panels
+      if (node.name === 'Scr002') {      // a tall display here, hanging down the face of the building, so more of her fits
+        const w = node.userData.w * 1.04, h = 7.8, drop = -(h - node.userData.h) / 2;
+        const back = new THREE.Mesh(new THREE.PlaneGeometry(w + .36, h + .36), new THREE.MeshBasicMaterial({color: 0x2b2a55, toneMapped: false})); back.position.set(0, drop, 1.75);
+        const rim = new THREE.Mesh(new THREE.PlaneGeometry(w + .6, h + .6), new THREE.MeshBasicMaterial({color: 0x7fe6d8, toneMapped: false})); rim.position.set(0, drop, 1.72);
+        const tall = snsScreen(w, h, 'ramune', 0, 0, RAMUNE_CLIPS, .66); tall.position.set(0, drop, 1.8);   // out in front of the building's rounded face
+        node.add(rim, back, tall); return;
+      }   // DJ Ramune's own videos, framed on her face
       if (node.name === 'Scr001') { node.add(snsScreen(node.userData.w, node.userData.h, 'town', 1, 6)); return; }   // the wide monitor by the workshop plays the dance videos, out of step with the airship
       const here = node.getWorldPosition(V(0, 0, 0)); let pick = 0, best = -1;
       CLIPS.forEach((clip, k) => { const apart = p => { let d = Math.abs(Math.atan2(p.z, p.x) - Math.atan2(here.z, here.x)); if (d > Math.PI) d = Math.PI * 2 - d; return d * 60 + p.distanceTo(here) * .15; };   // mostly: how far round the city
@@ -1312,7 +1320,8 @@ function start() {
       m.userData.phase = signs.length * 1.7; parent.add(m); signs.push(m); return m;
     };
     // one above or beside every monitor in the city
-    Object.entries(N).filter(([name, node]) => /^Scr\d+$/.test(name) && node.userData.w).forEach(([, node], i) => {
+    Object.entries(N).filter(([name, node]) => /^Scr\d+$/.test(name) && node.userData.w).forEach(([name, node], i) => {
+      if (QUIET_SCREENS.includes(name)) return;
       const w = node.userData.w, h = node.userData.h, k = i % 8;
       if (i % 3 === 0) hang(node, k, Math.max(3.2, h * 1.5), -w / 2 - .9, 0, .05, true);          // tall sign down the left edge
       else hang(node, k, Math.max(3, w * .95), 0, h / 2 + .75, .05, false);                      // wide sign over the top
@@ -1607,7 +1616,7 @@ function start() {
     const channel = new MessageChannel(); let wake = null;
     channel.port1.onmessage = () => { if (wake) wake(); };
     window.__city = {
-      get mode() { return mode; }, get debug() { return {signs, N, camera, landmarkModels, traffic, cast, jump(i, t) { moveIndex = i - 1; dance(); moveT = t; }}; },
+      get mode() { return mode; }, get debug() { return {signs, N, camera, landmarkModels, traffic, cast, peek(p, l) { mode = 'peek'; camPos.set(p[0], p[1], p[2]); camLook.set(l[0], l[1], l[2]); }, jump(i, t) { moveIndex = i - 1; dance(); moveT = t; }}; },
       lineup(on) { lineup = on; }, enter() { return enterPlace(); }, back() { return backToCity(); }, meet(id) { return meet(id); }, leave() { return leave(); },
       async advance(seconds) { for (let t = 0; t < seconds; t += 1 / 30) { step(1 / 30); await new Promise(resolve => { wake = resolve; channel.port2.postMessage(0); }); } return mode; }
     };
