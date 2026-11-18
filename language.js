@@ -119,7 +119,7 @@
     '宇宙船のコックピットに流れてきた、あのメロディー。':'A familiar melody drifts into the cockpit.', '窓の外には、宇宙ラーメンの屋台。':'Outside the window: a space ramen stall.', '「やっぱ宇宙ラーメンがいちばんやで！」':'“Nothing beats space ramen!”',
     '約18秒 ／ 音声あり':'About 18 sec / with sound', '第1話「宇宙ラーメン」を再生する':'Play episode 1, “Space Ramen”', '第1話「宇宙ラーメン」':'Episode 1, “Space Ramen”',
     'これからのお話':'Coming up next', '次のお話を、月でつくっています。':'The next stories are being made on the Moon.', '公開したら、ここに並びます。':'They’ll appear here once they’re out.',
-    '第2話':'Episode 2', '第3話':'Episode 3', '第4話':'Episode 4', 'タイトル未定':'Title to be announced', '制作中のお話。もう少し待っててな。':'In production. Hang tight a little longer.',
+    '第2話':'Episode 2', '第3話':'Episode 3', '第4話':'Episode 4', 'タイトル未定':'Title to be announced', 'ニンニン忍者ニンジンジャ':'Nin-Nin Ninja Ninjinja', 'グルーパー登場':'Enter Grouper', 'ぴょんすたーハンター':'Pyonster Hunter', '制作中のお話。もう少し待っててな。':'In production. Hang tight a little longer.',
     'キャスト':'Cast', '3Dのふたり':'The duo in 3D', '3Dアニメのらんぴょん。銀色の帽子とうさぎ耳、紫の瞳':'Ranpyon in 3D, with a silver cap, rabbit ears and purple eyes.', '3Dアニメのぴょんぴー。銀色の帽子をかぶった白いうさぎ':'Pyonpy in 3D, a white rabbit in a silver cap.',
     '新しいお話は、YouTubeとSNSでもお知らせします。':'New episodes will also be announced on YouTube and social media.',
     '公開中の':'Now', 'エピソード':'showing', 'これからの':'Coming', 'お話':'soon', '3Dの':'The duo', 'ふたり':'in 3D', 'YouTubeチャンネルを開く ↗':'Open our YouTube channel ↗',
