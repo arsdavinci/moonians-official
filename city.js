@@ -739,6 +739,15 @@ function start() {
           const anchor = PLACES[id].node; model.position.copy(anchor.position); model.quaternion.copy(anchor.quaternion); scene.add(model);
           spec.hide.forEach(name => { if (N[name]) N[name].visible = false; });
         }
+        if (id === 'friends') {        // the round display on the bunny building shows Yanavis's expressions, one after another
+          model.updateMatrixWorld(true);
+          const from = model.localToWorld(V(0, .4325, 1)), to = model.localToWorld(V(0, .4325, 0)), hit = new THREE.Raycaster(from, to.clone().sub(from).normalize()).intersectObject(model, true)[0];
+          const z = hit ? model.worldToLocal(hit.point.clone()).z : .26;
+          const back = new THREE.Mesh(new THREE.CircleGeometry(.116, 48), new THREE.MeshBasicMaterial({color: 0x0b0a1c, toneMapped: false})); back.position.set(0, .4325, z + .004); model.add(back);
+          const map = textures.load('assets/city/yanavis-faces.webp', t => { t.colorSpace = THREE.SRGBColorSpace; }); map.repeat.set(1 / 6, 1);
+          const face = new THREE.Mesh(new THREE.PlaneGeometry(.2, .2), new THREE.MeshBasicMaterial({map, transparent: true, toneMapped: false})); face.position.set(0, .4325, z + .007); model.add(face);
+          bigFace = {map, face, now: 0, until: 0, pop: 0};
+        }
         landmarkModels[id] = model;
       }, undefined, () => { /* the hand-built landmark stays */ });
     }
@@ -980,6 +989,12 @@ function start() {
     }
     return best;
   }
+  let bigFace = null;
+  function updateBigFace(dt) {
+    if (!bigFace) return;
+    if (time > bigFace.until) { let next = Math.floor(Math.random() * 6); if (next === bigFace.now) next = (next + 1) % 6; bigFace.now = next; bigFace.map.offset.x = next / 6; bigFace.until = time + .9 + Math.random() * .9; bigFace.pop = 1; }
+    bigFace.pop = Math.max(0, bigFace.pop - dt * 4); bigFace.face.scale.setScalar(1 + Math.sin(bigFace.pop * Math.PI) * .16);   // each new face pops in
+  }
   function updateName() {             // a small name tag over whoever is pointed at, and over whoever's profile is open
     const m = (mode === 'meet' || (mode === 'fly' && meeting)) ? (hovered || meeting) : mode === 'orbit' ? hovered : null;
     if (!m) { nameEl.hidden = true; return; }
@@ -1097,7 +1112,7 @@ function start() {
       else hang(node, k, Math.max(3, w * .95), 0, h / 2 + .75, .05, false);                      // wide sign over the top
     });
     // a ring of signs round the plaza, and tall ones along the main road
-    for (let i = 0; i < 8; i++) { const a = i / 8 * Math.PI * 2 + .39, g = new THREE.Group(); g.position.set(Math.cos(a) * 25.2, 6.2 + (i % 2) * 1.6, Math.sin(a) * 25.2); g.rotation.y = -a - Math.PI / 2; scene.add(g); hang(g, (i + 3) % 8, 5.2, 0, 0, 0, i % 2 === 1); }
+    for (let i = 0; i < 8; i++) { if (i === 2 || i === 7) continue; const a = i / 8 * Math.PI * 2 + .39, g = new THREE.Group(); g.position.set(Math.cos(a) * 25.2, 6.2 + (i % 2) * 1.6, Math.sin(a) * 25.2); g.rotation.y = -a - Math.PI / 2; scene.add(g); hang(g, (i + 3) % 8, 5.2, 0, 0, 0, i % 2 === 1); }
     for (let i = 0; i < 6; i++) { const g = new THREE.Group(), side = i % 2 ? 1 : -1; g.position.set(side * 8.4, 5.5, 26 + i * 6.5); g.rotation.y = side > 0 ? -Math.PI / 2 : Math.PI / 2; scene.add(g); hang(g, (i + 5) % 8, 4.6, 0, 0, 0, true); }
   }
 
@@ -1351,7 +1366,7 @@ function start() {
     const channel = new MessageChannel(); let wake = null;
     channel.port1.onmessage = () => { if (wake) wake(); };
     window.__city = {
-      get mode() { return mode; },
+      get mode() { return mode; }, get debug() { return {signs, N, camera, landmarkModels}; },
       lineup(on) { lineup = on; }, enter() { return enterPlace(); }, back() { return backToCity(); }, meet(id) { return meet(id); }, leave() { return leave(); },
       async advance(seconds) { for (let t = 0; t < seconds; t += 1 / 30) { step(1 / 30); await new Promise(resolve => { wake = resolve; channel.port2.postMessage(0); }); } return mode; }
     };
@@ -1440,7 +1455,7 @@ function start() {
       m.material.opacity = (.75 + .25 * Math.sin(time * 5 + m.position.x)) * (.7 + .3 * night);
     }
     for (const c of paintedClouds) { const a = c.userData.a + time * .006; c.position.set(Math.cos(a) * c.userData.r, c.userData.y, Math.sin(a) * c.userData.r); c.material.opacity = .95 - night * .7; }
-    updateTraffic(dt, still); updateCast(dt, still); updateSns(dt);
+    updateTraffic(dt, still); updateCast(dt, still); updateSns(dt); updateBigFace(dt);
     for (const m of signs) m.material.opacity = (.45 + .5 * night) * (.86 + .14 * Math.sin(time * 3.1 + m.userData.phase)) * (Math.sin(time * .7 + m.userData.phase * 2.3) > .985 ? .35 : 1);   // steady glow with a rare flicker
     if (N.stageArt && !still) N.stageArt.rotation.z += dt * .25;
     updateBursts(dt);
