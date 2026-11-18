@@ -969,7 +969,7 @@ function start() {
   let meeting = null, shift = 0, shiftT = 0, profileRide = false;
   function loadCast() {
     Object.entries(CAST).forEach(([id, spec], index) => {
-      new GLTFLoader().load(`assets/city/cast/${id}.glb?v=20261118-2`, gltf => {
+      new GLTFLoader().load(`assets/city/cast/${id}.glb?v=20261118-3`, gltf => {
         const model = gltf.scene; model.scale.setScalar(spec.height); model.rotation.y = spec.yaw;
         model.traverse(node => { if (node.isMesh) { node.frustumCulled = false; (Array.isArray(node.material) ? node.material : [node.material]).forEach(m => { m.envMapIntensity = .5; m.roughness = .55; m.metalness = 0; }); } });
         const group = new THREE.Group(); group.add(model); scene.add(group);
