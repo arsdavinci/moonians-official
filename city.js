@@ -133,17 +133,17 @@ function start() {
   const tileTexture = textures.load('assets/city/floor-tile.jpg', texture => { texture.colorSpace = THREE.SRGBColorSpace; texture.wrapS = texture.wrapT = THREE.RepeatWrapping; texture.anisotropy = 4; });
   // Building skins: the facade pictures are wrapped onto walls by world position (side walls) and roofs get
   // the rooftop picture, so the merged low-poly city needs no UVs. At night the pictures glow a little.
-  const uSkinGlow = {value: 0};
+  const uSkinGlow = {value: .42};
   const skinTextures = {};
   const skinTexture = name => skinTextures[name] || (skinTextures[name] = textures.load(`assets/city/tex/${name}.jpg`, t => { t.colorSpace = THREE.SRGBColorSpace; t.wrapS = t.wrapT = THREE.RepeatWrapping; t.anisotropy = 4; }));
   function skinned(source, wall, roof, size) {
     const material = source.clone(); material.color.set(0xffffff);
     material.onBeforeCompile = shader => {
       shader.uniforms.uWall = {value: skinTexture(wall)}; shader.uniforms.uRoof = {value: skinTexture(roof)}; shader.uniforms.uSkinGlow = uSkinGlow; shader.uniforms.uSkinSize = {value: 1 / size};
-      shader.vertexShader = shader.vertexShader.replace('#include <common>', '#include <common>\nvarying vec3 vSkinPos; varying vec3 vSkinNormal;')
-        .replace('#include <project_vertex>', '#include <project_vertex>\nvSkinPos = (modelMatrix * vec4(transformed, 1.0)).xyz; vSkinNormal = normalize(mat3(modelMatrix) * objectNormal);');
-      shader.fragmentShader = shader.fragmentShader.replace('#include <common>', '#include <common>\nuniform sampler2D uWall; uniform sampler2D uRoof; uniform float uSkinGlow; uniform float uSkinSize; varying vec3 vSkinPos; varying vec3 vSkinNormal; vec3 skinColor;')
-        .replace('#include <map_fragment>', '#include <map_fragment>\nvec3 sn = normalize(vSkinNormal);\nif (abs(sn.y) > 0.75) skinColor = texture2D(uRoof, vSkinPos.xz * uSkinSize).rgb;\nelse skinColor = texture2D(uWall, vec2(vSkinPos.x * sn.z - vSkinPos.z * sn.x, vSkinPos.y) * uSkinSize).rgb;\nskinColor = pow(skinColor, vec3(2.2));\ndiffuseColor.rgb = skinColor;')
+      shader.vertexShader = shader.vertexShader.replace('#include <common>', '#include <common>\nvarying vec3 vSkinPos; varying vec3 vSkinNormal; varying vec2 vSkinUv;')
+        .replace('#include <project_vertex>', '#include <project_vertex>\nvSkinPos = (modelMatrix * vec4(transformed, 1.0)).xyz; vSkinNormal = normalize(mat3(modelMatrix) * objectNormal); vSkinUv = uv;');
+      shader.fragmentShader = shader.fragmentShader.replace('#include <common>', '#include <common>\nuniform sampler2D uWall; uniform sampler2D uRoof; uniform float uSkinGlow; uniform float uSkinSize; varying vec3 vSkinPos; varying vec3 vSkinNormal; varying vec2 vSkinUv; vec3 skinColor;')
+        .replace('#include <map_fragment>', '#include <map_fragment>\nvec3 sn = normalize(vSkinNormal);\nif (abs(sn.y) > 0.75) skinColor = texture2D(uRoof, vSkinPos.xz * uSkinSize).rgb;\nelse skinColor = texture2D(uWall, vSkinUv * uSkinSize).rgb;\nskinColor = mix(pow(skinColor, vec3(2.2)), vec3(0.95, 0.93, 1.0), 0.34);\ndiffuseColor.rgb = skinColor;')
         .replace('#include <emissivemap_fragment>', '#include <emissivemap_fragment>\ntotalEmissiveRadiance += skinColor * uSkinGlow;');
     };
     material.customProgramCacheKey = () => 'skin-' + wall + roof + size;
@@ -178,7 +178,7 @@ function start() {
     };
     material.customProgramCacheKey = () => 'tiled';
   }
-  scene.fog = new THREE.Fog(0xdde6ff, 120, 560);
+  scene.fog = new THREE.Fog(0xe8e4ff, 55, 400);   // far things fade into a pale pastel haze
   const camera = new THREE.PerspectiveCamera(50, 1, .3, 2000);
   const hemi = new THREE.HemisphereLight(0xf4f6ff, 0xe2d4ff, 2.5); scene.add(hemi);
   const sun = new THREE.DirectionalLight(0xfff2ea, 2.6); sun.position.set(-45, 80, 50); scene.add(sun);
@@ -194,7 +194,7 @@ function start() {
   const envNightScene = new THREE.Scene(); envNightScene.add(makeSky(NIGHT_SKY));
   const envNight = pmrem.fromScene(envNightScene, .03).texture;
   const skyDay = SKY.map(c => new THREE.Color(c)), skyNight = NIGHT_SKY.map(c => new THREE.Color(c));
-  const fogDay = new THREE.Color(0xdde6ff), fogNight = new THREE.Color(0x1b1450);
+  const fogDay = new THREE.Color(0xe8e4ff), fogNight = new THREE.Color(0x1b1450);
   const sunDay = new THREE.Color(0xfff2ea), sunNight = new THREE.Color(0x8fa4ff);
   const hemiSkyDay = new THREE.Color(0xf4f6ff), hemiSkyNight = new THREE.Color(0x4a47b0), hemiGroundDay = new THREE.Color(0xe2d4ff), hemiGroundNight = new THREE.Color(0x3a2a80);
   let night = 0, nightT = 0;
@@ -263,7 +263,7 @@ function start() {
     scene.environment = k > .5 ? envNight : envDay;
     uGlow.value = lerp(1, 1.75, k);
     sk.panoMix.value = panoReady ? 1 - k : 0;
-    uSkinGlow.value = k * .6; if (N.skylineDay) { N.skylineDay.material.opacity = 1 - k; N.skylineNight.material.opacity = k; N.skylineNight.visible = k > .01; N.skylineDay.visible = k < .99; }
+    uSkinGlow.value = lerp(.42, .55, k);   // the pictures light themselves a little, so shading does not darken their pastel colours if (N.skylineDay) { N.skylineDay.material.opacity = 1 - k; N.skylineNight.material.opacity = k; N.skylineNight.visible = k > .01; N.skylineDay.visible = k < .99; }
     if (N.plazaArt) N.plazaArt.material.color.setScalar(lerp(1, .55, k));
     stars.material.opacity = k; moonDisc.material.opacity = k * .95; sunDisc.material.opacity = (1 - k) * .95;
     if (keep.cloud) keep.cloud.emissiveIntensity = lerp(.34, .04, k);
@@ -718,6 +718,9 @@ function start() {
               text: 'らんぴょんの妹。月でDJをしています。'},
     pt:      {height: 1.1, yaw: 0, route: circle(4.4, .3), speed: .9, ride: 'roadster', seat: [.5, .98, -.05], kicker: 'PTPUTY / PT', role: 'らむねの相方', name: 'ピーティープティ',
               text: 'ニックネームは「PT」。DJらむねの相方で、親友。好きなのは、ぴょんぴー。身長はおよそ45cm。'},
+    // Grouper grooves on the spot in front of the Music Dome.
+    grouper: {height: 3.0, yaw: 0, route: circle(.7, .22, 14.2, 11), speed: .35, dance: true, view: [-.8, -.6], kicker: 'GROUPER', role: '音楽の星のエイリアン', name: 'グルーパー',
+              text: '音楽の星「グルーヴィア星」から来た、機械の体のエイリアン。「地球の音楽はクソすぎる！」と地球を破壊しに来たけれど、ぴょんぴーとのラップバトルでそのバイブスに感化され、まさかの友達に。地球滅亡は、ギリギリで回避されました。'},
     // Yanavis rolls on wheels: a smooth glide round the outer ring of the plaza, with a little bump now and then.
     robot:   {height: 1.9, yaw: 0, route: circle(16, .3), speed: 1.7, glide: true, kicker: 'Y.A.N.A.V.I.S', role: '人工知能', name: 'ヤナビス',
               text: '翻訳酸素カプセルから聞こえる声の主。ぴょんぴーのムーニアン語を、日本語に同時翻訳してくれる人工知能です。'}
@@ -737,7 +740,7 @@ function start() {
         gltf.animations.forEach(clip => { actions[clip.name] = mixer.clipAction(clip); });
         const member = {id, spec, group, mixer, actions, active: null, d: index * 7, facing: 0, stopped: false};
         member.proxy = new THREE.Mesh(new THREE.SphereGeometry(spec.height * .62, 10, 8)); member.proxy.userData = {kind: 'cast', id}; proxies.push(member.proxy);
-        mixer.addEventListener('finished', () => playCast(member, member.stopped || spec.glide || spec.ride ? 'Idle' : 'Walk'));
+        mixer.addEventListener('finished', () => playCast(member, member.stopped || spec.glide || spec.ride ? 'Idle' : spec.dance ? 'React' : 'Walk'));
         if (id === 'robot') {          // Yanavis's face is a display: six expressions that change by themselves and when it is clicked
           const map = textures.load('assets/city/yanavis-faces.webp', t => { t.colorSpace = THREE.SRGBColorSpace; }); map.repeat.set(1 / 6, 1);
           const face = new THREE.Mesh(new THREE.CircleGeometry(.158, 40), new THREE.MeshBasicMaterial({map, transparent: true, toneMapped: false}));
@@ -772,6 +775,10 @@ function start() {
       } else {
         if (!m.stopped && !still) m.d += m.spec.speed * dt;
         m.spec.route.at(m.d, castPos); m.spec.route.at(m.d + .4, castNext);
+        if (m.spec.dance) {            // riding the rhythm: a looping hop-and-nod, a bounce and a sway, always facing the plaza
+          if (m.active !== m.actions.React && !m.stopped) playCast(m, 'React');
+          castPos.y += Math.abs(Math.sin(time * 4.6)) * .14; castNext.set(castPos.x - castPos.x * .1 + Math.sin(time * 2.3) * .5, 0, castPos.z - castPos.z * .1);
+        }
         if (m.spec.glide) {            // wheels: no walking sway, just an occasional "koton, koton" over an imagined pebble
           if (m.active === m.actions.Walk) playCast(m, 'Idle');
           const p = (m.d / m.spec.speed) % 5.2;
@@ -1005,7 +1012,7 @@ function start() {
     profileEl.hidden = true; shiftT = 0; body.classList.remove('is-meeting'); if (meeting) { meeting.stopped = false; meeting = null; }
   });
 
-  new GLTFLoader().load('assets/city/pastel-moon-city.glb?v=20261118-4', gltf => {
+  new GLTFLoader().load('assets/city/pastel-moon-city.glb?v=20261118-5', gltf => {
     try { build(gltf); } catch (error) { console.error(error); fail(); return; }
     progress = 1;
   }, event => { progress = Math.min(.98, event.loaded / (event.total || 3460872)); }, () => fail());
