@@ -742,7 +742,13 @@ function start() {
   const landmarkModels = {};
   function loadLandmarks() {
     for (const [id, spec] of Object.entries(MODELS)) {
-      new GLTFLoader().load(`assets/city/lm/${id}.glb?v=20261118-2`, gltf => {
+      spec.hide.forEach(name => { if (N[name]) N[name].visible = false; });
+      let tries = 0;
+      const giveUp = () => {             // a failed download is tried again; only after three failures does the simple stand-in come back
+        if (++tries < 3) { setTimeout(fetchModel, 1500 * tries); return; }
+        spec.hide.forEach(name => { if (N[name]) N[name].visible = true; }); if (id === 'anime' && N.bigScreen) N.bigScreen.visible = false;
+      };
+      const fetchModel = () => new GLTFLoader().load(`assets/city/lm/${id}.glb?v=20261118-3`, gltf => {
         const model = gltf.scene;
         model.traverse(node => { if (node.isMesh) (Array.isArray(node.material) ? node.material : [node.material]).forEach(m => { m.envMapIntensity = .45; m.roughness = .5; m.metalness = 0; nightLights(m); }); });
         model.scale.setScalar(spec.height);
@@ -778,8 +784,9 @@ function start() {
           const face = laid(.2, .006, blue);
           bigFace = {map, face, now: 0, until: 0, pop: 0};
         }
-        landmarkModels[id] = model;
-      }, undefined, () => { /* the hand-built landmark stays */ });
+        landmarkModels[id] = model; if (id === 'anime' && N.bigScreen) N.bigScreen.visible = true;
+      }, undefined, giveUp);
+      fetchModel();
     }
   }
   // He dances on the stage, facing the main road. A routine of moves runs one after another: some are his own clips
@@ -904,7 +911,7 @@ function start() {
     screens.forEach((node, i) => node.add(videoScreen(CLIPS[i % CLIPS.length], node.userData.w, node.userData.h)));
     const anchor = PLACES.anime.node, big = videoScreen('anime/uchu-ramen', 11.9, 6.7);
     const holder = new THREE.Group(); holder.position.copy(anchor.position); holder.quaternion.copy(anchor.quaternion);
-    big.position.set(0, 10.5, 5.8); holder.add(big); scene.add(holder);
+    big.position.set(0, 10.5, 5.8); holder.add(big); scene.add(holder); N.bigScreen = holder; holder.visible = !!landmarkModels.anime;   // shown once its building is there
     addEventListener('pointerdown', () => videos.forEach(v => { if (v.el.paused) v.el.play().catch(() => {}); }), {passive: true});
   }
 
