@@ -378,7 +378,7 @@ function start() {
   /* ── the city ── */
   const N = {};                     // named nodes from the model
   const PLACES = {
-    anime:   {anchor: 'Anchor_Anime',   label: '3Dアニメ',       labelY: 9, dist: 27, h: 7,   lookY: 14, ask: [-.55, 25, 2.0, 12.5]},
+    anime:   {anchor: 'Anchor_Anime',   label: '3Dアニメ',       labelY: 16, dist: 27, h: 7,   lookY: 14, ask: [-.55, 25, 2.0, 12.5]},
     game:    {anchor: 'Anchor_Game',    label: 'ゲーム',         labelY: 5.6, dist: 17, h: -5, lookY: 0, ask: [.6, 21, -9.5, .6]},
     music:   {anchor: 'Anchor_Music',   label: '音楽',           labelY: 6, dist: 25, h: 4.4, lookY: 6.2, ask: [-.55, 22, 1.9, 6.6]},
     friends: {anchor: 'Anchor_Friends', label: '愉快な仲間たち', labelY: 9, dist: 18, h: 4.6, lookY: 7, ask: [-.5, 17.5, 1.8, 7.6]},
