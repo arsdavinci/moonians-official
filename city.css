@@ -93,6 +93,20 @@ body.is-loading .city-main,body.is-loading .city-top{opacity:0;pointer-events:no
 .city-main,.city-top{transition:opacity .7s}
 body.is-loading .city-main *,body.is-loading .city-top *{pointer-events:none}
 
+/* ---- character profile: the character stands on the right, the card on the left */
+.city-profile{position:fixed;z-index:25;left:max(28px,env(safe-area-inset-left,0px));top:50%;transform:translateY(-50%);width:min(400px,40vw);padding:24px 24px 22px;border-radius:28px;
+  color:var(--city-ink);background:var(--city-glass-strong);border:1.5px solid var(--city-line);-webkit-backdrop-filter:blur(16px) saturate(1.4);backdrop-filter:blur(16px) saturate(1.4);
+  box-shadow:0 18px 50px rgba(98,74,190,.32),0 0 0 1px rgba(255,255,255,.4) inset;animation:city-pop .45s cubic-bezier(.2,1.4,.4,1) both}
+.city-profile-kicker{margin:0;font:.76rem var(--city-dot);letter-spacing:.24em;color:var(--city-pink-deep)}
+.city-profile-role{margin:6px 0 0;font-size:.8rem;color:var(--city-mint-deep)}
+.city-profile h2{margin:2px 0 10px;font-size:1.7rem;font-weight:900;line-height:1.25}
+.city-profile-text{margin:0;font-size:.92rem;line-height:1.8;color:var(--city-ink-soft)}
+.city-profile-actions{display:flex;flex-direction:column;gap:8px;margin-top:18px}
+.city-profile-actions .city-button{display:flex;align-items:center;justify-content:center;text-decoration:none}
+body.is-meeting .city-menu,body.is-meeting .city-hint,body.is-meeting .city-labels,body.is-meeting .city-bubble{opacity:0;pointer-events:none}
+.city-menu,.city-labels{transition:opacity .4s}
+@media (max-width:759px){ .city-profile{left:var(--pad-x);right:var(--pad-r);top:auto;bottom:calc(14px + env(safe-area-inset-bottom,0px));transform:none;width:auto;padding:18px} .city-profile h2{font-size:1.35rem} .city-profile-text{font-size:.84rem;line-height:1.65} }
+
 /* ---- loader and the sound gate */
 .city-loader{position:fixed;inset:0;z-index:40;display:grid;place-items:center;padding:24px var(--pad-r) calc(24px + env(safe-area-inset-bottom,0px)) var(--pad-x);
   color:#fff;transition:opacity .9s,visibility .9s;pointer-events:none}

@@ -16,10 +16,10 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DotGothic16&family=M+PLUS+Rounded+1c:wght@700;800;900&family=Unbounded:wght@700;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="city.css?v=20261118-2">
+  <link rel="stylesheet" href="city.css?v=20261118-3">
   <script type="importmap">{"imports":{"three":"./vendor/three/three.module.min.js"}}</script>
-  <script src="language.js?v=20261118-2"></script>
-  <script type="module" src="city.js?v=20261118-9"></script>
+  <script src="language.js?v=20261118-3"></script>
+  <script type="module" src="city.js?v=20261118-11"></script>
 </head>
 <body class="city-page is-loading">
   <canvas id="city-canvas" aria-hidden="true"></canvas>
@@ -59,6 +59,17 @@
 
   <div class="city-labels" id="city-labels"></div>
   <div class="city-bubble" id="city-bubble" role="status" aria-live="polite" hidden></div>
+
+  <aside class="city-profile" id="city-profile" hidden>
+    <p class="city-profile-kicker" id="profile-kicker" translate="no"></p>
+    <p class="city-profile-role" id="profile-role"></p>
+    <h2 id="profile-name"></h2>
+    <p class="city-profile-text" id="profile-text"></p>
+    <div class="city-profile-actions">
+      <a class="city-button is-primary" id="profile-link" href="friends.html" data-language-link>他の仲間たちを見る</a>
+      <button class="city-button" id="profile-close" type="button">街にもどる</button>
+    </div>
+  </aside>
 
   <div class="city-loader" id="city-loader">
     <div class="city-progress" id="city-progress">

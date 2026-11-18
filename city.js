@@ -658,10 +658,110 @@ function start() {
     addEventListener('pointerdown', () => videos.forEach(v => { if (v.el.paused) v.el.play().catch(() => {}); }), {passive: true});
   }
 
+  /* ── the cast: characters who walk about the city. Click one to meet them. ── */
+  const segment = (x0, z0, x1, z1, y) => { const L = Math.hypot(x1 - x0, z1 - z0); return {length: L * 2, at: (d, out) => { d = ((d % (L * 2)) + L * 2) % (L * 2); const k = (d < L ? d : L * 2 - d) / L; out.set(lerp(x0, x1, k), y, lerp(z0, z1, k)); }}; };
+  const CAST = {
+    ranpyon: {height: 2.3, yaw: 0, route: circle(4.4, .3), speed: .9, ride: 'scooter', kicker: 'RANPYON', role: 'ツッコミ担当', name: 'らんぴょん',
+              text: '地球人とムーニアンのハーフ。自分の「好き」を形にする、クリエイターなツッコミ担当。'},
+    luva:    {height: 3.1, yaw: 0, route: segment(-1.3, -19.5, -1.3, -33, .22), speed: .7, view: [.25, 1], kicker: 'ZA-LUVA SELES', role: '二人の上司', name: 'ザ・ルーヴァ・セレス',
+              text: '三日月大使館（クレッセントエンバシー）の偉い人。らんぴょんとぴょんぴーの上司です。胸には三日月、手にはマイク。二人の地球での活動を、おだやかな笑顔で見守っています。'},
+    kaguya:  {height: 2.7, yaw: 0, route: segment(3.9, 22, 3.9, 42, .22), speed: .6, view: [-1, -.35], kicker: 'PRINCESS KAGUYA', role: '月の宮の皇族', name: 'かぐや様',
+              text: '月の宮に住む、皇族のお姫さま。三日月の髪飾りに、竹と月の模様の衣をまとい、手には扇。そして、ぴょんぴーの好きな人です。'},
+    robot:   {height: 1.9, yaw: 0, route: segment(-3.9, 24, -3.9, 58, .22), speed: 1.6, view: [1, -.35], kicker: 'BUNNY ROBOT', role: '街の案内ロボ', name: 'うさぎロボ',
+              text: '街を走りまわる、うさぎ型の案内ロボ。困っている人を見つけると、すぐにかけつけます。名前は、まだ調査中です。'}
+  };
+  const cast = [], profileEl = $('#city-profile');
+  let meeting = null, shift = 0, shiftT = 0;
+  function loadCast() {
+    Object.entries(CAST).forEach(([id, spec], index) => {
+      new GLTFLoader().load(`assets/city/cast/${id}.glb?v=20261118-1`, gltf => {
+        const model = gltf.scene; model.scale.setScalar(spec.height); model.rotation.y = spec.yaw;
+        model.traverse(node => { if (node.isMesh) { node.frustumCulled = false; (Array.isArray(node.material) ? node.material : [node.material]).forEach(m => { m.envMapIntensity = .5; m.roughness = .55; m.metalness = 0; }); } });
+        const group = new THREE.Group(); group.add(model); scene.add(group);
+        const mixer = new THREE.AnimationMixer(model), actions = {};
+        gltf.animations.forEach(clip => { actions[clip.name] = mixer.clipAction(clip); });
+        const member = {id, spec, group, mixer, actions, active: null, d: index * 7, facing: 0, stopped: false};
+        member.proxy = new THREE.Mesh(new THREE.SphereGeometry(spec.height * .62, 10, 8)); member.proxy.userData = {kind: 'cast', id}; proxies.push(member.proxy);
+        mixer.addEventListener('finished', () => playCast(member, member.stopped ? 'Idle' : 'Walk'));
+        playCast(member, 'Walk'); cast.push(member);
+      }, undefined, () => { /* the city works without them */ });
+    });
+  }
+  function playCast(member, name, once = false) {
+    const next = member.actions[name]; if (!next) return;
+    next.reset(); next.setLoop(once ? THREE.LoopOnce : THREE.LoopRepeat, Infinity); next.clampWhenFinished = once;
+    if (member.active && member.active !== next) next.crossFadeFrom(member.active, .25, false);
+    next.play(); member.active = next;
+  }
+  const castPos = V(0, 0, 0), castNext = V(0, 0, 0);
+  function updateCast(dt, still) {
+    if (lineup) { cast.forEach((m, i) => { m.group.position.set(-4.5 + i * 3, .3, 8.5); m.group.rotation.y = 0; if (!still) m.mixer.update(dt); }); return; }
+    for (const m of cast) {
+      // A rider goes wherever their vehicle goes (Ranpyon on the plaza scooter); everyone else walks their own route.
+      const mount = m.spec.ride ? traffic.find(t => t.id === m.spec.ride && t.routeName === 'plaza') : null;
+      if (mount) {
+        mount.halt = m.stopped; castPos.copy(mount.car.position); castPos.y += .42;
+        castNext.copy(castPos).add(tmp.set(Math.sin(mount.car.rotation.y), 0, Math.cos(mount.car.rotation.y)));
+        if (m.active === m.actions.Walk) playCast(m, 'Idle');
+      } else {
+        if (!m.stopped && !still) m.d += m.spec.speed * dt;
+        m.spec.route.at(m.d, castPos); m.spec.route.at(m.d + .4, castNext);
+      }
+      m.group.position.copy(castPos);
+      let want = m.stopped ? Math.atan2(camPos.x - castPos.x, camPos.z - castPos.z) : Math.atan2(castNext.x - castPos.x, castNext.z - castPos.z), delta = want - m.facing;
+      while (delta > Math.PI) delta -= Math.PI * 2; while (delta < -Math.PI) delta += Math.PI * 2;
+      m.facing += delta * (1 - Math.pow(.01, dt)); m.group.rotation.y = m.facing;
+      if (!still) m.mixer.update(dt);
+      m.proxy.position.copy(castPos); m.proxy.position.y += m.spec.height * .55; m.proxy.updateMatrixWorld();
+    }
+    // slide the view sideways while a profile is open, so the character stands on the right
+    if (Math.abs(shiftT - shift) > .001) { shift = lerp(shift, shiftT, 1 - Math.pow(.01, dt)); applyOffset(); } else if (shift !== shiftT) { shift = shiftT; applyOffset(); }
+  }
+  function applyOffset() {
+    const w = innerWidth, h = innerHeight;
+    if (w < 760) camera.setViewOffset(w, h, 0, h * (.15 + .1 * shift), w, h);
+    else if (shift > 0) camera.setViewOffset(w, h, -w * .2 * shift, 0, w, h);
+    else camera.clearViewOffset();
+    camera.updateProjectionMatrix();
+  }
+  async function meet(id) {
+    const m = cast.find(x => x.id === id); if (!m || mode !== 'orbit') return;
+    mode = 'fly'; meeting = m; m.stopped = true; body.classList.add('is-meeting');
+    hintEl.classList.remove('is-on'); bubbleEl.hidden = true;
+    sound.fx.select(); playCast(m, 'Idle');
+    const p = m.group.position.clone(), eye = m.spec.height * .58;
+    // stand where the view is clear: a set side for those on the roads, otherwise wherever the camera already is
+    const away = (m.spec.view ? V(m.spec.view[0], 0, m.spec.view[1]) : camPos.clone().sub(p).setY(0)).normalize();
+    shiftT = 1;
+    if (motionOff()) { camPos.copy(p).addScaledVector(away, m.spec.height * 2.5).add(V(0, eye, 0)); camLook.copy(p).add(V(0, eye, 0)); }
+    else await fly(p.clone().addScaledVector(away, m.spec.height * 2.5).add(V(0, eye, 0)), p.clone().add(V(0, eye, 0)), 1.5, 1.2);
+    playCast(m, 'React', true); sound.fx.pop(); sound.fx.arrive();
+    burst(p.clone().add(V(0, m.spec.height * .9, 0)), PASTEL, 46, 5, .7);
+    $('#profile-kicker').textContent = m.spec.kicker; $('#profile-role').textContent = tr(m.spec.role);
+    $('#profile-name').textContent = tr(m.spec.name); $('#profile-text').textContent = tr(m.spec.text);
+    profileEl.hidden = false; mode = 'meet';
+    $('#profile-link').focus({preventScroll: true});
+  }
+  async function leave() {
+    if (mode !== 'meet' || !meeting) return;
+    const m = meeting; profileEl.hidden = true; mode = 'fly'; shiftT = 0;
+    orbitPose(tmp, tmp2);
+    if (!motionOff()) await fly(tmp.clone(), tmp2.clone(), 1.3, 1);
+    m.stopped = false; playCast(m, m.spec.ride ? 'Idle' : 'Walk'); meeting = null; body.classList.remove('is-meeting'); mode = 'orbit';
+  }
+  $('#profile-close').addEventListener('click', leave);
+  addEventListener('keydown', event => { if (event.key === 'Escape') leave(); });
+  $('#profile-link').addEventListener('click', event => {
+    if (event.metaKey || event.ctrlKey || event.shiftKey) return;
+    event.preventDefault(); const href = event.currentTarget.href;
+    sound.fx.select(); wipeEl.classList.add('is-on'); setTimeout(() => { location.href = href; }, 720);
+  });
+  canvas.addEventListener('click', () => { if (mode === 'meet' && meeting) { playCast(meeting, 'React', true); sound.fx.pop(); burst(meeting.group.position.clone().add(V(0, meeting.spec.height * .9, 0)), PASTEL, 30, 5, .7); } });
+
   /* ── traffic: hover cars on the roads and bridges, the lower town, and drones in the air ── */
   // Each route returns a position for a distance travelled; cars face along it and bob as they hover.
   const TAU = Math.PI * 2;
-  const circle = (r, y, cx = 0, cz = 0) => ({length: TAU * r, at: (d, out) => { const a = d / r; out.set(cx + Math.cos(a) * r, y, cz + Math.sin(a) * r); }});
+  function circle(r, y, cx = 0, cz = 0) { return {length: Math.PI * 2 * r, at: (d, out) => { const a = d / r; out.set(cx + Math.cos(a) * r, y, cz + Math.sin(a) * r); }}; }
   function stadium(x, z0, z1, y) {            // up one lane, round the end, back down the other
     const r = x, straight = z1 - z0, total = straight * 2 + Math.PI * r * 2;
     return {length: total, at: (d, out) => {
@@ -693,12 +793,12 @@ function start() {
   const traffic = []; let lineup = false;
   function loadTraffic() {
     for (const [id, spec] of Object.entries(CARS)) {
-      new GLTFLoader().load(`assets/city/cars/${id}.glb?v=20261118-1`, gltf => {
+      new GLTFLoader().load(`assets/city/cars/${id}.glb?v=20261118-2`, gltf => {
         gltf.scene.traverse(node => { if (node.isMesh) (Array.isArray(node.material) ? node.material : [node.material]).forEach(m => { m.envMapIntensity = .5; m.roughness = .45; m.metalness = 0; }); });
         FLEET.filter(f => f[0] === id).forEach(([, route, speed, start], i) => {
           const body = gltf.scene.clone(); body.scale.setScalar(spec.height); body.rotation.y = spec.yaw;
           const car = new THREE.Group(); car.add(body); scene.add(car);
-          traffic.push({id, car, body, route: ROUTES[route], speed, d: start, phase: Math.random() * 6, air: /air|lift/.test(route)});
+          traffic.push({id, car, body, routeName: route, route: ROUTES[route], speed, d: start, phase: Math.random() * 6, air: /air|lift/.test(route)});
         });
       }, undefined, () => { /* traffic is optional */ });
     }
@@ -707,7 +807,7 @@ function start() {
   function updateTraffic(dt, still) {
     if (lineup) { Object.keys(CARS).forEach((id, i) => { const t = traffic.find(x => x.id === id); if (t) { t.car.position.set(-10.5 + i * 3, .4, 5); t.car.rotation.set(0, 0, 0); } }); return; }
     for (const t of traffic) {
-      if (!still) t.d += t.speed * dt;
+      if (!still && !t.halt) t.d += t.speed * dt;
       t.route.at(t.d, carPos); t.route.at(t.d + Math.sign(t.speed) * .6, carNext);
       t.car.position.copy(carPos); t.car.position.y += (t.air ? .5 : .12) * Math.sin(time * (t.air ? 1.6 : 2.4) + t.phase) + (t.air ? 0 : .25);
       t.car.rotation.y = Math.atan2(carNext.x - carPos.x, carNext.z - carPos.z);
@@ -774,7 +874,7 @@ function start() {
     const hit = raycaster.intersectObjects(proxies, false)[0];
     if (!hit) return;
     const {kind, id} = hit.object.userData;
-    if (kind === 'place') go(id); else if (kind === 'pyon') { if (pyon) tapPyon(); } else if (kind === 'statue') { statueBounce = 1; sound.fx.pop(); burst(N.Statue.position.clone().add(V(0, 4, 0)), [0xff9bd0, 0xffffff], 40, 6, .8); }
+    if (kind === 'place') go(id); else if (kind === 'cast') meet(id); else if (kind === 'pyon') { if (pyon) tapPyon(); } else if (kind === 'statue') { statueBounce = 1; sound.fx.pop(); burst(N.Statue.position.clone().add(V(0, 4, 0)), [0xff9bd0, 0xffffff], 40, 6, .8); }
   }
 
   /* ── entering the city ── */
@@ -788,7 +888,7 @@ function start() {
     await wait(.72);
     body.classList.remove('is-loading');
     wipeEl.classList.remove('is-on');
-    loadPyonpy(); loadLandmarks(); loadTraffic(); loadScreens();
+    loadPyonpy(); loadLandmarks(); loadTraffic(); loadScreens(); loadCast();
     const token = ++introToken;
     if (motionOff()) { finishIntro(); return; }
     mode = 'intro';
@@ -828,6 +928,7 @@ function start() {
     wipeEl.classList.remove('is-on'); body.classList.remove('is-travelling'); links.forEach(a => a.classList.remove('is-going'));
     Object.assign(boost, {gear: 1, ring: 1, eq: 1, ear: 0, note: 1, ufo: 1, shutter: .86, screen: .72, beam: 0, bubbles: 0, crescent: 1});
     setShutters(boost.shutter); jobs.clear(); orbitPose(camPos, camLook); mode = 'orbit';
+    profileEl.hidden = true; shiftT = 0; body.classList.remove('is-meeting'); if (meeting) { meeting.stopped = false; meeting = null; }
   });
 
   new GLTFLoader().load('assets/city/pastel-moon-city.glb?v=20261118-4', gltf => {
@@ -842,8 +943,7 @@ function start() {
     for (const cam of [camera, loadCam]) { cam.aspect = w / h; }
     camera.fov = w / h < .75 ? 64 : w / h < 1.2 ? 56 : 48;
     // On narrow screens the menu sits along the bottom, so lift the whole view to keep Pyonpy above it.
-    if (w < 760) camera.setViewOffset(w, h, 0, h * .15, w, h); else camera.clearViewOffset();
-    camera.updateProjectionMatrix();
+    applyOffset();
     loadCam.position.set(0, 0, w / h < .8 ? 24 : 14.5); loadCam.updateProjectionMatrix();
   }
   addEventListener('resize', resize); resize();
@@ -892,7 +992,7 @@ function start() {
     channel.port1.onmessage = () => { if (wake) wake(); };
     window.__city = {
       get mode() { return mode; },
-      lineup(on) { lineup = on; },
+      lineup(on) { lineup = on; }, meet(id) { return meet(id); }, leave() { return leave(); },
       async advance(seconds) { for (let t = 0; t < seconds; t += 1 / 30) { step(1 / 30); await new Promise(resolve => { wake = resolve; channel.port2.postMessage(0); }); } return mode; }
     };
   }
@@ -973,7 +1073,7 @@ function start() {
       m.material.opacity = (.75 + .25 * Math.sin(time * 5 + m.position.x)) * (.7 + .3 * night);
     }
     for (const c of paintedClouds) { const a = c.userData.a + time * .006; c.position.set(Math.cos(a) * c.userData.r, c.userData.y, Math.sin(a) * c.userData.r); c.material.opacity = .95 - night * .7; }
-    updateTraffic(dt, still);
+    updateTraffic(dt, still); updateCast(dt, still);
     updateBursts(dt);
 
     // Labels and Pyonpy's speech bubble follow their spots on screen.
