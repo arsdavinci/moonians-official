@@ -1500,7 +1500,7 @@ function start() {
     sound.fx.whoosh(3);
     await fly(V(1.2, 2.7, 47), V(-1, 12, 0), 3.4, 0);
     if (token !== introToken || mode !== 'intro') return;
-    await wait(1.1);
+    await wait(.25);   // only a beat at the bottom of the dive, then straight in
     if (token !== introToken || mode !== 'intro') return;
     orbitPose(tmp, tmp2);
     await fly(tmp.clone(), tmp2.clone(), 2.6, 0);
@@ -1515,7 +1515,7 @@ function start() {
   // The welcome shot (the pause at the end of the dive in) should show the UFO left of the Moon Tower and the airship
   // at the upper right. Both are already flying, so they are put back along their own paths by exactly the time
   // left until that shot, and simply arrive there.
-  const WELCOME_AT = 3.95, WELCOME_POS = V(1.2, 2.7, 47), WELCOME_LOOK = V(-1, 12, 0);
+  const WELCOME_AT = 3.5, WELCOME_POS = V(1.2, 2.7, 47), WELCOME_LOOK = V(-1, 12, 0);
   function fliersFor(secondsLeft) {
     const cam = camera.clone(); cam.position.copy(WELCOME_POS); cam.lookAt(WELCOME_LOOK); cam.updateMatrixWorld(true);
     const wide = innerWidth > innerHeight, wantUfo = wide ? .345 : .2, wantShip = wide ? .74 : .8;   // where across the screen each should be
