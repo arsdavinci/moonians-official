@@ -651,10 +651,10 @@ function start() {
     const ship = traffic.find(t => t.id === 'airship');
     if (ship && !motionOff()) {
       ship.halt = true; sound.fx.whoosh(2.2);
-      const p = ship.car.position.clone().add(V(0, 13, 0)), out = p.clone().setY(0).normalize();
-      await fly(p.clone().addScaledVector(out, -46).add(V(0, -6, 0)), p, 2.3, 8);
+      const p = ship.car.position.clone().add(V(0, 33, 0)), out = p.clone().setY(0).normalize();
+      await fly(p.clone().addScaledVector(out, -112).add(V(0, -14, 0)), p, 2.3, 8);
       burst(p, PASTEL, 90, 14, 1.4); sound.fx.arrive();
-      await fly(p.clone().addScaledVector(out, -24).add(V(0, -2, 0)), p, 1.1, 0);
+      await fly(p.clone().addScaledVector(out, -62).add(V(0, -5, 0)), p, 1.1, 0);
     }
     wipeEl.classList.add('is-on'); await wait(.72); location.href = snsLink.href;
   }
@@ -762,6 +762,33 @@ function start() {
     const u0 = (1 - u) / 2, v0 = (1 - v) / 2;
     uv.setXY(0, u0, v0 + v); uv.setXY(1, u0 + u, v0 + v); uv.setXY(2, u0, v0); uv.setXY(3, u0 + u, v0); uv.needsUpdate = true;
   }
+  // The airship plays the SNS videos one after the other. Each is tall, so the screen shows a wide slice of it
+  // that drifts up and down and pushes in and out, picking a new framing every few seconds.
+  const SNS_CLIPS = ['assets/city/sns/1.mp4', 'assets/city/sns/2.mp4'];
+  let sns = null;
+  function snsScreen(w, h) {
+    if (!sns) {
+      const el = document.createElement('video'); el.muted = true; el.playsInline = true; el.preload = 'auto'; el.src = SNS_CLIPS[0];
+      const texture = new THREE.VideoTexture(el); texture.colorSpace = THREE.SRGBColorSpace;
+      sns = {el, texture, index: 0, planes: [], zoom: 1, pan: .5, zoomT: 1, panT: .5, next: 0};
+      el.addEventListener('ended', () => { sns.index = (sns.index + 1) % SNS_CLIPS.length; el.src = SNS_CLIPS[sns.index]; el.play().catch(() => {}); });
+      el.play().catch(() => {});
+      addEventListener('pointerdown', () => { if (el.paused) el.play().catch(() => {}); }, {passive: true});
+    }
+    const plane = new THREE.Mesh(new THREE.PlaneGeometry(w, h), new THREE.MeshBasicMaterial({map: sns.texture, toneMapped: false, side: THREE.DoubleSide}));
+    plane.userData.want = w / h; sns.planes.push(plane); return plane;
+  }
+  function updateSns(dt) {
+    if (!sns || !sns.el.videoWidth) return;
+    if (time > sns.next) { sns.next = time + 3 + Math.random() * 4; sns.zoomT = 1 + Math.random() * 1.1; sns.panT = Math.random(); }   // a new framing
+    const k = 1 - Math.pow(.25, dt); sns.zoom = lerp(sns.zoom, sns.zoomT, k); sns.pan = lerp(sns.pan, sns.panT, k);
+    const have = sns.el.videoWidth / sns.el.videoHeight;
+    for (const plane of sns.planes) {
+      const want = plane.userData.want; let u = 1 / sns.zoom, v = (have / want) / sns.zoom; if (v > 1) { u /= v; v = 1; }
+      const u0 = (1 - u) / 2, v0 = (1 - v) * sns.pan, uv = plane.geometry.attributes.uv;
+      uv.setXY(0, u0, v0 + v); uv.setXY(1, u0 + u, v0 + v); uv.setXY(2, u0, v0); uv.setXY(3, u0 + u, v0); uv.needsUpdate = true;
+    }
+  }
   function loadScreens() {
     // Go round the city in order and hand out the clips in turn, so screens that stand side by side never show the same one.
     const screens = Object.entries(N).filter(([name, node]) => /^Scr\d+$/.test(name) && node.userData.w).map(([, node]) => node)
@@ -776,7 +803,7 @@ function start() {
   /* ── the cast: characters who walk about the city. Click one to meet them. ── */
   const segment = (x0, z0, x1, z1, y) => { const L = Math.hypot(x1 - x0, z1 - z0); return {length: L * 2, at: (d, out) => { d = ((d % (L * 2)) + L * 2) % (L * 2); const k = (d < L ? d : L * 2 - d) / L; out.set(lerp(x0, x1, k), y, lerp(z0, z1, k)); }}; };
   const CAST = {
-    ranpyon: {height: 2.3, yaw: 0, route: circle(4.4, .3), speed: .9, ride: 'scooter', seat: [0, .3, -.12], kicker: 'RANPYON', role: 'ツッコミ担当', name: 'らんぴょん',
+    ranpyon: {height: 2.3, yaw: 0, route: circle(4.4, .3), speed: .9, ride: 'scooter', seat: [0, .62, -.12], kicker: 'RANPYON', role: 'ツッコミ担当', name: 'らんぴょん',
               text: '地球人とムーニアンのハーフ。自分の「好き」を形にする、クリエイターなツッコミ担当。'},
     luva:    {height: 3.1, yaw: 0, route: segment(-1.3, -19.5, -1.3, -33, .22), speed: .7, view: [.25, 1], kicker: 'ZA-LUVA SELES', role: '二人の上司', name: 'ザ・ルーヴァ・セレス',
               text: '三日月大使館（クレッセントエンバシー）の偉い人。らんぴょんとぴょんぴーの上司です。胸には三日月、手にはマイク。二人の地球での活動を、おだやかな笑顔で見守っています。'},
@@ -1007,7 +1034,7 @@ function start() {
   const CARS = {
     roadster: {height: 1.7, yaw: Math.PI / 2}, bubble: {height: 2.3, yaw: 0}, bus: {height: 3.1, yaw: Math.PI / 2}, van: {height: 2.7, yaw: Math.PI / 2},
     scooter: {height: 1.8, yaw: 0}, patrol: {height: 1.9, yaw: 0}, delivery: {height: 2.6, yaw: 0}, cart: {height: 2.9, yaw: Math.PI / 2},
-    airship: {height: 26, yaw: Math.PI / 2}        // the giant SNS airship
+    airship: {height: 66, yaw: Math.PI / 2}        // the giant SNS airship
   };
   const FLEET = [   // model, route, speed (m/s; negative = the other way), starting distance
     ['roadster', 'plaza', 3.2, 0], ['scooter', 'plaza', 3.2, 21],
@@ -1025,8 +1052,8 @@ function start() {
         FLEET.filter(f => f[0] === id).forEach(([, route, speed, start], i) => {
           const body = gltf.scene.clone(); body.scale.setScalar(spec.height); body.rotation.y = spec.yaw;
           const car = new THREE.Group(); car.add(body); scene.add(car);
-          if (id === 'airship') { for (const side of [1, -1]) { const screen = videoScreen(side > 0 ? 'capsule/complete' : 'capsule/clip-12', .43, .235); screen.position.set(-.085, .545, .31 * side); if (side < 0) screen.rotation.y = Math.PI; body.add(screen); } }
-          if (id === 'airship') { const p = new THREE.Mesh(new THREE.SphereGeometry(16, 10, 8)); p.userData = {kind: 'airship', id}; proxies.push(p); car.userData.proxy = p; }
+          if (id === 'airship') { for (const side of [1, -1]) { const screen = snsScreen(.43, .235); screen.position.set(-.085, .545, .31 * side); if (side < 0) screen.rotation.y = Math.PI; body.add(screen); } }
+          if (id === 'airship') { const p = new THREE.Mesh(new THREE.SphereGeometry(38, 10, 8)); p.userData = {kind: 'airship', id}; proxies.push(p); car.userData.proxy = p; }
           traffic.push({id, car, body, routeName: route, route: ROUTES[route], speed, d: id === 'airship' && airshipStart !== null ? airshipStart : start, phase: Math.random() * 6, air: /air|lift/.test(route)});
         });
       }, undefined, () => { /* traffic is optional */ });
@@ -1311,7 +1338,7 @@ function start() {
       m.material.opacity = (.75 + .25 * Math.sin(time * 5 + m.position.x)) * (.7 + .3 * night);
     }
     for (const c of paintedClouds) { const a = c.userData.a + time * .006; c.position.set(Math.cos(a) * c.userData.r, c.userData.y, Math.sin(a) * c.userData.r); c.material.opacity = .95 - night * .7; }
-    updateTraffic(dt, still); updateCast(dt, still);
+    updateTraffic(dt, still); updateCast(dt, still); updateSns(dt);
     for (const m of signs) m.material.opacity = (.45 + .5 * night) * (.86 + .14 * Math.sin(time * 3.1 + m.userData.phase)) * (Math.sin(time * .7 + m.userData.phase * 2.3) > .985 ? .35 : 1);   // steady glow with a rare flicker
     if (N.stageArt && !still) N.stageArt.rotation.z += dt * .25;
     updateBursts(dt);
