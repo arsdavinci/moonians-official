@@ -1304,7 +1304,12 @@ function start() {
   function ready() {
     loaded = true; mode = 'gate';
     let returning = false;
-    try { returning = sessionStorage.getItem('moonians.city') === '1'; } catch { /* optional */ }
+    // Only someone coming back from one of this site's own pages skips the question; opening or reloading the home always asks.
+    try {
+      const nav = performance.getEntriesByType('navigation')[0], from = document.referrer ? new URL(document.referrer) : null;
+      const inside = from && from.origin === location.origin && !/^\/(index\.html)?$/.test(from.pathname);
+      returning = sessionStorage.getItem('moonians.city') === '1' && (!nav || nav.type !== 'reload') && (inside || (nav && nav.type === 'back_forward'));
+    } catch { /* optional */ }
     if (returning) { enter(false).then(() => { /* sound comes back on the first tap if it was on */ }); return; }
     progressEl.hidden = true; gateEl.hidden = false;
     const first = gateEl.querySelector('button'); if (first) first.focus({preventScroll: true});
