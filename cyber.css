@@ -1110,7 +1110,7 @@ body .hero-transmission.music-card.music-float{animation:none;opacity:1;transfor
 .character-open::after{content:'';position:absolute;inset:0;z-index:4;border-radius:var(--radius)}
 .character:hover .character-open,.character-open:focus-visible{background:var(--lavender);box-shadow:0 0 22px -6px var(--c-accent)}
 .is-cards .character-detail{display:none}
-.character-dialog{width:min(760px,calc(100% - 24px));max-height:calc(100dvh - 32px);padding:0;border:1px solid var(--c-border-strong);border-radius:var(--radius);background:var(--c-bg-2,#120f26);color:var(--c-text);overflow:hidden}
+.character-dialog{width:min(760px,calc(100% - 24px));max-height:calc(100dvh - 32px);margin:auto;padding:0;border:1px solid var(--c-border-strong);border-radius:var(--radius);background:var(--c-bg-2,#120f26);color:var(--c-text);overflow:hidden}
 .character-dialog[open]{display:flex;flex-direction:column}
 .character-dialog-scroll{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
 .character-dialog::backdrop{background:rgba(6,5,20,.7);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
@@ -1327,3 +1327,9 @@ html[lang=en] .g-card h4>small{display:none}
 .fx-dialog.music-consent .music-consent-actions .music-allow{background:linear-gradient(135deg,#ff7fc0,#b58cff 60%,#3fe3c8);color:#fff;border:2px solid #fff;font-weight:800;text-shadow:0 1px 0 #5a288c73;box-shadow:0 8px 22px #ff7fc080}
 .fx-dialog.music-consent .music-consent-actions .music-decline{background:#fff;color:#2a2152;border:2px solid #b9a3f5;font-weight:800}
 .fx-dialog.music-consent .music-consent-actions .music-decline:hover{background:#f3ecff}
+
+/* previous / next inside a character profile */
+.character-dialog-nav{position:absolute;top:calc(50% - 22px);z-index:6;width:44px;height:44px;border:1px solid var(--c-border-strong);border-radius:50%;background:color-mix(in srgb,var(--c-bg) 80%,transparent);color:var(--c-text);font-size:20px;line-height:1;cursor:pointer;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+.character-dialog-nav.is-prev{left:10px}.character-dialog-nav.is-next{right:10px}
+.character-dialog-nav:hover,.character-dialog-nav:focus-visible{background:var(--c-accent,#b9a5ff);color:#120f26}
+@media(max-width:560px){.character-dialog-nav{top:auto;bottom:14px;width:40px;height:40px}}

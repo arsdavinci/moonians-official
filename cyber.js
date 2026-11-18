@@ -394,6 +394,7 @@
   const characterGrid = document.querySelector('.character-grid');
   if (characterGrid && characterGrid.querySelector('.character-detail')) {
     characterGrid.classList.add('is-cards');
+    const sheets = [];   // every profile, in order, so one can step to the next from inside it
     characterGrid.querySelectorAll('.character').forEach(card => {
       const detail = card.querySelector('.character-detail');
       const info = card.querySelector('.character-info');
@@ -424,6 +425,14 @@
       scroller.className = 'character-dialog-scroll';
       scroller.append(article);
       sheet.append(close, scroller);
+      for (const [dir, label, mark] of [[-1, '前のキャラクターへ', '‹'], [1, '次のキャラクターへ', '›']]) {
+        const step = document.createElement('button');
+        step.type = 'button'; step.className = 'character-dialog-nav ' + (dir < 0 ? 'is-prev' : 'is-next'); step.setAttribute('aria-label', label); step.textContent = mark;
+        step.addEventListener('click', () => { const next = sheets[(sheets.indexOf(sheet) + dir + sheets.length) % sheets.length]; if (next === sheet) return; sheet.close(); next.showModal(); next.querySelector('.character-dialog-scroll').scrollTop = 0; document.body.classList.add('character-open-lock'); });
+        sheet.append(step);
+      }
+      sheet.addEventListener('keydown', event => { if (event.key === 'ArrowRight') sheet.querySelector('.is-next').click(); else if (event.key === 'ArrowLeft') sheet.querySelector('.is-prev').click(); });
+      sheets.push(sheet);
       document.body.append(sheet);
       const more = detail.querySelector(':scope>details');
       if (more) more.open = true;
