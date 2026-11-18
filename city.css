@@ -120,6 +120,17 @@ body.is-meeting .city-menu,body.is-meeting .city-hint,body.is-meeting .city-labe
 .city-menu,.city-labels{transition:opacity .4s}
 @media (max-width:759px){ .city-profile{left:var(--pad-x);right:var(--pad-r);top:auto;bottom:calc(14px + env(safe-area-inset-bottom,0px));transform:none;width:auto;padding:18px} .city-profile-text{font-size:.84rem;line-height:1.65} }
 
+/* ---- "enter this place?" card, shown once the camera has arrived */
+.city-enter{position:fixed;z-index:25;left:50%;bottom:calc(34px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);width:min(420px,calc(100vw - 32px));padding:20px 22px;border-radius:26px;text-align:center;
+  color:var(--city-ink);background:var(--city-glass-strong);border:1.5px solid var(--city-line);-webkit-backdrop-filter:blur(16px) saturate(1.4);backdrop-filter:blur(16px) saturate(1.4);
+  box-shadow:0 18px 50px rgba(98,74,190,.32);animation:city-pop .4s cubic-bezier(.2,1.4,.4,1) both}
+.city-enter-where{margin:0;font:.78rem var(--city-dot);letter-spacing:.14em;color:var(--city-pink-deep)}
+.city-enter h2{margin:2px 0 4px;font-size:1.7rem;font-weight:900}
+.city-enter-ask{margin:0;font-size:.92rem;color:var(--city-ink-soft)}
+.city-enter .city-profile-actions{margin-top:14px}
+@media (min-width:760px){ .city-enter .city-profile-actions{flex-direction:row} .city-enter .city-button{flex:1} }
+body.is-asking .city-menu,body.is-asking .city-sns,body.is-asking .city-hint{opacity:0;pointer-events:none}
+
 /* ---- loader and the sound gate */
 .city-loader{position:fixed;inset:0;z-index:40;display:grid;place-items:center;padding:24px var(--pad-r) calc(24px + env(safe-area-inset-bottom,0px)) var(--pad-x);
   color:#fff;transition:opacity .9s,visibility .9s;pointer-events:none}

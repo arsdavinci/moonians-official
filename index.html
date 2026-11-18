@@ -16,10 +16,10 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DotGothic16&family=M+PLUS+Rounded+1c:wght@700;800;900&family=Unbounded:wght@700;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="city.css?v=20261118-8">
+  <link rel="stylesheet" href="city.css?v=20261118-9">
   <script type="importmap">{"imports":{"three":"./vendor/three/three.module.min.js"}}</script>
-  <script src="language.js?v=20261118-7"></script>
-  <script type="module" src="city.js?v=20261118-31"></script>
+  <script src="language.js?v=20261118-8"></script>
+  <script type="module" src="city.js?v=20261118-32"></script>
 </head>
 <body class="city-page is-loading">
   <canvas id="city-canvas" aria-hidden="true"></canvas>
@@ -84,6 +84,16 @@
       <button class="city-button" id="profile-close" type="button">街にもどる</button>
     </div>
   </aside>
+
+  <div class="city-enter" id="city-enter" hidden>
+    <p class="city-enter-where" id="enter-where"></p>
+    <h2 id="enter-name"></h2>
+    <p class="city-enter-ask">ここに入りますか？</p>
+    <div class="city-profile-actions">
+      <button class="city-button is-primary" id="enter-yes" type="button">入る</button>
+      <button class="city-button" id="enter-no" type="button">街にもどる</button>
+    </div>
+  </div>
 
   <div class="city-loader" id="city-loader">
     <div class="city-progress" id="city-progress">

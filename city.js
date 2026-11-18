@@ -594,6 +594,8 @@ function start() {
     return {pos: at(place, place.dist, place.h), look: at(place, 0, place.lookY)};
   }
 
+  // Choosing a place flies the camera there and stops. You then decide: go in, or back to the city.
+  const enterEl = $('#city-enter'); let asking = null;
   async function go(id) {
     const place = PLACES[id], link = links.find(a => a.dataset.place === id);
     if (!place || !link || mode !== 'orbit') return;
@@ -601,16 +603,29 @@ function start() {
     body.classList.add('is-travelling'); link.classList.add('is-going');
     hintEl.classList.remove('is-on'); bubbleEl.hidden = true;
     sound.fx.select();
-    if (!motionOff()) {
-      sound.fx.whoosh(1.7);
-      const target = vantage(place);
-      await fly(target.pos, target.look, 1.9, 5);
-      if (await SHOW[id](place)) { location.href = link.href; return; }
-    }
-    wipeEl.classList.add('is-on');
-    await wait(.72);
-    location.href = link.href;
+    const target = vantage(place);
+    if (!motionOff()) { sound.fx.whoosh(1.7); await fly(target.pos, target.look, 1.9, 5); }
+    else { camPos.copy(target.pos); camLook.copy(target.look); }
+    asking = {id, place, link};
+    $('#enter-name').textContent = tr(place.label); $('#enter-where').textContent = tr(link.querySelector('.where').textContent);
+    body.classList.remove('is-travelling'); body.classList.add('is-asking'); enterEl.hidden = false; mode = 'ask';
+    $('#enter-yes').focus({preventScroll: true});
   }
+  async function enterPlace() {
+    if (mode !== 'ask' || !asking) return;
+    const {id, place, link} = asking; enterEl.hidden = true; body.classList.add('is-travelling'); mode = 'fly'; sound.fx.select();
+    if (!motionOff() && await SHOW[id](place)) { location.href = link.href; return; }
+    wipeEl.classList.add('is-on'); await wait(.72); location.href = link.href;
+  }
+  async function backToCity() {
+    if (mode !== 'ask' || !asking) return;
+    const {link} = asking; asking = null; enterEl.hidden = true; link.classList.remove('is-going'); mode = 'fly';
+    orbitPose(tmp, tmp2);
+    if (!motionOff()) await fly(tmp.clone(), tmp2.clone(), 1.5, 4);
+    body.classList.remove('is-asking', 'is-travelling'); mode = 'orbit';
+  }
+  $('#enter-yes').addEventListener('click', enterPlace); $('#enter-no').addEventListener('click', backToCity);
+  addEventListener('keydown', event => { if (event.key === 'Escape') backToCity(); });
 
   let hotGame = false;
   function hot(id, turn = true) {
@@ -1107,7 +1122,7 @@ function start() {
     if (!event.persisted || !loaded) return;
     wipeEl.classList.remove('is-on'); body.classList.remove('is-travelling'); links.forEach(a => a.classList.remove('is-going')); snsLink.classList.remove('is-going'); traffic.forEach(t => { t.halt = false; });
     Object.assign(boost, {gear: 1, ring: 1, eq: 1, ear: 0, note: 1, ufo: 1, shutter: .86, screen: .72, beam: 0, bubbles: 0, crescent: 1});
-    setShutters(boost.shutter); jobs.clear(); orbitPose(camPos, camLook); mode = 'orbit';
+    setShutters(boost.shutter); jobs.clear(); orbitPose(camPos, camLook); mode = 'orbit'; asking = null; enterEl.hidden = true; body.classList.remove('is-asking');
     profileEl.hidden = true; shiftT = 0; body.classList.remove('is-meeting'); if (meeting) { meeting.stopped = false; meeting = null; }
   });
 
@@ -1172,7 +1187,7 @@ function start() {
     channel.port1.onmessage = () => { if (wake) wake(); };
     window.__city = {
       get mode() { return mode; },
-      lineup(on) { lineup = on; }, meet(id) { return meet(id); }, leave() { return leave(); },
+      lineup(on) { lineup = on; }, enter() { return enterPlace(); }, back() { return backToCity(); }, meet(id) { return meet(id); }, leave() { return leave(); },
       async advance(seconds) { for (let t = 0; t < seconds; t += 1 / 30) { step(1 / 30); await new Promise(resolve => { wake = resolve; channel.port2.postMessage(0); }); } return mode; }
     };
   }
