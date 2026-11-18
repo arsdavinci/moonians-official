@@ -231,3 +231,8 @@ body.is-meeting .city-menu a,body.is-asking .city-menu a,body.is-meeting .city-s
 /* the hint line is gone; the row under the menu is now one link to the work request page */
 .city-hint{display:none}
 .city-sns a.city-work{padding:9px 20px;font-size:.84rem;background:linear-gradient(90deg,#ff8cc8,#8fd8ff);border:2px solid #fff;box-shadow:0 8px 20px rgba(255,127,192,.4)}
+
+/* nine places in the menu; the last one (work requests) stands out and fills its row */
+.city-menu a.is-work{background:linear-gradient(90deg,rgba(255,140,200,.85),rgba(143,216,255,.85));border-color:#fff}
+.city-menu a.is-work .name,.city-menu a.is-work .num,.city-menu a.is-work .where{color:#fff}
+.city-menu ol > li:last-child:nth-child(odd){grid-column:1 / -1}

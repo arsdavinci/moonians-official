@@ -12,7 +12,7 @@
     'ムーニアンズのSNSは、この飛行船からぜんぶ届けています。気になるチャンネルを、えらんでな。':'Every Moonians channel is broadcast from this airship. Pick the one you like.',
     '飛行船をつつく':'Poke the airship', 'ひらく →':'Open →', 'らんぴょんの、日々のひとこと。':'Ranpyon’s daily notes.', 'ぴょんぴーの、写真と動画。':'Pyonpy’s photos and videos.',
     'みじかい動画は、こちら。':'Short videos live here.', 'ネタ動画と、3Dアニメ。':'Comedy videos and 3D anime.',
-    'グッズ':'Goods',
+    'グッズ':'Goods', 'ご依頼フォーム':'Request form',
     '地球人とムーニアン（月人）のハーフ。':'Half Earthling, half Moonian (a person of the Moon).',
     'スターシードとして、愛と気づきを広めに地球へ。':'A starseed, here on Earth to spread love and awareness.',
     'スターシードとして、笑いで愛を広めに地球へ。':'A starseed, here on Earth to spread love through laughter.',

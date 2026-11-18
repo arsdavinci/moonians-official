@@ -16,9 +16,9 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DotGothic16&family=M+PLUS+Rounded+1c:wght@700;800;900&family=Unbounded:wght@700;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="city.css?v=20261118-16">
+  <link rel="stylesheet" href="city.css?v=20261118-17">
   <script type="importmap">{"imports":{"three":"./vendor/three/three.module.min.js"}}</script>
-  <script src="language.js?v=20261118-10"></script>
+  <script src="language.js?v=20261118-11"></script>
   <script type="module" src="city.js?v=20261118-69"></script>
 </head>
 <body class="city-page is-loading">
@@ -44,20 +44,19 @@
 
     <nav class="city-menu" aria-label="行き先をえらぶ">
       <ol>
-        <li><a href="anime.html" data-place="anime" data-language-link><span class="num" translate="no">01</span><span class="name">3Dアニメ</span><span class="where">ムーンビジョン</span></a></li>
-        <li><a href="game.html" data-place="game" data-language-link><span class="num" translate="no">02</span><span class="name">ゲーム</span><span class="where">パステルUFO</span></a></li>
-        <li><a href="music.html" data-place="music" data-language-link><span class="num" translate="no">03</span><span class="name">音楽</span><span class="where">ミュージックドーム</span></a></li>
-        <li><a href="friends.html" data-place="friends" data-language-link><span class="num" translate="no">04</span><span class="name">愉快な仲間たち</span><span class="where">うさぎロボ案内所</span></a></li>
-        <li><a href="lab.html" data-place="lab" data-language-link><span class="num" translate="no">05</span><span class="name">制作ラボ</span><span class="where">からくり工房</span></a></li>
-        <li><a href="roadmap.html" data-place="roadmap" data-language-link><span class="num" translate="no">06</span><span class="name">ロードマップ</span><span class="where">ムーンタワー</span></a></li>
+        <li><a href="roadmap.html" data-place="roadmap" data-language-link><span class="num" translate="no">01</span><span class="name">ロードマップ</span><span class="where">ムーンタワー</span></a></li>
+        <li><a href="friends.html" data-place="friends" data-language-link><span class="num" translate="no">02</span><span class="name">愉快な仲間たち</span><span class="where">うさぎロボ案内所</span></a></li>
+        <li><a href="anime.html" data-place="anime" data-language-link><span class="num" translate="no">03</span><span class="name">3Dアニメ</span><span class="where">ムーンビジョン</span></a></li>
+        <li><a href="game.html" data-place="game" data-language-link><span class="num" translate="no">04</span><span class="name">ゲーム</span><span class="where">パステルUFO</span></a></li>
+        <li><a href="music.html" data-place="music" data-language-link><span class="num" translate="no">05</span><span class="name">音楽</span><span class="where">ミュージックドーム</span></a></li>
+        <li><a href="lab.html" data-place="lab" data-language-link><span class="num" translate="no">06</span><span class="name">制作ラボ</span><span class="where">からくり工房</span></a></li>
         <li><a href="sns.html" data-sns data-language-link><span class="num" translate="no">07</span><span class="name" translate="no">SNS</span><span class="where">SNSの飛行船</span></a></li>
         <li><a href="https://suzuri.jp/Ranpyon" target="_blank" rel="noopener"><span class="num" translate="no">08</span><span class="name">グッズ</span><span class="where" translate="no">SUZURI</span></a></li>
+        <li><a class="is-work" href="work.html" data-language-link><span class="num" translate="no">09</span><span class="name">お仕事のご依頼</span><span class="where">ご依頼フォーム</span></a></li>
       </ol>
     </nav>
 
-    <nav class="city-sns" id="city-sns" aria-label="お仕事のご依頼">
-      <a class="city-work" href="work.html" data-language-link>お仕事のご依頼はこちら</a>
-    </nav>
+    <nav class="city-sns" id="city-sns" hidden style="display:none"></nav>
 
     <p class="city-hint" id="city-hint" hidden></p>
     <p class="city-error" id="city-error" hidden>街の3Dを表示できませんでした。下のメニューから行き先をえらべます。</p>
