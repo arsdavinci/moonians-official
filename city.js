@@ -839,7 +839,7 @@ function start() {
               text: '地球人とムーニアンのハーフ。自分の「好き」を形にする、クリエイターなツッコミ担当。'},
     luva:    {height: 3.1, yaw: 0, route: segment(-1.3, -19.5, -1.3, -33, .22), speed: .7, view: [.25, 1], kicker: 'ZA-LUVA SELES', role: '二人の上司', name: 'ザ・ルーヴァ・セレス',
               text: '三日月大使館（クレッセントエンバシー）の偉い人。らんぴょんとぴょんぴーの上司です。胸には三日月、手にはマイク。二人の地球での活動を、おだやかな笑顔で見守っています。'},
-    kaguya:  {height: 2.7, yaw: 0, route: circle(1.9, .22, -18.6, 3.45), speed: .5, view: [1, -.25], kicker: 'PRINCESS KAGUYA', role: '月の宮の皇族', name: 'かぐや様',
+    kaguya:  {height: 11.5, yaw: 0, route: circle(1, 0), speed: .5, holo: [0, 3.3, 74], glide: true, view: [.18, -1], kicker: 'PRINCESS KAGUYA', role: '月の宮の皇族', name: 'かぐや様',
               text: '月の宮に住む、皇族のお姫さま。三日月の髪飾りに、竹と月の模様の衣をまとい、手には扇。そして、ぴょんぴーの好きな人です。'},
     // DJ Ramune and PT ride in the plaza roadster, side by side.
     ramune:  {height: 2.0, yaw: 0, route: circle(4.4, .3), speed: .9, ride: 'roadster', seat: [-.5, .42, -.2], kicker: 'DJ RAMUNE', role: 'らんぴょんの妹', name: 'DJらむね',
@@ -865,6 +865,20 @@ function start() {
         const model = gltf.scene; model.scale.setScalar(spec.height); model.rotation.y = spec.yaw;
         model.traverse(node => { if (node.isMesh) { node.frustumCulled = false; (Array.isArray(node.material) ? node.material : [node.material]).forEach(m => { m.envMapIntensity = .5; m.roughness = .55; m.metalness = 0; }); } });
         const group = new THREE.Group(); group.add(model); scene.add(group);
+        if (spec.holo) {               // a projected figure: see-through, blue-tinted, scan lines, a flicker, and a beam of light under her feet
+          model.traverse(node => { if (!node.isMesh) return;
+            const material = new THREE.MeshBasicMaterial({map: node.material.map, transparent: true, toneMapped: false});
+            material.onBeforeCompile = shader => {
+              shader.uniforms.uTime = uTime;
+              shader.fragmentShader = shader.fragmentShader.replace('#include <common>', '#include <common>\nuniform float uTime;')
+                .replace('#include <map_fragment>', '#include <map_fragment>\nfloat hl = dot(diffuseColor.rgb, vec3(0.3333)); float hs = 0.72 + 0.28 * sin(gl_FragCoord.y * 1.5 - uTime * 6.0);\nfloat hf = 0.93 + 0.07 * sin(uTime * 23.0) - 0.3 * step(0.988, fract(sin(floor(uTime * 6.0)) * 43758.5));\ndiffuseColor.rgb = mix(diffuseColor.rgb, vec3(hl) * vec3(0.6, 1.0, 1.15) + vec3(0.12, 0.3, 0.42), 0.5) * hs * hf * 1.2; diffuseColor.a *= 0.82 * hf;');
+            };
+            material.customProgramCacheKey = () => 'holo-figure'; node.material = material; });
+          const beam = new THREE.Mesh(new THREE.CylinderGeometry(4.2, .5, spec.holo[1] - .3, 28, 1, true), new THREE.MeshBasicMaterial({color: 0x8fe9ff, transparent: true, opacity: .2, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide, toneMapped: false}));
+          beam.position.set(spec.holo[0], (spec.holo[1] + .3) / 2, spec.holo[2]); scene.add(beam);
+          const pad = new THREE.Mesh(new THREE.CylinderGeometry(4.4, 4.4, .08, 40), new THREE.MeshBasicMaterial({color: 0xbff4ff, transparent: true, opacity: .32, blending: THREE.AdditiveBlending, depthWrite: false, toneMapped: false}));
+          pad.position.set(spec.holo[0], spec.holo[1], spec.holo[2]); scene.add(pad);
+        }
         const mixer = new THREE.AnimationMixer(model), actions = {};
         gltf.animations.forEach(clip => { actions[clip.name] = mixer.clipAction(clip); });
         // Characters with a full skeleton come with a seated or dancing clip; that is their everyday pose.
@@ -909,7 +923,8 @@ function start() {
         if (m.active === m.actions.Walk) playCast(m, 'Idle');
       } else {
         if (!m.stopped && !still) m.d += m.spec.speed * dt;
-        m.spec.route.at(m.d, castPos); m.spec.route.at(m.d + Math.sign(m.spec.speed) * .4, castNext);   // look the way they are actually going
+        if (m.spec.holo) { castPos.set(m.spec.holo[0], m.spec.holo[1] + Math.sin(time * .8) * .18, m.spec.holo[2]); castNext.set(castPos.x + Math.sin(time * .32), 0, castPos.z + Math.cos(time * .32)); }   // floats and turns on the spot
+        else m.spec.route.at(m.d, castPos); if (!m.spec.holo) m.spec.route.at(m.d + Math.sign(m.spec.speed) * .4, castNext);   // look the way they are actually going
         if (m.spec.dance) {            // riding the rhythm: a looping hop-and-nod, a bounce and a sway, always facing the plaza
           if (m.active !== m.actions.Walk && m.active !== m.actions.React && !m.stopped) playCast(m, 'Walk');
           castPos.y += Math.abs(Math.sin(time * 4.6)) * .14; castNext.set(castPos.x - castPos.x * .1 + Math.sin(time * 2.3) * .5, 0, castPos.z - castPos.z * .1);
@@ -917,7 +932,7 @@ function start() {
         if (m.spec.glide) {            // wheels: no walking sway, just an occasional "koton, koton" over an imagined pebble
           if (m.active === m.actions.Walk) playCast(m, 'Idle');
           const p = Math.abs(m.d / m.spec.speed) % 5.2;
-          if (!m.stopped) castPos.y += p < .14 ? Math.sin(p / .14 * Math.PI) * .07 : p > .24 && p < .36 ? Math.sin((p - .24) / .12 * Math.PI) * .045 : 0;
+          if (!m.stopped && !m.spec.holo) castPos.y += p < .14 ? Math.sin(p / .14 * Math.PI) * .07 : p > .24 && p < .36 ? Math.sin((p - .24) / .12 * Math.PI) * .045 : 0;
         }
       }
       m.group.position.copy(castPos);
@@ -1037,7 +1052,7 @@ function start() {
   /* ── plants: 3D models close to the plaza, flat pictures further away (lighter to draw) ── */
   function loadPlants() {
     const spots = Object.entries(N).filter(([name]) => /^P[bt]\d+$/.test(name)).map(([name, node]) => ({tree: name[1] === 't', p: node.getWorldPosition(V(0, 0, 0)), s: node.scale.x || 1}));
-    for (let i = 0; i < 18; i++) { const a = i / 18 * Math.PI * 2 + .2; spots.push({tree: true, far: true, p: V(Math.cos(a) * 75, .05, Math.sin(a) * 75), s: 1.3}); }   // a ring of picture trees on the outer bridge
+    for (let i = 0; i < 18; i++) { const a = i / 18 * Math.PI * 2 + .2; if (Math.abs(Math.cos(a) * 75) < 10 && Math.sin(a) > 0) continue; spots.push({tree: true, far: true, p: V(Math.cos(a) * 75, .05, Math.sin(a) * 75), s: 1.3}); }   // a ring of picture trees on the outer bridge
     const near = spots.filter(o => !o.far && Math.hypot(o.p.x, o.p.z) < 34), far = spots.filter(o => !near.includes(o));
     const KINDS = {bush: [['bush-pink', 1.5], ['bush-yellow', 1.5]], tree: [['tree-tall', 6], ['tree-fruit', 5]]};
     const dummy = new THREE.Object3D();
