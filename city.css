@@ -253,3 +253,9 @@ body.is-meeting .city-menu a,body.is-asking .city-menu a,body.is-meeting .city-s
 
 .city-profile-more{display:inline-block;margin:8px 0 0;font:800 .86rem var(--city-round);color:var(--city-pink-deep);text-decoration:none;border-bottom:2px solid currentColor;padding-bottom:1px}
 .city-profile-more:hover,.city-profile-more:focus-visible{color:#0d9d8a}
+
+/* phone: an item that has been tapped once is "pointed at" and says so; tap again to go */
+.city-menu a{position:relative}
+.city-menu a.is-armed{outline:3px solid #fff;box-shadow:0 0 0 5px rgba(255,127,192,.6),0 10px 26px rgba(255,127,192,.5)}
+.city-menu a.is-armed::after{content:attr(data-again);position:absolute;left:50%;top:-11px;transform:translateX(-50%);padding:3px 10px;border-radius:999px;background:linear-gradient(90deg,#ff7fc0,#8fd8ff);color:#fff;
+  font:800 .64rem var(--city-round);white-space:nowrap;box-shadow:0 4px 12px rgba(98,74,190,.35);pointer-events:none;z-index:2}

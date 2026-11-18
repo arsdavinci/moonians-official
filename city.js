@@ -731,21 +731,36 @@ function start() {
     if (ship && !motionOff()) { const p = ship.car.position.clone().add(V(0, 39, 0)), out = p.clone().setY(0).normalize(); await fly(p.clone().addScaledVector(out, -73).add(V(0, -6, 0)), p, 1.1, 0); }
     wipeEl.classList.add('is-on'); await wait(.72); location.href = snsLink.href;
   }
-  snsLink.addEventListener('pointerenter', () => { hotSns = true; snsLink.classList.add('is-hot'); sound.fx.hover(); });
-  snsLink.addEventListener('focus', () => { hotSns = true; });
-  for (const type of ['pointerleave', 'blur']) snsLink.addEventListener(type, () => { hotSns = false; snsLink.classList.remove('is-hot'); if (mode === 'orbit') view.tiltT = .12; });
-  snsLink.addEventListener('click', event => { if (body.classList.contains('no-3d') || event.metaKey || event.ctrlKey || event.shiftKey) return; event.preventDefault(); if (mode === 'intro') skipIntro(); openSns(); });
+  // Touch has no hover, so on a phone the first tap on a menu item does what pointing does on a computer
+  // (the view swings round to that place, the item lights up) and a second tap on the same item goes there.
+  let byTouch = false, armed = null, armTimer = 0;
+  addEventListener('pointerdown', event => { byTouch = event.pointerType === 'touch' || event.pointerType === 'pen'; }, true);
+  const disarm = () => { if (!armed) return; armed.classList.remove('is-armed'); armed = null; clearTimeout(armTimer); hot(null); hotSns = false; snsLink.classList.remove('is-hot'); if (mode === 'orbit') view.tiltT = .12; };
+  const arm = link => {                 // true: this tap only pointed at it
+    if (!byTouch || armed === link) return false;
+    disarm(); armed = link; link.classList.add('is-armed'); link.dataset.again = tr('もう一度タップで入る'); sound.fx.hover();
+    if (link === snsLink) { hotSns = true; snsLink.classList.add('is-hot'); } else if (link.dataset.place) hot(link.dataset.place);
+    clearTimeout(armTimer); armTimer = setTimeout(disarm, 9000);
+    return true;
+  };
+  canvas.addEventListener('pointerdown', () => { if (byTouch) disarm(); }, true);
+  document.querySelectorAll('.city-menu a:not([data-place]):not([data-sns])').forEach(link => link.addEventListener('click', event => { if (arm(link)) event.preventDefault(); }));
+  snsLink.addEventListener('pointerenter', () => { if (byTouch) return; hotSns = true; snsLink.classList.add('is-hot'); sound.fx.hover(); });
+  snsLink.addEventListener('focus', () => { if (!byTouch) hotSns = true; });
+  for (const type of ['pointerleave', 'blur']) snsLink.addEventListener(type, () => { if (byTouch) return; hotSns = false; snsLink.classList.remove('is-hot'); if (mode === 'orbit') view.tiltT = .12; });
+  snsLink.addEventListener('click', event => { if (body.classList.contains('no-3d') || event.metaKey || event.ctrlKey || event.shiftKey) return; event.preventDefault(); if (mode === 'intro') skipIntro(); if (arm(snsLink)) return; disarm(); openSns(); });
   links.forEach(link => {
     link.addEventListener('click', event => {
       if (body.classList.contains('no-3d') || !loaded || event.metaKey || event.ctrlKey || event.shiftKey) return;
       event.preventDefault();
       if (mode === 'intro') skipIntro();
-      go(link.dataset.place);
+      if (arm(link)) return;
+      disarm(); go(link.dataset.place);
     });
-    link.addEventListener('pointerenter', () => { hot(link.dataset.place); sound.fx.hover(); });
-    link.addEventListener('focus', () => hot(link.dataset.place));
-    link.addEventListener('pointerleave', () => hot(null));
-    link.addEventListener('blur', () => hot(null));
+    link.addEventListener('pointerenter', () => { if (byTouch) return; hot(link.dataset.place); sound.fx.hover(); });
+    link.addEventListener('focus', () => { if (!byTouch) hot(link.dataset.place); });
+    link.addEventListener('pointerleave', () => { if (!byTouch) hot(null); });
+    link.addEventListener('blur', () => { if (!byTouch) hot(null); });
   });
 
   /* ── Pyonpy on the plaza stage ── */
