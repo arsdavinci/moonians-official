@@ -728,7 +728,7 @@ function start() {
               text: '地球人とムーニアンのハーフ。自分の「好き」を形にする、クリエイターなツッコミ担当。'},
     luva:    {height: 3.1, yaw: 0, route: segment(-1.3, -19.5, -1.3, -33, .22), speed: .7, view: [.25, 1], kicker: 'ZA-LUVA SELES', role: '二人の上司', name: 'ザ・ルーヴァ・セレス',
               text: '三日月大使館（クレッセントエンバシー）の偉い人。らんぴょんとぴょんぴーの上司です。胸には三日月、手にはマイク。二人の地球での活動を、おだやかな笑顔で見守っています。'},
-    kaguya:  {height: 2.7, yaw: 0, route: segment(3.9, 22, 3.9, 42, .22), speed: .6, view: [-1, -.35], kicker: 'PRINCESS KAGUYA', role: '月の宮の皇族', name: 'かぐや様',
+    kaguya:  {height: 2.7, yaw: 0, route: circle(11.6, .3), speed: -.55, view: 'out', kicker: 'PRINCESS KAGUYA', role: '月の宮の皇族', name: 'かぐや様',
               text: '月の宮に住む、皇族のお姫さま。三日月の髪飾りに、竹と月の模様の衣をまとい、手には扇。そして、ぴょんぴーの好きな人です。'},
     // DJ Ramune and PT ride in the plaza roadster, side by side.
     ramune:  {height: 2.0, yaw: 0, route: circle(4.4, .3), speed: .9, ride: 'roadster', seat: [-.5, .5, -.05], kicker: 'DJ RAMUNE', role: 'らんぴょんの妹', name: 'DJらむね',
@@ -739,9 +739,10 @@ function start() {
     grouper: {height: 3.0, yaw: 0, route: circle(.7, .22, 14.2, 11), speed: .35, dance: true, view: [-.8, -.6], kicker: 'GROUPER', role: '音楽の星のエイリアン', name: 'グルーパー',
               text: '音楽の星「グルーヴィア星」から来た、機械の体のエイリアン。「地球の音楽はクソすぎる！」と地球を破壊しに来たけれど、ぴょんぴーとのラップバトルでそのバイブスに感化され、まさかの友達に。地球滅亡は、ギリギリで回避されました。'},
     // Yanavis rolls on wheels: a smooth glide round the outer ring of the plaza, with a little bump now and then.
-    robot:   {height: 1.9, yaw: 0, route: circle(16, .3), speed: 1.7, glide: true, kicker: 'Y.A.N.A.V.I.S', role: '人工知能', name: 'ヤナビス',
+    robot:   {height: 1.9, yaw: 0, route: circle(16, .3), speed: 1.7, glide: true, view: 'out', kicker: 'Y.A.N.A.V.I.S', role: '人工知能', name: 'ヤナビス',
               text: '翻訳酸素カプセルから聞こえる声の主。ぴょんぴーのムーニアン語を、日本語に同時翻訳してくれる人工知能です。'}
   };
+  const PHOTOS = {ranpyon: 1, pyon: 1, luva: 1, kaguya: 1, ramune: 1, pt: 1, robot: 1, grouper: 1};   // close-up face pictures in assets/city/faces
   const cast = [], profileEl = $('#city-profile');
   // Pyonpy stays on his stage, but meets you the same way as the others.
   const pyonMember = {id: 'pyon', actions: {}, stopped: false, spec: {height: 2.3, kicker: 'PYONPY', role: 'ボケ担当', name: 'ぴょんぴー',
@@ -834,7 +835,7 @@ function start() {
     sound.fx.select(); playCast(m, 'Idle');
     const p = m.group.position.clone(), eye = m.spec.height * .58;
     // stand where the view is clear: a set side for those on the roads, otherwise wherever the camera already is
-    const away = (m.spec.view ? V(m.spec.view[0], 0, m.spec.view[1]) : camPos.clone().sub(p).setY(0)).normalize();
+    const away = (m.spec.view === 'out' ? p.clone().setY(0).applyAxisAngle(V(0, 1, 0), .9) : m.spec.view ? V(m.spec.view[0], 0, m.spec.view[1]) : camPos.clone().sub(p).setY(0)).normalize();
     const reach = m.spec.ride ? 4.4 : m.spec.height * 1.75, lift = m.spec.ride ? 1.0 : 0;   // riders in the car are seen from a little further back and above
     shiftT = 1;
     if (motionOff()) { camPos.copy(p).addScaledVector(away, reach).add(V(0, eye + lift, 0)); camLook.copy(p).add(V(0, eye, 0)); }
@@ -843,6 +844,7 @@ function start() {
     if (m === pyonMember) playPyon(pyonActions.Cheer ? 'Cheer' : 'Jump', true);
     if (m.face) { m.face.set(3, .7); setTimeout(() => m.face && m.face.set(0, 4), 700); }
     burst(p.clone().add(V(0, m.spec.height * .9, 0)), PASTEL, 46, 5, .7);
+    const photo = $('#profile-photo'); photo.hidden = !PHOTOS[m.id]; if (PHOTOS[m.id]) { photo.src = 'assets/city/faces/' + m.id + '.jpg'; photo.alt = tr(m.spec.name); }
     $('#profile-kicker').textContent = m.spec.kicker; $('#profile-role').textContent = tr(m.spec.role);
     $('#profile-name').textContent = tr(m.spec.name); $('#profile-text').textContent = tr(m.spec.text);
     profileEl.hidden = false; mode = 'meet'; profileRide = !!m.spec.ride;
@@ -862,7 +864,17 @@ function start() {
     event.preventDefault(); const href = event.currentTarget.href;
     sound.fx.select(); wipeEl.classList.add('is-on'); setTimeout(() => { location.href = href; }, 720);
   });
-  canvas.addEventListener('click', () => { if (mode === 'meet' && meeting) { playCast(meeting, 'React', true); if (meeting === pyonMember) playPyon(pyonActions.Jump ? 'Jump' : 'Cheer', true); sound.fx.pop(); burst(meeting.group.position.clone().add(V(0, meeting.spec.height * .9, 0)), PASTEL, 30, 5, .7); } });
+  canvas.addEventListener('click', event => {
+    if (mode !== 'meet' || !meeting) return;
+    // Someone else in view? Clicking them goes straight over to them.
+    ndc.set(event.clientX / innerWidth * 2 - 1, -(event.clientY / innerHeight) * 2 + 1); raycaster.setFromCamera(ndc, camera);
+    const hit = raycaster.intersectObjects(proxies, false).find(h => (h.object.userData.kind === 'cast' || h.object.userData.kind === 'pyon') && h.object.userData.id !== meeting.id);
+    if (hit) {
+      const old = meeting; old.stopped = false; playCast(old, old.spec.ride || old.spec.glide ? 'Idle' : old.spec.dance ? 'React' : 'Walk');
+      profileEl.hidden = true; profileRide = false; meeting = null; mode = 'orbit'; meet(hit.object.userData.id); return;
+    }
+    { playCast(meeting, 'React', true); if (meeting === pyonMember) playPyon(pyonActions.Jump ? 'Jump' : 'Cheer', true); sound.fx.pop(); burst(meeting.group.position.clone().add(V(0, meeting.spec.height * .9, 0)), PASTEL, 30, 5, .7); }
+  });
 
   /* ── plants: 3D models close to the plaza, flat pictures further away (lighter to draw) ── */
   function loadPlants() {
