@@ -675,6 +675,7 @@ function start() {
   }
 
   // 07 SNS: look up at the airship and open the row of SNS buttons (the airship itself does the same when clicked).
+  let snsLabel = null;
   const snsEl = $('#city-sns'), snsLink = document.querySelector('.city-menu a[data-sns]');
   async function openSns() {
     if (mode !== 'orbit') return;
@@ -1268,7 +1269,7 @@ function start() {
   const ROUTES = {
     plaza: circle(6.6, .32), road: stadium(2.1, 21, 62, .22), ringA: circle(46, .06), ringB: circle(75, .06),
     low1: circle(34, -69.9), low2: circle(50, -69.9), low3: circle(22, -69.9),
-    air1: circle(20, 27), air2: circle(38, 22), air3: circle(58, 12), lift: helix(29, -62, 9, 3), sky: circle(165, 16),
+    air1: circle(20, 27), air2: circle(38, 22), air3: circle(58, 12), lift: helix(29, -62, 9, 3), sky: circle(165, 44),
     // Delivery rounds: each courier has its own winding path laid out in advance, at its own heights.
     airTourA: tour([[0, 11, -16], [14, 13, -6], [10, 10, 14], [5, 12, 34], [6, 15, 56], [-6, 17, 56], [-5, 13, 32], [-12, 11, 12], [-14, 14, -6]]),   // plaza, down the main road and back
     airTourB: tour([[-17, 19, 0], [-7, 23, 13], [5, 19, 6], [17, 22, -3], [9, 24, -15], [-3, 20, -7], [-12, 23, -16]]),                             // criss-crossing above the plaza
@@ -1533,7 +1534,7 @@ function start() {
         const ship = traffic.find(t => t.id === 'airship');
         if (ship) { let target = Math.atan2(ship.car.position.x, ship.car.position.z) + Math.PI;
           while (target - view.azT > Math.PI) target -= Math.PI * 2; while (target - view.azT < -Math.PI) target += Math.PI * 2;
-          view.azT = target; view.tiltT = .36; view.idle = 0; }
+          view.azT = target; view.tiltT = .5; view.idle = 0; }
       }
       if (hotGame && N.UFO) {          // keep following the UFO while its menu item is pointed at
         let target = Math.atan2(N.UFO.position.x, N.UFO.position.z) + Math.PI;
@@ -1608,6 +1609,16 @@ function start() {
       const on = showLabels && tmp.z < 1 && Math.abs(tmp.x) < 1.05 && tmp.y < 1 && tmp.y > -.9;
       place.el.classList.toggle('is-on', on);
       if (on) place.el.style.transform = `translate(${((tmp.x + 1) / 2 * innerWidth).toFixed(1)}px,${((1 - tmp.y) / 2 * innerHeight).toFixed(1)}px) translate(-50%,-100%)`;
+    }
+    {                                    // the airship carries an "SNS" label of its own, like the places do
+      const ship = traffic.find(t => t.id === 'airship');
+      if (ship && !snsLabel) { snsLabel = document.createElement('button'); snsLabel.type = 'button'; snsLabel.className = 'city-label'; snsLabel.textContent = 'SNS'; snsLabel.addEventListener('click', () => openSns()); labelsEl.append(snsLabel); }
+      if (ship) {
+        tmp.copy(ship.car.position); tmp.y += 62; tmp.project(camera);
+        const on = showLabels && tmp.z < 1 && Math.abs(tmp.x) < 1.05 && tmp.y < 1 && tmp.y > -.9;
+        snsLabel.classList.toggle('is-on', on);
+        if (on) snsLabel.style.transform = `translate(${((tmp.x + 1) / 2 * innerWidth).toFixed(1)}px,${((1 - tmp.y) / 2 * innerHeight).toFixed(1)}px) translate(-50%,-100%)`;
+      }
     }
     if (!bubbleEl.hidden) {
       tmp.set(0, 3.5, 0).project(camera);
