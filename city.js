@@ -135,7 +135,7 @@ function start() {
   // the rooftop picture, so the merged low-poly city needs no UVs. At night the pictures glow a little.
   const uSkinGlow = {value: .42}, uNight = {value: 0};
   // Which parts of a picture are lights: warm yellow and cyan panes (windows, lamps) and hot pink (neon, the insides of bunny ears).
-  const LIGHTS = 'float lightMask(vec3 c){ float warm = smoothstep(0.10, 0.30, min(c.r, c.g) - c.b); float cool = smoothstep(0.12, 0.32, min(c.g, c.b) - c.r) * smoothstep(-0.02, 0.06, c.b - c.g); float pink = smoothstep(0.16, 0.36, c.r - c.g) * step(0.45, c.b); return clamp(warm + cool + pink * 0.8, 0.0, 1.0); }';
+  const LIGHTS = 'float lightMask(vec3 c, float pinkFrom){ float warm = smoothstep(0.24, 0.42, min(c.r, c.g) - c.b); float cool = smoothstep(0.12, 0.32, min(c.g, c.b) - c.r) * smoothstep(-0.02, 0.06, c.b - c.g); float pink = smoothstep(pinkFrom, pinkFrom + 0.14, c.r - c.g) * step(0.45, c.b); return clamp(warm + cool + pink * 0.8, 0.0, 1.0); }';
   const skinTextures = {};
   const skinTexture = name => skinTextures[name] || (skinTextures[name] = textures.load(`assets/city/tex/${name}.jpg`, t => { t.colorSpace = THREE.SRGBColorSpace; t.wrapS = t.wrapT = THREE.RepeatWrapping; t.anisotropy = 4; }));
   function skinned(source, wall, roof, size) {
@@ -146,7 +146,7 @@ function start() {
         .replace('#include <project_vertex>', '#include <project_vertex>\nvSkinPos = (modelMatrix * vec4(transformed, 1.0)).xyz; vSkinNormal = normalize(mat3(modelMatrix) * objectNormal); vSkinUv = uv;');
       shader.fragmentShader = shader.fragmentShader.replace('#include <common>', '#include <common>\nuniform sampler2D uWall; uniform sampler2D uRoof; uniform float uSkinGlow; uniform float uSkinSize; varying vec3 vSkinPos; varying vec3 vSkinNormal; varying vec2 vSkinUv; vec3 skinColor; vec3 skinRaw; uniform float uNight;\n' + LIGHTS)
         .replace('#include <map_fragment>', '#include <map_fragment>\nvec3 sn = normalize(vSkinNormal);\nif (abs(sn.y) > 0.75) skinColor = texture2D(uRoof, vSkinPos.xz * uSkinSize).rgb;\nelse skinColor = texture2D(uWall, vSkinUv * uSkinSize).rgb;\nskinRaw = skinColor;\nskinColor = mix(pow(skinColor, vec3(2.2)), vec3(0.95, 0.93, 1.0), 0.34);\ndiffuseColor.rgb = skinColor;')
-        .replace('#include <emissivemap_fragment>', '#include <emissivemap_fragment>\ntotalEmissiveRadiance += skinColor * uSkinGlow + pow(skinRaw, vec3(2.2)) * lightMask(skinRaw) * uNight * 1.5;');
+        .replace('#include <emissivemap_fragment>', '#include <emissivemap_fragment>\ntotalEmissiveRadiance += skinColor * uSkinGlow + pow(skinRaw, vec3(2.2)) * lightMask(skinRaw, 0.44) * uNight * 1.5;');
     };
     material.customProgramCacheKey = () => 'skin-' + wall + roof + size;
     return material;
@@ -175,7 +175,7 @@ function start() {
     material.onBeforeCompile = shader => {
       shader.uniforms.uNight = uNight;
       shader.fragmentShader = shader.fragmentShader.replace('#include <common>', '#include <common>\nuniform float uNight;\n' + LIGHTS)
-        .replace('#include <emissivemap_fragment>', '#include <emissivemap_fragment>\n#ifdef USE_MAP\nvec3 lit = texture2D(map, vMapUv).rgb;\ntotalEmissiveRadiance += pow(lit, vec3(2.2)) * lightMask(lit) * uNight * 1.3;\n#endif');
+        .replace('#include <emissivemap_fragment>', '#include <emissivemap_fragment>\n#ifdef USE_MAP\nvec3 lit = texture2D(map, vMapUv).rgb;\ntotalEmissiveRadiance += pow(lit, vec3(2.2)) * lightMask(lit, 0.38) * uNight * 1.3;\n#endif');
     };
     material.customProgramCacheKey = () => 'night-lights';
   }
