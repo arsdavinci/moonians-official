@@ -901,14 +901,15 @@ function start() {
   // Each player is its own video with its own framing. The airship has one; a monitor in town has another that
   // starts on the other clip, part-way through, so the two never show the same picture.
   const snsPlayers = {};
-  function snsScreen(w, h, key = 'ship', startClip = 0, startAt = 0) {
+  const RAMUNE_CLIPS = ['assets/city/ramune/1.mp4', 'assets/city/ramune/2.mp4'];
+  function snsScreen(w, h, key = 'ship', startClip = 0, startAt = 0, clips = SNS_CLIPS, faceAt = .5) {
     let sns = snsPlayers[key];
     if (!sns) {
-      const el = document.createElement('video'); el.muted = true; el.playsInline = true; el.preload = 'auto'; el.src = SNS_CLIPS[startClip];
+      const el = document.createElement('video'); el.muted = true; el.playsInline = true; el.preload = 'auto'; el.src = clips[startClip];
       const texture = new THREE.VideoTexture(el); texture.colorSpace = THREE.SRGBColorSpace;
-      sns = snsPlayers[key] = {el, texture, index: startClip, planes: [], zoom: 1, pan: .5, zoomT: 1, panT: .5, next: 0};
+      sns = snsPlayers[key] = {el, texture, clips, faceAt, index: startClip, planes: [], zoom: 1, pan: faceAt, zoomT: 1, panT: faceAt, next: 0};
       if (startAt) el.addEventListener('loadedmetadata', () => { try { el.currentTime = Math.min(startAt, el.duration - 1); } catch { /* not seekable yet */ } }, {once: true});
-      el.addEventListener('ended', () => { sns.index = (sns.index + 1) % SNS_CLIPS.length; el.src = SNS_CLIPS[sns.index]; el.play().catch(() => {}); });
+      el.addEventListener('ended', () => { sns.index = (sns.index + 1) % clips.length; el.src = clips[sns.index]; el.play().catch(() => {}); });
       el.play().catch(() => {});
       addEventListener('pointerdown', () => { if (el.paused) el.play().catch(() => {}); }, {passive: true});
     }
@@ -922,7 +923,7 @@ function start() {
       // Pyonpy's face is about half way up both videos. Shots that show it stay on for a while and drift slowly;
       // shots of anything else (feet, signs, the street) are quick cuts.
       const face = Math.random() < .68; sns.zoom = face ? 1 + Math.random() * 1.2 : 1.3 + Math.random() * 1.1;
-      sns.pan = face ? .5 + (Math.random() - .5) * .08 : Math.random() < .5 ? .08 + Math.random() * .24 : .68 + Math.random() * .24;
+      sns.pan = face ? sns.faceAt + (Math.random() - .5) * .08 : clamp(sns.faceAt + (Math.random() < .5 ? -1 : 1) * (.2 + Math.random() * .25), .08, .92);   // faceAt: how far up the picture the face usually is
       sns.zoomT = sns.zoom * (face ? .88 + Math.random() * .3 : 1); sns.panT = sns.pan + (face ? (Math.random() - .5) * .06 : 0);
       sns.next = time + (face ? 5 + Math.random() * 4 : .55 + Math.random() * .6);
     }
@@ -942,6 +943,7 @@ function start() {
     // showing is furthest away, so the same footage is never seen side by side (or even in the same view).
     const shown = CLIPS.map(() => []);
     screens.forEach(node => {
+      if (node.name === 'Scr002') { node.add(snsScreen(node.userData.w, node.userData.h, 'ramune', 0, 0, RAMUNE_CLIPS, .68)); return; }   // DJ Ramune's own videos, framed on her face
       if (node.name === 'Scr001') { node.add(snsScreen(node.userData.w, node.userData.h, 'town', 1, 6)); return; }   // the wide monitor by the workshop plays the dance videos, out of step with the airship
       const here = node.getWorldPosition(V(0, 0, 0)); let pick = 0, best = -1;
       CLIPS.forEach((clip, k) => { const apart = p => { let d = Math.abs(Math.atan2(p.z, p.x) - Math.atan2(here.z, here.x)); if (d > Math.PI) d = Math.PI * 2 - d; return d * 60 + p.distanceTo(here) * .15; };   // mostly: how far round the city
