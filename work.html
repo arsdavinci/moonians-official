@@ -141,7 +141,7 @@
   (function () {
     'use strict';
     // Where the form is delivered. Set this to the notification webhook's address; while it is empty the form says so instead of pretending to send.
-    var ENDPOINT = '';
+    var ENDPOINT = 'https://hooks.zapier.com/hooks/catch/27045252/45sqdoq/';
     var form = document.getElementById('work-form'), ok = document.getElementById('work-ok'), ng = document.getElementById('work-ng'), button = form.querySelector('.send');
     var opened = Date.now();
     function fail(text) { ng.textContent = text; ng.hidden = false; ok.hidden = true; ng.scrollIntoView({block: 'nearest', behavior: 'smooth'}); }
