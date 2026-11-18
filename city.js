@@ -1030,10 +1030,11 @@ function start() {
     kicker: 'ZOMPY', role: '夜の住人', name: 'ゾンピー', text: 'ミントグリーンの毛並みに、つぎはぎと舌ぺろ。夜になると、どこからともなく街に現れて、ふらふら歩き回ります。ちょっとこわいけど、どこかにくめないやつ。'};
   const ring = (r, wobble, turns, phase) => tour(Array.from({length: 12}, (_, i) => { const a = i / 12 * Math.PI * 2 * turns + phase, rr = r + Math.sin(i * 2.1 + phase) * wobble; return [Math.cos(a) * rr, .3, Math.sin(a) * rr]; }));
   Object.assign(CAST, {
-    zombie1: {...ZOMPY, route: ring(11, 1.6, 1, .4)},
-    zombie2: {...ZOMPY, route: ring(19, 1.2, -1, 2.2), speed: .42},
-    zombie3: {...ZOMPY, route: ring(13.5, 2, -1, 4.1), speed: .56},
-    zombie4: {...ZOMPY, route: tour([[5.4, .25, 26], [5.8, .25, 40], [5.2, .25, 56], [-5.2, .25, 57], [-5.8, .25, 42], [-5.4, .25, 27]]), speed: .46}
+    // none of them on the plaza itself: two go up and down the path to the Moon Tower, two along the sides of the main road
+    zombie1: {...ZOMPY, route: segment(1.6, -20.5, 1.6, -34, .22)},
+    zombie2: {...ZOMPY, route: segment(-2.3, -33, -2.3, -21, .22), speed: .42},
+    zombie3: {...ZOMPY, route: segment(-5.6, 25.5, -5.6, 58, .22), speed: .56},
+    zombie4: {...ZOMPY, route: segment(5.6, 57, 5.6, 26, .22), speed: .46}
   });
   const PHOTOS = {zombie: 1, ranpyon: 1, pyon: 1, luva: 1, kaguya: 1, ramune: 1, pt: 1, robot: 1, grouper: 1};   // close-up face pictures in assets/city/faces
   const cast = [], profileEl = $('#city-profile');
@@ -1785,7 +1786,17 @@ function start() {
       else m.rotation.y = time * m.userData.spin;
       m.material.opacity = (.75 + .25 * Math.sin(time * 5 + m.position.x)) * (.7 + .3 * night);
     }
-    for (const c of paintedClouds) { const a = c.userData.a + time * .006; c.position.set(Math.cos(a) * c.userData.r, c.userData.y, Math.sin(a) * c.userData.r); c.material.opacity = .95 - night * .7; }
+    {                                     // a cloud that drifts between the camera and the airship thins out, so the airship shows through it
+      const ship = traffic.find(t => t.id === 'airship'), shipFar = ship ? tmp2.copy(ship.car.position).setY(ship.car.position.y + 42).distanceTo(camera.position) : 0;
+      if (ship) tmp2.sub(camera.position).normalize();
+      for (const c of paintedClouds) {
+        const a = c.userData.a + time * .006; c.position.set(Math.cos(a) * c.userData.r, c.userData.y, Math.sin(a) * c.userData.r);
+        let thin = 0;
+        if (ship) { const far = tmp.copy(c.position).sub(camera.position).length(); if (far < shipFar) { const apart = Math.acos(clamp(tmp.normalize().dot(tmp2), -1, 1)), reach = c.scale.x * .5 / far + 46 / shipFar; thin = 1 - clamp((apart - reach * .7) / (reach * .5), 0, 1); } }
+        c.userData.thin = lerp(c.userData.thin ?? 0, thin, 1 - Math.pow(.2, dt));
+        c.material.opacity = (.95 - night * .7) * (1 - c.userData.thin * .88);
+      }
+    }
     updateTraffic(dt, still); updateCast(dt, still); updateSns(dt); updateBigFace(dt);
     if (mode === 'edit' && editPlace) { const v = vantage(editPlace); camPos.copy(v.pos); camLook.copy(v.look); }
     if (mode === 'ask' && asking && asking.id === 'game') { const v = vantage(asking.place), k = 1 - Math.pow(.02, dt); camPos.lerp(v.pos, k); camLook.lerp(v.look, k); }   // the UFO keeps flying, so the camera keeps up with it
