@@ -16,7 +16,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DotGothic16&family=M+PLUS+Rounded+1c:wght@700;800;900&family=Unbounded:wght@700;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="city.css?v=20261118-7">
+  <link rel="stylesheet" href="city.css?v=20261118-8">
   <script type="importmap">{"imports":{"three":"./vendor/three/three.module.min.js"}}</script>
   <script src="language.js?v=20261118-7"></script>
   <script type="module" src="city.js?v=20261118-26"></script>
@@ -70,10 +70,14 @@
   <div class="city-bubble" id="city-bubble" role="status" aria-live="polite" hidden></div>
 
   <aside class="city-profile" id="city-profile" hidden>
-    <img class="city-profile-photo" id="profile-photo" alt="" width="120" height="120" hidden>
-    <p class="city-profile-kicker" id="profile-kicker" translate="no"></p>
-    <p class="city-profile-role" id="profile-role"></p>
-    <h2 id="profile-name"></h2>
+    <div class="city-profile-head">
+      <img class="city-profile-photo" id="profile-photo" alt="" width="240" height="240" hidden>
+      <div class="city-profile-titles">
+        <p class="city-profile-role" id="profile-role"></p>
+        <h2 id="profile-name"></h2>
+        <p class="city-profile-kicker" id="profile-kicker" translate="no"></p>
+      </div>
+    </div>
     <p class="city-profile-text" id="profile-text"></p>
     <div class="city-profile-actions">
       <a class="city-button is-primary" id="profile-link" href="friends.html" data-language-link>他の仲間たちを見る</a>
