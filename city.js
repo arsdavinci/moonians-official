@@ -1143,10 +1143,36 @@ function start() {
   }
   function applyOffset() {
     const w = innerWidth, h = innerHeight;
-    if (w < 760) camera.setViewOffset(w, h, 0, h * (.15 + .1 * Math.abs(shift)), w, h);
+    if (w < 760) camera.setViewOffset(w, h, 0, h * (.15 + .14 * Math.abs(shift)), w, h);   // on a phone the card fills the lower half, so the subject sits in the upper half
     else if (shift !== 0) camera.setViewOffset(w, h, -w * (shift > 0 ? .1 : .11) * shift, 0, w, h);   // profile: character on the right; question: place on the left
     else camera.clearViewOffset();
     camera.updateProjectionMatrix();
+  }
+  // Where to stand to see a character: the wanted side first, then round to either side until nothing
+  // (a lamp, a bush, a car, another character) stands between the camera and them.
+  const sightRay = new THREE.Raycaster();
+  function clearSide(m, p, away, reach, eye, lift) {
+    const solid = [];
+    scene.traverse(o => {
+      if (!o.isMesh || !o.visible || o === sky) return;
+      for (let q = o; q; q = q.parent) { if (q === m.group) return; if (!q.visible) return; }
+      const mat = Array.isArray(o.material) ? o.material[0] : o.material;
+      if (!mat || mat.blending === THREE.AdditiveBlending || (mat.transparent && mat.depthWrite === false) || mat.side === THREE.BackSide) return;   // light, haze and holograms do not block
+      solid.push(o);
+    });
+    const spots = [p.clone().add(V(0, eye, 0)), p.clone().add(V(0, m.spec.height * .9, 0)), p.clone().add(V(0, m.spec.height * .25, 0))];
+    let best = away, bestScore = -1;
+    for (const turn of [0, .5, -.5, 1, -1, 1.5, -1.5, 2.1, -2.1, 2.7, -2.7, Math.PI]) {
+      const dir = away.clone().applyAxisAngle(V(0, 1, 0), turn), cam = p.clone().addScaledVector(dir, reach).add(V(0, eye + lift, 0));
+      let seen = 0;
+      for (const spot of spots) {
+        const span = cam.distanceTo(spot); sightRay.set(spot, cam.clone().sub(spot).normalize()); sightRay.far = span - .15; sightRay.near = .05;
+        if (!sightRay.intersectObjects(solid, false).length) seen++;
+      }
+      if (seen > bestScore) { bestScore = seen; best = dir; }
+      if (seen === spots.length) break;                      // a clear view: take it
+    }
+    return best;
   }
   async function meet(id) {
     const m = id === 'pyon' ? (pyon ? Object.assign(pyonMember, {group: pyon}) : null) : cast.find(x => x.id === id); if (!m || mode !== 'orbit') return;
@@ -1156,7 +1182,8 @@ function start() {
     const p = m.group.position.clone(), eye = m.spec.height * .58;
     // stand where the view is clear: a set side for those on the roads, otherwise wherever the camera already is
     const away = (m.spec.view === 'out' ? p.clone().setY(0).applyAxisAngle(V(0, 1, 0), .9) : m.spec.view ? V(m.spec.view[0], 0, m.spec.view[1]) : camPos.clone().sub(p).setY(0)).normalize();
-    const reach = m.spec.ride ? 4.4 : m.spec.height * 1.75, lift = m.spec.ride ? 1.0 : 0;   // riders in the car are seen from a little further back and above
+    const small = innerWidth < 760, reach = m.spec.ride ? 4.4 : m.spec.height * (small ? 2.3 : 1.75), lift = m.spec.ride ? 1.0 : 0;   // riders in the car are seen from a little further back and above
+    if (!m.spec.ride) away.copy(clearSide(m, p, away, reach, eye, lift));
     shiftT = m.spec.side === 'right' ? -1 : 1; profileEl.classList.toggle('is-right', m.spec.side === 'right');   // most stand on the right of their card; a few on the left
     if (motionOff()) { camPos.copy(p).addScaledVector(away, reach).add(V(0, eye + lift, 0)); camLook.copy(p).add(V(0, eye, 0)); }
     else if (m.spec.ride) {            // a rider keeps moving, so the camera aims at where they are each moment and arrives right in step with them
