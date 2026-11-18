@@ -664,8 +664,10 @@ function start() {
   async function openLink(id) {         // fly up to it, then ask: open the other site, or back to the city
     const item = LINKS[id]; if (!item || mode !== 'orbit') return;
     mode = 'fly'; shiftT = -1; body.classList.add('is-travelling'); hintEl.classList.remove('is-on'); bubbleEl.hidden = true; sound.fx.select();
-    const pos = item.centre.clone().addScaledVector(item.out, 15).add(V(0, -1.5, 0));
-    if (!motionOff()) { sound.fx.whoosh(1.7); await fly(pos, item.centre.clone(), 1.9, 5); } else { camPos.copy(pos); camLook.copy(item.centre); }
+    // On a phone the card fills the lower half: come in closer and aim a little high, so the display runs right down to the card.
+    const small = innerWidth < 760, look = item.centre.clone().add(V(0, small ? 1.1 : 0, 0));
+    const pos = item.centre.clone().addScaledVector(item.out, small ? 12.6 : 15).add(V(0, small ? -.5 : -1.5, 0));
+    if (!motionOff()) { sound.fx.whoosh(1.7); await fly(pos, look, 1.9, 5); } else { camPos.copy(pos); camLook.copy(look); }
     asking = {id: 'link', link: noLink, url: item.url};
     askText(tr(item.where), tr(item.name), item.question, item.yes);
     body.classList.remove('is-travelling'); body.classList.add('is-asking'); enterEl.hidden = false; mode = 'ask';
