@@ -133,18 +133,20 @@ function start() {
   const tileTexture = textures.load('assets/city/floor-tile.jpg', texture => { texture.colorSpace = THREE.SRGBColorSpace; texture.wrapS = texture.wrapT = THREE.RepeatWrapping; texture.anisotropy = 4; });
   // Building skins: the facade pictures are wrapped onto walls by world position (side walls) and roofs get
   // the rooftop picture, so the merged low-poly city needs no UVs. At night the pictures glow a little.
-  const uSkinGlow = {value: .42};
+  const uSkinGlow = {value: .42}, uNight = {value: 0};
+  // Which parts of a picture are lights: warm yellow and cyan panes (windows, lamps) and hot pink (neon, the insides of bunny ears).
+  const LIGHTS = 'float lightMask(vec3 c){ float warm = smoothstep(0.10, 0.30, min(c.r, c.g) - c.b); float cool = smoothstep(0.12, 0.32, min(c.g, c.b) - c.r); float pink = smoothstep(0.22, 0.45, c.r - c.g) * step(0.5, c.b); return clamp(warm + cool + pink * 0.8, 0.0, 1.0); }';
   const skinTextures = {};
   const skinTexture = name => skinTextures[name] || (skinTextures[name] = textures.load(`assets/city/tex/${name}.jpg`, t => { t.colorSpace = THREE.SRGBColorSpace; t.wrapS = t.wrapT = THREE.RepeatWrapping; t.anisotropy = 4; }));
   function skinned(source, wall, roof, size) {
     const material = source.clone(); material.color.set(0xffffff);
     material.onBeforeCompile = shader => {
-      shader.uniforms.uWall = {value: skinTexture(wall)}; shader.uniforms.uRoof = {value: skinTexture(roof)}; shader.uniforms.uSkinGlow = uSkinGlow; shader.uniforms.uSkinSize = {value: 1 / size};
+      shader.uniforms.uWall = {value: skinTexture(wall)}; shader.uniforms.uRoof = {value: skinTexture(roof)}; shader.uniforms.uSkinGlow = uSkinGlow; shader.uniforms.uNight = uNight; shader.uniforms.uSkinSize = {value: 1 / size};
       shader.vertexShader = shader.vertexShader.replace('#include <common>', '#include <common>\nvarying vec3 vSkinPos; varying vec3 vSkinNormal; varying vec2 vSkinUv;')
         .replace('#include <project_vertex>', '#include <project_vertex>\nvSkinPos = (modelMatrix * vec4(transformed, 1.0)).xyz; vSkinNormal = normalize(mat3(modelMatrix) * objectNormal); vSkinUv = uv;');
-      shader.fragmentShader = shader.fragmentShader.replace('#include <common>', '#include <common>\nuniform sampler2D uWall; uniform sampler2D uRoof; uniform float uSkinGlow; uniform float uSkinSize; varying vec3 vSkinPos; varying vec3 vSkinNormal; varying vec2 vSkinUv; vec3 skinColor;')
-        .replace('#include <map_fragment>', '#include <map_fragment>\nvec3 sn = normalize(vSkinNormal);\nif (abs(sn.y) > 0.75) skinColor = texture2D(uRoof, vSkinPos.xz * uSkinSize).rgb;\nelse skinColor = texture2D(uWall, vSkinUv * uSkinSize).rgb;\nskinColor = mix(pow(skinColor, vec3(2.2)), vec3(0.95, 0.93, 1.0), 0.34);\ndiffuseColor.rgb = skinColor;')
-        .replace('#include <emissivemap_fragment>', '#include <emissivemap_fragment>\ntotalEmissiveRadiance += skinColor * uSkinGlow;');
+      shader.fragmentShader = shader.fragmentShader.replace('#include <common>', '#include <common>\nuniform sampler2D uWall; uniform sampler2D uRoof; uniform float uSkinGlow; uniform float uSkinSize; varying vec3 vSkinPos; varying vec3 vSkinNormal; varying vec2 vSkinUv; vec3 skinColor; vec3 skinRaw; uniform float uNight;\n' + LIGHTS)
+        .replace('#include <map_fragment>', '#include <map_fragment>\nvec3 sn = normalize(vSkinNormal);\nif (abs(sn.y) > 0.75) skinColor = texture2D(uRoof, vSkinPos.xz * uSkinSize).rgb;\nelse skinColor = texture2D(uWall, vSkinUv * uSkinSize).rgb;\nskinRaw = skinColor;\nskinColor = mix(pow(skinColor, vec3(2.2)), vec3(0.95, 0.93, 1.0), 0.34);\ndiffuseColor.rgb = skinColor;')
+        .replace('#include <emissivemap_fragment>', '#include <emissivemap_fragment>\ntotalEmissiveRadiance += skinColor * uSkinGlow + pow(skinRaw, vec3(2.2)) * lightMask(skinRaw) * uNight * 1.5;');
     };
     material.customProgramCacheKey = () => 'skin-' + wall + roof + size;
     return material;
@@ -168,6 +170,15 @@ function start() {
   }
 
   // Floors take the tile picture by world position, so the merged model needs no UVs.
+  function nightLights(material) {     // the same night lights for the models made from the design sheets
+    if (!material.map) return;
+    material.onBeforeCompile = shader => {
+      shader.uniforms.uNight = uNight;
+      shader.fragmentShader = shader.fragmentShader.replace('#include <common>', '#include <common>\nuniform float uNight;\n' + LIGHTS)
+        .replace('#include <emissivemap_fragment>', '#include <emissivemap_fragment>\n#ifdef USE_MAP\nvec3 lit = texture2D(map, vMapUv).rgb;\ntotalEmissiveRadiance += pow(lit, vec3(2.2)) * lightMask(lit) * uNight * 1.3;\n#endif');
+    };
+    material.customProgramCacheKey = () => 'night-lights';
+  }
   function tiled(material) {
     material.onBeforeCompile = shader => {
       shader.uniforms.uTile = {value: tileTexture};
@@ -263,7 +274,7 @@ function start() {
     scene.environment = k > .5 ? envNight : envDay;
     uGlow.value = lerp(1, 1.75, k);
     sk.panoMix.value = panoReady ? 1 - k : 0;
-    uSkinGlow.value = lerp(.42, .55, k);   // the pictures light themselves a little, so shading does not darken their pastel colours if (N.skylineDay) { N.skylineDay.material.opacity = 1 - k; N.skylineNight.material.opacity = k; N.skylineNight.visible = k > .01; N.skylineDay.visible = k < .99; }
+    uSkinGlow.value = lerp(.42, .02, k); uNight.value = k;   // the pictures light themselves a little, so shading does not darken their pastel colours if (N.skylineDay) { N.skylineDay.material.opacity = 1 - k; N.skylineNight.material.opacity = k; N.skylineNight.visible = k > .01; N.skylineDay.visible = k < .99; }
     if (N.plazaArt) N.plazaArt.material.color.setScalar(lerp(1, .55, k));
     if (N.mistLayers) N.mistLayers.forEach(m => m.material.color.setRGB(lerp(.925, .2, k), lerp(.894, .16, k), lerp(1, .42, k), THREE.SRGBColorSpace));
     stars.material.opacity = k; moonDisc.material.opacity = k * .95; sunDisc.material.opacity = (1 - k) * .95;
@@ -676,7 +687,7 @@ function start() {
     for (const [id, spec] of Object.entries(MODELS)) {
       new GLTFLoader().load(`assets/city/lm/${id}.glb?v=20261118-2`, gltf => {
         const model = gltf.scene;
-        model.traverse(node => { if (node.isMesh) (Array.isArray(node.material) ? node.material : [node.material]).forEach(m => { m.envMapIntensity = .45; m.roughness = .5; m.metalness = 0; }); });
+        model.traverse(node => { if (node.isMesh) (Array.isArray(node.material) ? node.material : [node.material]).forEach(m => { m.envMapIntensity = .45; m.roughness = .5; m.metalness = 0; nightLights(m); }); });
         model.scale.setScalar(spec.height);
         if (id === 'game') {
           N.UFO.traverse(node => { if (node.isMesh && node.parent !== N.UFO_BeamMesh && node !== N.UFO_BeamMesh) node.visible = false; });
@@ -956,10 +967,11 @@ function start() {
   function loadTraffic() {
     for (const [id, spec] of Object.entries(CARS)) {
       new GLTFLoader().load(`assets/city/cars/${id}.glb?v=20261118-2`, gltf => {
-        gltf.scene.traverse(node => { if (node.isMesh) (Array.isArray(node.material) ? node.material : [node.material]).forEach(m => { m.envMapIntensity = .5; m.roughness = .45; m.metalness = 0; }); });
+        gltf.scene.traverse(node => { if (node.isMesh) (Array.isArray(node.material) ? node.material : [node.material]).forEach(m => { m.envMapIntensity = .5; m.roughness = .45; m.metalness = 0; nightLights(m); }); });
         FLEET.filter(f => f[0] === id).forEach(([, route, speed, start], i) => {
           const body = gltf.scene.clone(); body.scale.setScalar(spec.height); body.rotation.y = spec.yaw;
           const car = new THREE.Group(); car.add(body); scene.add(car);
+          if (id === 'airship') { for (const side of [1, -1]) { const screen = videoScreen(side > 0 ? 'capsule/complete' : 'capsule/clip-12', .40, .215); screen.position.set(.02, .585, .268 * side); if (side < 0) screen.rotation.y = Math.PI; body.add(screen); } }
           if (id === 'airship') { const p = new THREE.Mesh(new THREE.SphereGeometry(16, 10, 8)); p.userData = {kind: 'airship', id}; proxies.push(p); car.userData.proxy = p; }
           traffic.push({id, car, body, routeName: route, route: ROUTES[route], speed, d: start, phase: Math.random() * 6, air: /air|lift/.test(route)});
         });
@@ -1189,7 +1201,8 @@ function start() {
       const u = N.UFO;
       // The UFO circles high over the city; it holds still while the camera flies anywhere, so it is easy to reach.
       if (mode !== 'fly' && !still) ufoAngle += dt * .16;
-      u.position.set(Math.cos(ufoAngle) * 30, 27 + Math.sin(time * 1.25) * .8, Math.sin(ufoAngle) * 30);
+      const ufoR = 25 + Math.sin(ufoAngle * 2.3) * 5;   // stays inside the Moon Tower's reach and above every roof
+      u.position.set(Math.cos(ufoAngle) * ufoR, 40 + Math.sin(time * .7) * 4.5 + Math.sin(time * 2.6) * 1.1, Math.sin(ufoAngle) * ufoR);
       u.rotation.y += dt * .35 * boost.ufo; u.rotation.z = Math.sin(time * .9) * .06; u.rotation.x = Math.cos(time * .7) * .05;
       if (N.ufoProxy) { N.ufoProxy.position.copy(u.position); N.ufoProxy.updateMatrixWorld(); }
       if (N.UFO_BeamMesh) N.UFO_BeamMesh.traverse(o => { if (o.isMesh) { o.material.opacity = boost.beam * (.8 + Math.sin(time * 22) * .2); o.visible = boost.beam > .01; } });
