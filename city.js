@@ -627,7 +627,7 @@ function start() {
   $('#enter-yes').addEventListener('click', enterPlace); $('#enter-no').addEventListener('click', backToCity);
   addEventListener('keydown', event => { if (event.key === 'Escape') backToCity(); });
 
-  let hotGame = false;
+  let hotGame = false, hotSns = false;
   function hot(id, turn = true) {
     hotGame = id === 'game' && turn;
     links.forEach(a => a.classList.toggle('is-hot', a.dataset.place === id));
@@ -658,6 +658,9 @@ function start() {
     }
     wipeEl.classList.add('is-on'); await wait(.72); location.href = snsLink.href;
   }
+  snsLink.addEventListener('pointerenter', () => { hotSns = true; snsLink.classList.add('is-hot'); sound.fx.hover(); });
+  snsLink.addEventListener('focus', () => { hotSns = true; });
+  for (const type of ['pointerleave', 'blur']) snsLink.addEventListener(type, () => { hotSns = false; snsLink.classList.remove('is-hot'); if (mode === 'orbit') view.tiltT = .12; });
   snsLink.addEventListener('click', event => { if (body.classList.contains('no-3d') || event.metaKey || event.ctrlKey || event.shiftKey) return; event.preventDefault(); if (mode === 'intro') skipIntro(); openSns(); });
   links.forEach(link => {
     link.addEventListener('click', event => {
@@ -1222,6 +1225,12 @@ function start() {
     beams.forEach((m, i) => { m.material.opacity = (1 - night) * (.07 + .07 * (Math.sin(time * .35 + i * 1.7) * .5 + .5)); m.visible = night < .98; });
     if (mode === 'orbit') {
       view.idle += dt;
+      if (hotSns) {                    // keep following the airship while the SNS item is pointed at
+        const ship = traffic.find(t => t.id === 'airship');
+        if (ship) { let target = Math.atan2(ship.car.position.x, ship.car.position.z) + Math.PI;
+          while (target - view.azT > Math.PI) target -= Math.PI * 2; while (target - view.azT < -Math.PI) target += Math.PI * 2;
+          view.azT = target; view.tiltT = .62; view.idle = 0; }
+      }
       if (hotGame && N.UFO) {          // keep following the UFO while its menu item is pointed at
         let target = Math.atan2(N.UFO.position.x, N.UFO.position.z) + Math.PI;
         while (target - view.azT > Math.PI) target -= Math.PI * 2; while (target - view.azT < -Math.PI) target += Math.PI * 2;
