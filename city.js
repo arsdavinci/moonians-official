@@ -1030,11 +1030,14 @@ function start() {
     kicker: 'ZOMPY', role: '夜の住人', name: 'ゾンピー', text: 'ミントグリーンの毛並みに、つぎはぎと舌ぺろ。夜になると、どこからともなく街に現れて、ふらふら歩き回ります。ちょっとこわいけど、どこかにくめないやつ。'};
   const ring = (r, wobble, turns, phase) => tour(Array.from({length: 12}, (_, i) => { const a = i / 12 * Math.PI * 2 * turns + phase, rr = r + Math.sin(i * 2.1 + phase) * wobble; return [Math.cos(a) * rr, .3, Math.sin(a) * rr]; }));
   Object.assign(CAST, {
-    // none of them on the plaza itself: two go up and down the path to the Moon Tower, two along the sides of the main road
-    zombie1: {...ZOMPY, route: segment(1.6, -20.5, 1.6, -34, .22)},
-    zombie2: {...ZOMPY, route: segment(-2.3, -33, -2.3, -21, .22), speed: .42},
-    zombie3: {...ZOMPY, route: segment(-5.6, 25.5, -5.6, 58, .22), speed: .56},
-    zombie4: {...ZOMPY, route: segment(5.6, 57, 5.6, 26, .22), speed: .46}
+    // None on the plaza, and none on the Moon Tower path (that is Za-Luva's). Two keep to the sides of the main road;
+    // the rest are spread over the walkways that run out from the plaza to the ring road, and one further out still.
+    zombie1: {...ZOMPY, route: segment(-5.6, 25.5, -5.6, 58, .22), speed: .56},
+    zombie2: {...ZOMPY, route: segment(5.6, 57, 5.6, 26, .22), speed: .46},
+    ...Object.fromEntries([[58, 24, 44, .5], [125, 44, 24, .44], [155, 24.5, 44, .52], [-5, 44, 24, .48], [-145, 24, 44, .42], [150, 49, 73, .5]].map(([deg, r0, r1, speed], i) => {
+      const a = deg * Math.PI / 180, x = Math.cos(a), z = -Math.sin(a);       // the walkways were laid out by compass angle
+      return ['zombie' + (i + 3), {...ZOMPY, route: segment(x * r0, z * r0, x * r1, z * r1, .08), speed}];
+    }))
   });
   const PHOTOS = {zombie: 1, ranpyon: 1, pyon: 1, luva: 1, kaguya: 1, ramune: 1, pt: 1, robot: 1, grouper: 1};   // close-up face pictures in assets/city/faces
   const cast = [], profileEl = $('#city-profile');
