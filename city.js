@@ -753,12 +753,28 @@ function start() {
           spec.hide.forEach(name => { if (N[name]) N[name].visible = false; });
         }
         if (id === 'friends') {        // the round display on the bunny building shows Yanavis's expressions, one after another
+          // The display is tilted and domed, so the picture is laid on it: the surface is measured at a grid of points
+          // and both the black backing and the face follow that shape.
           model.updateMatrixWorld(true);
-          const from = model.localToWorld(V(0, .4325, 1)), to = model.localToWorld(V(0, .4325, 0)), hit = new THREE.Raycaster(from, to.clone().sub(from).normalize()).intersectObject(model, true)[0];
-          const z = hit ? model.worldToLocal(hit.point.clone()).z : .26;
-          const back = new THREE.Mesh(new THREE.CircleGeometry(.116, 48), new THREE.MeshBasicMaterial({color: 0x0b0a1c, toneMapped: false})); back.position.set(0, .4325, z + .004); model.add(back);
+          const CY = .4325, R = .104, G = 8, ray = new THREE.Raycaster(), grid = [];
+          const depth = (x, y) => { const from = model.localToWorld(V(x, CY + y, 1)), to = model.localToWorld(V(x, CY + y, 0)); ray.set(from, to.sub(from).normalize()); const hit = ray.intersectObject(model, true)[0]; return hit ? model.worldToLocal(hit.point.clone()).z : null; };
+          for (let iy = 0; iy <= G; iy++) for (let ix = 0; ix <= G; ix++) {
+            let x = (ix / G * 2 - 1) * R, y = (iy / G * 2 - 1) * R; const r = Math.hypot(x, y); if (r > R) { x *= R / r; y *= R / r; }   // outside the glass: use its edge
+            grid.push(depth(x, y));
+          }
+          const mid = grid[(G / 2) * (G + 1) + G / 2] ?? .26; for (let k = 0; k < grid.length; k++) if (grid[k] === null || Math.abs(grid[k] - mid) > .08) grid[k] = mid;
+          const zAt = (x, y) => { const fx = clamp((x / R + 1) / 2, 0, 1) * G, fy = clamp((y / R + 1) / 2, 0, 1) * G, x0 = Math.min(G - 1, Math.floor(fx)), y0 = Math.min(G - 1, Math.floor(fy)), tx = fx - x0, ty = fy - y0, g = (a, b) => grid[b * (G + 1) + a];
+            return lerp(lerp(g(x0, y0), g(x0 + 1, y0), tx), lerp(g(x0, y0 + 1), g(x0 + 1, y0 + 1), tx), ty); };
+          const laid = (size, lift, material) => { const geo = new THREE.PlaneGeometry(size, size, 16, 16), pos = geo.attributes.position;
+            for (let k = 0; k < pos.count; k++) pos.setZ(k, zAt(pos.getX(k), pos.getY(k)) + lift);
+            const m = new THREE.Mesh(geo, material); m.position.set(0, CY, 0); model.add(m); return m; };
+          const round = document.createElement('canvas'); round.width = round.height = 128; const rc = round.getContext('2d'); rc.fillStyle = '#0b0a1c'; rc.beginPath(); rc.arc(64, 64, 63, 0, Math.PI * 2); rc.fill();
+          laid(.232, .003, new THREE.MeshBasicMaterial({map: new THREE.CanvasTexture(round), alphaTest: .5, toneMapped: false}));
           const map = textures.load('assets/city/yanavis-faces.webp', t => { t.colorSpace = THREE.SRGBColorSpace; }); map.repeat.set(1 / 6, 1);
-          const face = new THREE.Mesh(new THREE.PlaneGeometry(.2, .2), new THREE.MeshBasicMaterial({map, transparent: true, toneMapped: false})); face.position.set(0, .4325, z + .007); model.add(face);
+          const blue = new THREE.MeshBasicMaterial({map, transparent: true, toneMapped: false});   // eyes and mouth in light blue; unlit, so they glow the same at night
+          blue.onBeforeCompile = shader => { shader.fragmentShader = shader.fragmentShader.replace('#include <map_fragment>', '#include <map_fragment>\nfloat fl = dot(diffuseColor.rgb, vec3(0.3333)); diffuseColor.rgb = vec3(0.45, 0.93, 1.0) * (0.85 + 0.3 * fl); diffuseColor.a *= smoothstep(0.08, 0.42, fl);'); };
+          blue.customProgramCacheKey = () => 'blue-face';
+          const face = laid(.2, .006, blue);
           bigFace = {map, face, now: 0, until: 0, pop: 0};
         }
         landmarkModels[id] = model;
@@ -1006,7 +1022,7 @@ function start() {
   function updateBigFace(dt) {
     if (!bigFace) return;
     if (time > bigFace.until) { let next = Math.floor(Math.random() * 6); if (next === bigFace.now) next = (next + 1) % 6; bigFace.now = next; bigFace.map.offset.x = next / 6; bigFace.until = time + .9 + Math.random() * .9; bigFace.pop = 1; }
-    bigFace.pop = Math.max(0, bigFace.pop - dt * 4); bigFace.face.scale.setScalar(1 + Math.sin(bigFace.pop * Math.PI) * .16);   // each new face pops in
+    bigFace.pop = Math.max(0, bigFace.pop - dt * 4); { const k = 1 + Math.sin(bigFace.pop * Math.PI) * .12; bigFace.face.scale.set(k, k, 1); }   // each new face pops in
   }
   function updateName() {             // a small name tag over whoever is pointed at, and over whoever's profile is open
     const m = (mode === 'meet' || (mode === 'fly' && meeting)) ? (hovered || meeting) : mode === 'orbit' ? hovered : null;
@@ -1126,7 +1142,7 @@ function start() {
     });
     // a ring of signs round the plaza, and tall ones along the main road
     for (let i = 0; i < 8; i++) { if (i === 2 || i === 7) continue; const a = i / 8 * Math.PI * 2 + .39, g = new THREE.Group(); g.position.set(Math.cos(a) * 25.2, 6.2 + (i % 2) * 1.6, Math.sin(a) * 25.2); g.rotation.y = -a - Math.PI / 2; scene.add(g); hang(g, (i + 3) % 8, 5.2, 0, 0, 0, i % 2 === 1); }
-    for (let i = 0; i < 6; i++) { const g = new THREE.Group(), side = i % 2 ? 1 : -1; g.position.set(side * 8.4, 5.5, 26 + i * 6.5); g.rotation.y = side > 0 ? -Math.PI / 2 : Math.PI / 2; scene.add(g); hang(g, (i + 5) % 8, 4.6, 0, 0, 0, true); }
+    for (let i = 1; i < 6; i++) { const g = new THREE.Group(), side = i % 2 ? 1 : -1; g.position.set(side * 8.4, 5.5, 26 + i * 6.5); g.rotation.y = side > 0 ? -Math.PI / 2 : Math.PI / 2; scene.add(g); hang(g, (i + 5) % 8, 4.6, 0, 0, 0, true); }
   }
 
   /* ── traffic: hover cars on the roads and bridges, the lower town, and drones in the air ── */
