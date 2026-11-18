@@ -780,7 +780,7 @@ function start() {
     grouper: {height: 3.0, yaw: 0, route: circle(.6, .22, 20.4, 6.5), speed: .35, dance: true, view: [-.75, -.65], kicker: 'GROUPER', role: '音楽の星のエイリアン', name: 'グルーパー',
               text: '音楽の星「グルーヴィア星」から来た、機械の体のエイリアン。「地球の音楽はクソすぎる！」と地球を破壊しに来たけれど、ぴょんぴーとのラップバトルでそのバイブスに感化され、まさかの友達に。地球滅亡は、ギリギリで回避されました。'},
     // Yanavis rolls on wheels: a smooth glide round the outer ring of the plaza, with a little bump now and then.
-    robot:   {height: 1.9, yaw: 0, route: circle(16, .3), speed: 1.7, glide: true, view: 'out', kicker: 'Y.A.N.A.V.I.S', role: '人工知能', name: 'ヤナビス',
+    robot:   {height: 1.9, yaw: 0, route: circle(16, .3), speed: -1.7, glide: true, view: 'out', kicker: 'Y.A.N.A.V.I.S', role: '人工知能', name: 'ヤナビス',
               text: '翻訳酸素カプセルから聞こえる声の主。ぴょんぴーのムーニアン語を、日本語に同時翻訳してくれる人工知能です。'}
   };
   const PHOTOS = {ranpyon: 1, pyon: 1, luva: 1, kaguya: 1, ramune: 1, pt: 1, robot: 1, grouper: 1};   // close-up face pictures in assets/city/faces
@@ -843,7 +843,7 @@ function start() {
         }
         if (m.spec.glide) {            // wheels: no walking sway, just an occasional "koton, koton" over an imagined pebble
           if (m.active === m.actions.Walk) playCast(m, 'Idle');
-          const p = (m.d / m.spec.speed) % 5.2;
+          const p = Math.abs(m.d / m.spec.speed) % 5.2;
           if (!m.stopped) castPos.y += p < .14 ? Math.sin(p / .14 * Math.PI) * .07 : p > .24 && p < .36 ? Math.sin((p - .24) / .12 * Math.PI) * .045 : 0;
         }
       }
