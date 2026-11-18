@@ -365,12 +365,12 @@ function start() {
   /* ── the city ── */
   const N = {};                     // named nodes from the model
   const PLACES = {
-    anime:   {anchor: 'Anchor_Anime',   label: '3Dアニメ',       labelY: 9, dist: 27, h: 7,   lookY: 14, ask: [.55, 25, 2.0, 12.5]},
+    anime:   {anchor: 'Anchor_Anime',   label: '3Dアニメ',       labelY: 9, dist: 27, h: 7,   lookY: 14, ask: [-.55, 25, 2.0, 12.5]},
     game:    {anchor: 'Anchor_Game',    label: 'ゲーム',         labelY: 3.4, dist: 17, h: -5, lookY: 0, ask: [.6, 13, -6.5, .4]},
     music:   {anchor: 'Anchor_Music',   label: '音楽',           labelY: 6, dist: 25, h: 4.4, lookY: 6.2, ask: [-.55, 22, 1.9, 6.6]},
-    friends: {anchor: 'Anchor_Friends', label: '愉快な仲間たち', labelY: 9, dist: 18, h: 4.6, lookY: 7, ask: [.5, 17.5, 1.8, 7.6]},
+    friends: {anchor: 'Anchor_Friends', label: '愉快な仲間たち', labelY: 9, dist: 18, h: 4.6, lookY: 7, ask: [-.5, 17.5, 1.8, 7.6]},
     lab:     {anchor: 'Anchor_Lab',     label: '制作ラボ',       labelY: 7, dist: 20, h: 4.2, lookY: 6, ask: [-.5, 17.5, 1.8, 6.6]},
-    roadmap: {anchor: 'Anchor_Roadmap', label: 'ロードマップ',   labelY: 9, dist: 31, h: 6.5, lookY: 25, ask: [.42, 33, 1.7, 30]}
+    roadmap: {anchor: 'Anchor_Roadmap', label: 'ロードマップ',   labelY: 9, dist: 31, h: 6.5, lookY: 25, ask: [-.42, 33, 1.7, 30]}
   };
   const proxies = [];               // invisible pick targets
   const tmp = V(0, 0, 0), tmp2 = V(0, 0, 0);
@@ -1042,7 +1042,7 @@ function start() {
   function applyOffset() {
     const w = innerWidth, h = innerHeight;
     if (w < 760) camera.setViewOffset(w, h, 0, h * (.15 + .1 * Math.abs(shift)), w, h);
-    else if (shift !== 0) camera.setViewOffset(w, h, -w * (shift > 0 ? .2 : .17) * shift, 0, w, h);   // profile: character on the right; question: place on the left
+    else if (shift !== 0) camera.setViewOffset(w, h, -w * (shift > 0 ? .2 : .11) * shift, 0, w, h);   // profile: character on the right; question: place on the left
     else camera.clearViewOffset();
     camera.updateProjectionMatrix();
   }
