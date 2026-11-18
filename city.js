@@ -623,7 +623,7 @@ function start() {
     if (name === 'Idle') setTimeout(() => { if (pyonActive === pyonActions.Idle && !pyonTurning) dance(); }, 1600);
   }
   /* ── monitors: clips from the site play on every screen; the big Moon Vision screen loops the 3D anime ── */
-  const CLIPS = ['capsule/clip-11', 'capsule/clip-12', 'capsule/clip-16', 'capsule/clip-23', 'capsule/clip-05', 'capsule/clip-03', 'capsule2/clip-01'];
+  const CLIPS = ['11', '03', '16', '05', '23', '01', '12', '09', '20', '14', '22', '07', '18', '25', '02', '27'].map(n => 'capsule/clip-' + n).concat(['capsule2/clip-01']);
   const videos = [];
   function videoScreen(src, w, h) {
     let entry = videos.find(v => v.src === src);
@@ -646,12 +646,10 @@ function start() {
     uv.setXY(0, u0, v0 + v); uv.setXY(1, u0 + u, v0 + v); uv.setXY(2, u0, v0); uv.setXY(3, u0 + u, v0); uv.needsUpdate = true;
   }
   function loadScreens() {
-    let i = 0;
-    for (const [name, node] of Object.entries(N)) {
-      if (!/^Scr\d+$/.test(name) || !node.userData.w) continue;
-      const plane = videoScreen(CLIPS[i++ % CLIPS.length], node.userData.w, node.userData.h);
-      node.add(plane);
-    }
+    // Go round the city in order and hand out the clips in turn, so screens that stand side by side never show the same one.
+    const screens = Object.entries(N).filter(([name, node]) => /^Scr\d+$/.test(name) && node.userData.w).map(([, node]) => node)
+      .sort((a, b) => Math.atan2(a.position.z, a.position.x) - Math.atan2(b.position.z, b.position.x));
+    screens.forEach((node, i) => node.add(videoScreen(CLIPS[i % CLIPS.length], node.userData.w, node.userData.h)));
     const anchor = PLACES.anime.node, big = videoScreen('anime/uchu-ramen', 11.9, 6.7);
     const holder = new THREE.Group(); holder.position.copy(anchor.position); holder.quaternion.copy(anchor.quaternion);
     big.position.set(0, 10.5, 5.8); holder.add(big); scene.add(holder);

@@ -77,6 +77,13 @@ a:focus-visible,button:focus-visible{outline:3px solid var(--city-mint-deep);out
 body.is-exploring .city-hint.is-on{opacity:1}
 .city-error{color:var(--city-pink-deep);border-radius:14px}
 
+/* ---- SNS buttons */
+.city-sns{display:flex;flex-wrap:wrap;gap:6px}
+.city-sns a{font:800 .76rem var(--city-round);color:#fff;text-decoration:none;padding:6px 14px;border-radius:999px;min-height:32px;display:flex;align-items:center;
+  background:linear-gradient(135deg,var(--city-pink),#b58cff 60%,var(--city-mint));border:1.5px solid #fff;text-shadow:0 1px 0 rgba(90,40,140,.45);box-shadow:0 6px 18px rgba(255,127,192,.4);transition:transform .15s}
+.city-sns a:hover,.city-sns a:focus-visible{transform:translateY(-2px) scale(1.05)}
+body.is-meeting .city-sns,body.is-travelling .city-sns{opacity:0;pointer-events:none}
+
 /* ---- floating place labels and Pyonpy's bubble */
 .city-labels{position:fixed;inset:0;z-index:12;pointer-events:none;overflow:hidden}
 .city-label{position:absolute;left:0;top:0;display:flex;align-items:center;gap:6px;padding:4px 12px 4px 8px;border-radius:999px;font:800 .78rem var(--city-round);
