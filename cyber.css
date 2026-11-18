@@ -1356,3 +1356,11 @@ html[lang=en] .g-card h4>small{display:none}
 .friend-dialog .friend-sheet .friend-body{padding:26px 30px 34px}
 .friend-dialog .friend-open{display:none}
 .friend-open{align-self:flex-start;margin-top:16px}
+
+/* Phones, game page: the play button sits right under the title logo and the blurb below it, both on the picture, left of Pyonpy. */
+@media(max-width:860px){
+  .game-hero .game-cta-row .anime-cta{position:absolute;z-index:3;top:calc(min(86vw,580px) * .56);left:5%;margin:0;padding:11px 20px;font-size:14px;box-shadow:0 8px 24px rgba(10,8,30,.45)}
+  .game-hero .anime-lead{position:absolute;z-index:3;top:calc(min(86vw,580px) * .735);left:5%;width:58%;max-width:340px;margin:0;font-size:clamp(11px,3.2vw,14px);line-height:1.6;text-shadow:0 1px 3px rgba(10,8,30,.95),0 0 14px rgba(10,8,30,.85)}
+  .game-hero .anime-lead br{display:none}
+  .game-hero{padding-top:calc(min(86vw,580px) + 8px)}
+}
