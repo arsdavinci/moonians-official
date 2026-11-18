@@ -920,6 +920,7 @@ function start() {
   function updateSns(dt) { for (const sns of Object.values(snsPlayers)) updateSnsPlayer(sns, dt); }
   function updateSnsPlayer(sns, dt) {
     if (!sns.el.videoWidth) return;
+    if (sns.full) { sns.zoom = sns.zoomT = 1; sns.pan = sns.panT = .5; sns.next = time + 60; }   // shown whole: no cropping or moving
     if (time > sns.next) {
       // Pyonpy's face is about half way up both videos. Shots that show it stay on for a while and drift slowly;
       // shots of anything else (feet, signs, the street) are quick cuts.
@@ -946,10 +947,10 @@ function start() {
     screens.forEach(node => {
       if (QUIET_SCREENS.includes(node.name)) return;   // too many monitors on this side: these two stay blank panels
       if (node.name === 'Scr002') {      // a tall display here, hanging down the face of the building, so more of her fits
-        const w = node.userData.w * 1.04, h = 7.8, drop = -(h - node.userData.h) / 2;
+        const h = 8.6, w = h * 9 / 16, drop = -(h - node.userData.h) / 2 - 1.1;   // the videos' own shape, so the whole picture shows
         const back = new THREE.Mesh(new THREE.PlaneGeometry(w + .36, h + .36), new THREE.MeshBasicMaterial({color: 0x2b2a55, toneMapped: false})); back.position.set(0, drop, 1.75);
         const rim = new THREE.Mesh(new THREE.PlaneGeometry(w + .6, h + .6), new THREE.MeshBasicMaterial({color: 0x7fe6d8, toneMapped: false})); rim.position.set(0, drop, 1.72);
-        const tall = snsScreen(w, h, 'ramune', 0, 0, RAMUNE_CLIPS, .66); tall.position.set(0, drop, 1.8);   // out in front of the building's rounded face
+        const tall = snsScreen(w, h, 'ramune', 0, 0, RAMUNE_CLIPS, .66); snsPlayers.ramune.full = true; tall.position.set(0, drop, 1.8);   // out in front of the building's rounded face
         node.add(rim, back, tall); return;
       }   // DJ Ramune's own videos, framed on her face
       if (node.name === 'Scr001') { node.add(snsScreen(node.userData.w, node.userData.h, 'town', 1, 6)); return; }   // the wide monitor by the workshop plays the dance videos, out of step with the airship
@@ -1328,7 +1329,7 @@ function start() {
     });
     // a ring of signs round the plaza, and tall ones along the main road
     for (let i = 0; i < 8; i++) { if (i === 2 || i === 7) continue; const a = i / 8 * Math.PI * 2 + .39, g = new THREE.Group(); g.position.set(Math.cos(a) * 25.2, 6.2 + (i % 2) * 1.6, Math.sin(a) * 25.2); g.rotation.y = -a - Math.PI / 2; scene.add(g); hang(g, (i + 3) % 8, 5.2, 0, 0, 0, i % 2 === 1); }
-    for (let i = 1; i < 6; i++) { const g = new THREE.Group(), side = i % 2 ? 1 : -1; g.position.set(side * 8.4, 5.5, 26 + i * 6.5); g.rotation.y = side > 0 ? -Math.PI / 2 : Math.PI / 2; scene.add(g); hang(g, (i + 5) % 8, 4.6, 0, 0, 0, true); }
+    for (let i = 2; i < 6; i++) { const g = new THREE.Group(), side = i % 2 ? 1 : -1; g.position.set(side * 8.4, 5.5, 26 + i * 6.5); g.rotation.y = side > 0 ? -Math.PI / 2 : Math.PI / 2; scene.add(g); hang(g, (i + 5) % 8, 4.6, 0, 0, 0, true); }
   }
 
   /* ── traffic: hover cars on the roads and bridges, the lower town, and drones in the air ── */
