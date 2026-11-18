@@ -1364,3 +1364,18 @@ html[lang=en] .g-card h4>small{display:none}
   .game-hero .anime-lead br{display:none}
   .game-hero{padding-top:calc(min(86vw,580px) + 8px)}
 }
+
+/* Game page: how to add the game to the phone's home screen. Shown on phones and tablets only. */
+.game-install{display:none}
+@media(max-width:860px),(pointer:coarse){
+  .game-install{display:block;padding:8px 0 34px}
+  .game-install-card{padding:22px 20px 20px;border:1px solid var(--c-border-strong);border-radius:var(--radius);background:var(--c-surface);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
+  .game-install h2{margin:6px 0 8px;font-size:clamp(18px,5vw,24px);line-height:1.45}
+  .game-install-lead{margin:0 0 16px;font-size:13px;line-height:1.8;color:var(--c-text-soft,var(--c-text))}
+  .game-install-steps{list-style:none;margin:0;padding:0;display:grid;gap:14px}
+  .game-install-steps li{display:grid;grid-template-columns:30px 1fr;gap:12px;align-items:start}
+  .game-install-steps li>span{display:grid;place-items:center;width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,var(--c-mint,#8dffd9),var(--c-accent,#b9a5ff));color:#120f26;font:800 13px var(--mono,monospace)}
+  .game-install-steps b{display:block;font-size:14px;line-height:1.6;padding-top:3px}
+  .game-install-steps img{display:block;width:100%;max-width:420px;height:auto;margin-top:10px;border-radius:14px;border:1px solid var(--c-border-strong)}
+  .game-install-note{margin:16px 0 0;font-size:11.5px;line-height:1.7;opacity:.75}
+}
