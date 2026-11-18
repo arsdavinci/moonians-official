@@ -803,11 +803,11 @@ function start() {
   let lineIndex = 0, bubbleTimer = 0;
   function loadPyonpy() {
     new GLTFLoader().load('assets/models/pyonpy.glb', gltf => {
-      const model = gltf.scene, box = new THREE.Box3().setFromObject(model), size = box.getSize(V(0, 0, 0)), scale = 1.25 / size.y;
+      const model = gltf.scene, box = new THREE.Box3().setFromObject(model), size = box.getSize(V(0, 0, 0)), scale = 1.65 / size.y;
       model.scale.setScalar(scale);
       model.position.set(-(box.min.x + size.x / 2) * scale, -box.min.y * scale, -(box.min.z + size.z / 2) * scale);
       model.traverse(node => { if (node.isMesh) { node.frustumCulled = false; (Array.isArray(node.material) ? node.material : [node.material]).forEach(m => { m.envMapIntensity = .5; }); } });
-      pyon = new THREE.Group(); pyon.position.set(0, .68, 0); pyon.add(model); scene.add(pyon); pyonShadow = blobShadow(1.0);
+      pyon = new THREE.Group(); pyon.position.set(0, .68, 0); pyon.add(model); scene.add(pyon); pyonShadow = blobShadow(1.3);
       pyonMixer = new THREE.AnimationMixer(model);
       gltf.animations.forEach(clip => {
         clip.tracks = clip.tracks.filter(track => !/^(root|RootNode)\.position$/.test(track.name));
@@ -924,7 +924,7 @@ function start() {
       } else if (move.n === 'run') { hop = Math.abs(s1) * .08; sway = s2 * .55; }   // running on the spot, turning from side to side
     }
     pyon.rotation.y = pyonFacing + spin + sway; pyon.rotation.z = lean;
-    pyon.position.set(slide * .7, .68 + hop * .6, 0);
+    pyon.position.set(slide * .82, .68 + hop * .78, 0);
     if (pyonShadow) { pyonShadow.position.set(pyon.position.x, .725, 0); const k = 1 - hop * 1.4; pyonShadow.scale.set(k, 1, k); }   // he is small now, so his hops and steps are smaller too
   }
   /* ── monitors: clips from the site play on every screen; the big Moon Vision screen loops the 3D anime ── */
@@ -1079,7 +1079,7 @@ function start() {
   const PHOTOS = {zombie: 1, ranpyon: 1, pyon: 1, luva: 1, kaguya: 1, ramune: 1, pt: 1, robot: 1, grouper: 1};   // close-up face pictures in assets/city/faces
   const cast = [], profileEl = $('#city-profile');
   // Pyonpy stays on his stage, but meets you the same way as the others.
-  const pyonMember = {id: 'pyon', actions: {}, stopped: false, spec: {height: 1.25, view: [.35, 1], kicker: 'PYONPY', role: 'ボケ担当', name: 'ぴょんぴー',
+  const pyonMember = {id: 'pyon', actions: {}, stopped: false, spec: {height: 1.65, view: [.35, 1], kicker: 'PYONPY', role: 'ボケ担当', name: 'ぴょんぴー',
     text: '超ポジティブで、みんなの兄貴分。月と地球を笑いでつなぐ、もふもふのボケ担当。三日月大使館のエースで、新人のらんぴょんのお手本です。'}};
   let meeting = null, shift = 0, shiftT = 0, profileRide = false;
   function loadCast() {
