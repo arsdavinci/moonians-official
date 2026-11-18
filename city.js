@@ -626,12 +626,13 @@ function start() {
   async function enterPlace() {
     if (mode !== 'ask' || !asking) return;
     const {id, place, link} = asking; enterEl.hidden = true; body.classList.add('is-travelling'); mode = 'fly'; sound.fx.select();
+    if (id === 'sns') { await enterSns(); return; }
     if (!motionOff() && await SHOW[id](place)) { location.href = link.href; return; }
     wipeEl.classList.add('is-on'); await wait(.72); location.href = link.href;
   }
   async function backToCity() {
     if (mode !== 'ask' || !asking) return;
-    const {link} = asking; asking = null; enterEl.hidden = true; link.classList.remove('is-going'); mode = 'fly';
+    const {link, ship} = asking; asking = null; enterEl.hidden = true; link.classList.remove('is-going'); mode = 'fly'; if (ship) ship.halt = false;
     orbitPose(tmp, tmp2);
     if (!motionOff()) await fly(tmp.clone(), tmp2.clone(), 1.5, 4);
     body.classList.remove('is-asking', 'is-travelling'); mode = 'orbit';
@@ -666,8 +667,16 @@ function start() {
       const p = ship.car.position.clone().add(V(0, 33, 0)), out = p.clone().setY(0).normalize();
       await fly(p.clone().addScaledVector(out, -112).add(V(0, -14, 0)), p, 2.3, 8);
       burst(p, PASTEL, 90, 14, 1.4); sound.fx.arrive();
-      await fly(p.clone().addScaledVector(out, -62).add(V(0, -5, 0)), p, 1.1, 0);
     }
+    // the same question as every other place: go in, or back to the city
+    asking = {id: 'sns', link: snsLink, ship};
+    const where = snsLink.querySelector('.where'); $('#enter-name').textContent = 'SNS'; $('#enter-where').textContent = where ? tr(where.textContent) : '';
+    body.classList.remove('is-travelling'); body.classList.add('is-asking'); enterEl.hidden = false; mode = 'ask';
+    $('#enter-yes').focus({preventScroll: true});
+  }
+  async function enterSns() {
+    const {ship} = asking;
+    if (ship && !motionOff()) { const p = ship.car.position.clone().add(V(0, 33, 0)), out = p.clone().setY(0).normalize(); await fly(p.clone().addScaledVector(out, -62).add(V(0, -5, 0)), p, 1.1, 0); }
     wipeEl.classList.add('is-on'); await wait(.72); location.href = snsLink.href;
   }
   snsLink.addEventListener('pointerenter', () => { hotSns = true; snsLink.classList.add('is-hot'); sound.fx.hover(); });
@@ -746,6 +755,16 @@ function start() {
   /* ── monitors: clips from the site play on every screen; the big Moon Vision screen loops the 3D anime ── */
   const CLIPS = ['11', '03', '16', '05', '23', '01', '12', '09', '20', '14', '22', '07', '18', '25', '02', '27'].map(n => 'capsule/clip-' + n).concat(['capsule2/clip-01']);
   const videos = [];
+  function holo(texture, seed) {
+    const material = new THREE.MeshBasicMaterial({map: texture, toneMapped: false, transparent: true, opacity: .86, side: THREE.DoubleSide, depthWrite: false});
+    material.onBeforeCompile = shader => {
+      shader.uniforms.uTime = uTime; shader.uniforms.uSeed = {value: seed};
+      shader.fragmentShader = shader.fragmentShader.replace('#include <common>', '#include <common>\nuniform float uTime; uniform float uSeed;')
+        .replace('#include <map_fragment>', '#include <map_fragment>\nfloat hy = vMapUv.y; float scan = 0.82 + 0.18 * sin(hy * 240.0 - uTime * 9.0);\nfloat band = smoothstep(0.0, 0.06, abs(fract(hy * 1.3 - uTime * 0.22 + uSeed) - 0.5) - 0.44);\nfloat flick = 0.9 + 0.1 * sin(uTime * 31.0 + uSeed * 7.0) - 0.35 * step(0.985, fract(sin(floor(uTime * 7.0) + uSeed) * 43758.5));\nvec2 edge = smoothstep(vec2(0.0), vec2(0.07), vMapUv) * smoothstep(vec2(0.0), vec2(0.07), 1.0 - vMapUv);\ndiffuseColor.rgb = mix(diffuseColor.rgb, diffuseColor.rgb * vec3(0.72, 1.0, 1.12) + vec3(0.05, 0.1, 0.16), 0.5) * scan * flick + band * vec3(0.25, 0.5, 0.55);\ndiffuseColor.a *= (0.55 + 0.45 * edge.x * edge.y) * flick;');
+    };
+    material.customProgramCacheKey = () => 'holo-screen';
+    return material;
+  }
   function videoScreen(src, w, h) {
     let entry = videos.find(v => v.src === src);
     if (!entry) {
@@ -757,13 +776,7 @@ function start() {
       el.play().catch(() => { /* starts on the first tap */ });
     }
     // Hologram look: see-through, scan lines sliding up, a soft tint, bright edges and an occasional flicker.
-    const material = new THREE.MeshBasicMaterial({map: entry.texture, toneMapped: false, transparent: true, opacity: .86, side: THREE.DoubleSide, depthWrite: false});
-    material.onBeforeCompile = shader => {
-      shader.uniforms.uTime = uTime; shader.uniforms.uSeed = {value: videos.length * 1.37 + entry.planes.length * .61};
-      shader.fragmentShader = shader.fragmentShader.replace('#include <common>', '#include <common>\nuniform float uTime; uniform float uSeed;')
-        .replace('#include <map_fragment>', '#include <map_fragment>\nfloat hy = vMapUv.y; float scan = 0.82 + 0.18 * sin(hy * 240.0 - uTime * 9.0);\nfloat band = smoothstep(0.0, 0.06, abs(fract(hy * 1.3 - uTime * 0.22 + uSeed) - 0.5) - 0.44);\nfloat flick = 0.9 + 0.1 * sin(uTime * 31.0 + uSeed * 7.0) - 0.35 * step(0.985, fract(sin(floor(uTime * 7.0) + uSeed) * 43758.5));\nvec2 edge = smoothstep(vec2(0.0), vec2(0.07), vMapUv) * smoothstep(vec2(0.0), vec2(0.07), 1.0 - vMapUv);\ndiffuseColor.rgb = mix(diffuseColor.rgb, diffuseColor.rgb * vec3(0.72, 1.0, 1.12) + vec3(0.05, 0.1, 0.16), 0.5) * scan * flick + band * vec3(0.25, 0.5, 0.55);\ndiffuseColor.a *= (0.55 + 0.45 * edge.x * edge.y) * flick;');
-    };
-    material.customProgramCacheKey = () => 'holo-screen';
+    const material = holo(entry.texture, videos.length * 1.37 + entry.planes.length * .61);
     const plane = new THREE.Mesh(new THREE.PlaneGeometry(w, h), material);
     plane.userData = {w, h, entry}; entry.planes.push(plane); if (entry.el.videoWidth) fit(plane);
     return plane;
@@ -787,7 +800,7 @@ function start() {
       el.play().catch(() => {});
       addEventListener('pointerdown', () => { if (el.paused) el.play().catch(() => {}); }, {passive: true});
     }
-    const plane = new THREE.Mesh(new THREE.PlaneGeometry(w, h), new THREE.MeshBasicMaterial({map: sns.texture, toneMapped: false, side: THREE.DoubleSide}));
+    const plane = new THREE.Mesh(new THREE.PlaneGeometry(w, h), holo(sns.texture, 4.2 + sns.planes.length));
     plane.userData.want = w / h; sns.planes.push(plane); return plane;
   }
   function updateSns(dt) {
@@ -1111,11 +1124,21 @@ function start() {
   function loadTraffic() {
     for (const [id, spec] of Object.entries(CARS)) {
       new GLTFLoader().load(`assets/city/cars/${id}.glb?v=20261118-2`, gltf => {
-        gltf.scene.traverse(node => { if (node.isMesh) (Array.isArray(node.material) ? node.material : [node.material]).forEach(m => { m.envMapIntensity = .5; m.roughness = .45; m.metalness = 0; nightLights(m); if (id === 'roadster') glassy(m); }); });
+        gltf.scene.traverse(node => { if (node.isMesh) (Array.isArray(node.material) ? node.material : [node.material]).forEach(m => { m.envMapIntensity = .5; m.roughness = .45; m.metalness = 0; if (id !== 'airship') nightLights(m); if (id === 'roadster') glassy(m); }); });
         FLEET.filter(f => f[0] === id).forEach(([, route, speed, start], i) => {
           const body = gltf.scene.clone(); body.scale.setScalar(spec.height); body.rotation.y = spec.yaw;
           const car = new THREE.Group(); car.add(body); scene.add(car);
-          if (id === 'airship') { for (const side of [1, -1]) { const screen = snsScreen(.43, .235); screen.position.set(-.085, .545, .31 * side); if (side < 0) screen.rotation.y = Math.PI; body.add(screen); } }
+          if (id === 'airship') {       // the video sits flat inside the monitor's rim (measured on the model), with a raised frame round it
+            const rim = new THREE.MeshStandardMaterial({color: 0x63d8cf, roughness: .5, metalness: 0});
+            for (const side of [1, -1]) {
+              const set = new THREE.Group(); set.position.set(-.052, .562, .283 * side); if (side < 0) set.rotation.y = Math.PI;
+              set.add(snsScreen(.404, .208));
+              for (const [w, h, x, y] of [[.44, .018, 0, .113], [.44, .018, 0, -.113], [.018, .208, -.211, 0], [.018, .208, .211, 0]]) {
+                const bar = new THREE.Mesh(new THREE.BoxGeometry(w, h, .03), rim); bar.position.set(x, y, 0); set.add(bar);
+              }
+              body.add(set);
+            }
+          }
           if (id === 'airship') { const p = new THREE.Mesh(new THREE.SphereGeometry(38, 10, 8)); p.userData = {kind: 'airship', id}; proxies.push(p); car.userData.proxy = p; }
           traffic.push({id, car, body, routeName: route, route: ROUTES[route], speed, d: id === 'airship' && airshipStart !== null ? airshipStart : start, phase: Math.random() * 6, air: /air|lift/.test(route)});
         });
