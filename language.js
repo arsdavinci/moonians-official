@@ -12,7 +12,7 @@
     'ムーニアンズのSNSは、この飛行船からぜんぶ届けています。気になるチャンネルを、えらんでな。':'Every Moonians channel is broadcast from this airship. Pick the one you like.',
     '飛行船をつつく':'Poke the airship', 'ひらく →':'Open →', 'らんぴょんの、日々のひとこと。':'Ranpyon’s daily notes.', 'ぴょんぴーの、写真と動画。':'Pyonpy’s photos and videos.',
     'みじかい動画は、こちら。':'Short videos live here.', 'ネタ動画と、3Dアニメ。':'Comedy videos and 3D anime.',
-    'グッズ':'Goods', 'もう一度タップで入る':'Tap again to go', 'もう一度タップ':'Tap again', 'DJらむねのTikTok':'DJ Ramune’s TikTok', 'らむねのTikTokを見ますか？':'Open Ramune’s TikTok?', '見る':'Open', 'DJらむね TikTok':'DJ Ramune TikTok',
+    'グッズ':'Goods', '体験版を今すぐ遊ぶ':'Play the demo now', '体験版を今すぐ遊ぶ ':'Play the demo now ', 'もう一度タップで入る':'Tap again to go', 'もう一度タップ':'Tap again', 'DJらむねのTikTok':'DJ Ramune’s TikTok', 'らむねのTikTokを見ますか？':'Open Ramune’s TikTok?', '見る':'Open', 'DJらむね TikTok':'DJ Ramune TikTok',
     '三日月大使館のエースで、らんぴょんのお手本。':'The ace of the Crescent Embassy, and Ranpyon’s role model.',
     '三日月大使館のエース':'Ace of the Crescent Embassy',
     '三日月大使館（クレッセントエンバシー）のエースで、とにかく仕事ができる。':'The ace of the Crescent Embassy: he simply gets things done.',
