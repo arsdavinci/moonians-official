@@ -393,9 +393,9 @@
   // Home character cards: compact cards, tap one to open the full profile.
   const sheets = [];   // every profile on the page, in order, so one can step to the next from inside it
   const addSheetNav = sheet => {
-    for (const [dir, label, mark] of [[-1, '前のキャラクターへ', '‹'], [1, '次のキャラクターへ', '›']]) {
+    for (const [dir, label, mark, word] of [[-1, '前のキャラクターへ', '«', 'PREV'], [1, '次のキャラクターへ', '»', 'NEXT']]) {
       const step = document.createElement('button');
-      step.type = 'button'; step.className = 'character-dialog-nav ' + (dir < 0 ? 'is-prev' : 'is-next'); step.setAttribute('aria-label', label); step.textContent = mark;
+      step.type = 'button'; step.className = 'character-dialog-nav ' + (dir < 0 ? 'is-prev' : 'is-next'); step.setAttribute('aria-label', label); step.innerHTML = `<i aria-hidden="true">${mark}</i><b aria-hidden="true">${word}</b>`;
       step.addEventListener('click', () => { const next = sheets[(sheets.indexOf(sheet) + dir + sheets.length) % sheets.length]; if (next === sheet) return; sheet.close(); next.showModal(); next.querySelector('.character-dialog-scroll').scrollTop = 0; document.body.classList.add('character-open-lock'); });
       sheet.append(step);
     }
@@ -418,6 +418,7 @@
       const sheet = document.createElement('dialog');
       sheet.className = 'character-dialog';
       sheet.setAttribute('aria-label', `${name}のプロフィール`);
+      sheet.dataset.key = card.classList.contains('ranpyon') ? 'ranpyon' : 'pyonpy';
       const close = document.createElement('button');
       close.type = 'button';
       close.className = 'character-dialog-close';
@@ -460,7 +461,7 @@
     const bodyEl = card.querySelector('.friend-body'), nameEl = card.querySelector('h4'); if (!bodyEl || !nameEl) return;
     const sheet = document.createElement('dialog');
     sheet.className = 'character-dialog friend-dialog';
-    sheet.setAttribute('aria-label', `${nameEl.textContent}のプロフィール`);
+    sheet.setAttribute('aria-label', `${nameEl.textContent}のプロフィール`); sheet.dataset.key = card.id;
     const close = document.createElement('button');
     close.type = 'button'; close.className = 'character-dialog-close'; close.setAttribute('aria-label', 'プロフィールを閉じる'); close.textContent = '×';
     const copy = card.cloneNode(true); copy.removeAttribute('id'); copy.className = 'friend friend-sheet';
@@ -476,6 +477,10 @@
     sheet.addEventListener('click', event => { if (event.target === sheet) sheet.close(); });
     sheet.addEventListener('close', () => { if (!document.querySelector('dialog.character-dialog[open]')) document.body.classList.remove('character-open-lock'); });
   });
+
+  // Arriving with ?open=<name> (from a profile card in the city): that character's sheet opens straight away.
+  { const want = new URLSearchParams(location.search).get('open'), sheet = want && sheets.find(s => s.dataset.key === want);
+    if (sheet) setTimeout(() => { sheet.showModal(); document.body.classList.add('character-open-lock'); }, 350); }
 
   // Keep the current page visible in the sideways-scrolling sub-page nav.
   const pageNav = document.querySelector('.page-nav'), currentLink = pageNav && pageNav.querySelector('[aria-current=page]');

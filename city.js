@@ -1238,6 +1238,8 @@ function start() {
     const photo = $('#profile-photo'); photo.hidden = !PHOTOS[m.id]; if (PHOTOS[m.id]) { photo.src = 'assets/city/faces/' + m.id + '.jpg?v=2'; photo.alt = tr(m.spec.name); }
     $('#profile-kicker').textContent = m.spec.kicker; $('#profile-role').textContent = tr(m.spec.role);
     $('#profile-name').textContent = tr(m.spec.name); $('#profile-text').textContent = tr(m.spec.text);
+    { const key = {pyon: 'pyonpy', luva: 'zaluva', pt: 'ptputy', robot: 'yanabisu'}[m.id] || m.id, lang = new URL(location.href).searchParams.get('lang') || document.documentElement.lang || 'ja';
+      $('#profile-more').href = `friends.html?open=${key}&lang=${lang}`; }   // their full profile, opened
     profileEl.hidden = false; mode = 'meet'; profileRide = !!m.spec.ride;
     $('#profile-link').focus({preventScroll: true});
   }
@@ -1250,6 +1252,7 @@ function start() {
   }
   $('#profile-close').addEventListener('click', leave);
   addEventListener('keydown', event => { if (event.key === 'Escape') leave(); });
+  $('#profile-more').addEventListener('click', event => { event.preventDefault(); const href = event.currentTarget.href; sound.fx.select(); wipeEl.classList.add('is-on'); setTimeout(() => { location.href = href; }, 720); });
   $('#profile-link').addEventListener('click', event => {
     if (event.metaKey || event.ctrlKey || event.shiftKey) return;
     event.preventDefault(); const href = event.currentTarget.href;

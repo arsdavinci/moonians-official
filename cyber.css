@@ -1328,12 +1328,27 @@ html[lang=en] .g-card h4>small{display:none}
 .fx-dialog.music-consent .music-consent-actions .music-decline{background:#fff;color:#2a2152;border:2px solid #b9a3f5;font-weight:800}
 .fx-dialog.music-consent .music-consent-actions .music-decline:hover{background:#f3ecff}
 
-/* previous / next inside a character profile */
-.character-dialog-nav{position:absolute;top:calc(50% - 22px);z-index:6;width:44px;height:44px;border:1px solid var(--c-border-strong);border-radius:50%;background:color-mix(in srgb,var(--c-bg) 80%,transparent);color:var(--c-text);font-size:20px;line-height:1;cursor:pointer;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
-.character-dialog-nav.is-prev{left:10px}.character-dialog-nav.is-next{right:10px}
-.character-dialog-nav:hover,.character-dialog-nav:focus-visible{background:var(--c-accent,#b9a5ff);color:#120f26}
-@media(max-width:560px){.character-dialog-nav{top:auto;bottom:14px;width:40px;height:40px}}
-
+/* previous / next: neon tabs standing just outside the profile sheet */
+.character-dialog-nav{position:fixed;top:50%;z-index:6;width:54px;height:150px;margin-top:-75px;padding:0;border:0;cursor:pointer;color:#8dffd9;
+  background:linear-gradient(180deg,rgba(141,255,217,.18),rgba(185,165,255,.1) 50%,rgba(255,155,224,.18));
+  clip-path:polygon(14px 0,100% 0,100% calc(100% - 14px),calc(100% - 14px) 100%,0 100%,0 14px);
+  font:700 11px/1 "DotGothic16",monospace;letter-spacing:.18em;text-shadow:0 0 10px currentColor;transition:color .2s,background .2s,translate .2s}
+.character-dialog-nav::before{content:"";position:absolute;inset:0;padding:1.5px;background:linear-gradient(180deg,#8dffd9,#b9a5ff 50%,#ff9be0);
+  clip-path:polygon(14px 0,100% 0,100% calc(100% - 14px),calc(100% - 14px) 100%,0 100%,0 14px);-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;pointer-events:none}
+.character-dialog-nav i{display:block;font-style:normal;font-size:30px;line-height:1;margin-bottom:10px}
+.character-dialog-nav b{display:block;font-weight:700;writing-mode:vertical-rl;margin:0 auto}
+.character-dialog-nav.is-prev{left:calc(50% - min(380px,50% - 12px) - 70px)}
+.character-dialog-nav.is-next{right:calc(50% - min(380px,50% - 12px) - 70px);clip-path:polygon(0 0,calc(100% - 14px) 0,100% 14px,100% 100%,14px 100%,0 calc(100% - 14px))}
+.character-dialog-nav.is-next::before{clip-path:polygon(0 0,calc(100% - 14px) 0,100% 14px,100% 100%,14px 100%,0 calc(100% - 14px))}
+.character-dialog-nav:hover,.character-dialog-nav:focus-visible{color:#fff;background:linear-gradient(180deg,rgba(141,255,217,.45),rgba(185,165,255,.35) 50%,rgba(255,155,224,.45));outline:0}
+.character-dialog-nav.is-prev:hover{translate:-4px 0}.character-dialog-nav.is-next:hover{translate:4px 0}
+@media(max-width:920px){   /* no room beside the sheet: small tabs on its lower corners */
+  .character-dialog-nav{top:auto;bottom:calc(14px + env(safe-area-inset-bottom,0px));width:64px;height:44px;margin:0;display:flex;align-items:center;justify-content:center;background:rgba(18,15,38,.86)}
+  .character-dialog-nav i{font-size:22px;margin:0}.character-dialog-nav b{display:none}
+  .character-dialog-nav.is-prev{left:12px}.character-dialog-nav.is-next{right:12px}
+}
+/* friend cards stay short: picture, name and a line or two; the rest is in the profile sheet */
+.friends .friend:not(.friend-sheet) dl,.friends .friend:not(.friend-sheet) .friend-note,.friends .friend:not(.friend-sheet) .model-sheet{display:none}
 /* a friend's card opened as a profile sheet */
 .friend-dialog .friend-sheet{display:block;border:0;border-radius:0;background:transparent;box-shadow:none;margin:0;backdrop-filter:none;-webkit-backdrop-filter:none}
 .friend-dialog .friend-sheet .friend-image{aspect-ratio:auto;min-height:0;max-height:62dvh;display:grid;place-items:center;background:var(--c-bg-2,#120f26)}

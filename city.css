@@ -250,3 +250,6 @@ body.is-meeting .city-menu a,body.is-asking .city-menu a,body.is-meeting .city-s
   body.is-meeting .city-tools > :not(.city-tools-toggle),body.is-asking .city-tools > :not(.city-tools-toggle){display:none}
   body.is-meeting .city-tools-toggle,body.is-asking .city-tools-toggle{opacity:.55}
 }
+
+.city-profile-more{display:inline-block;margin:8px 0 0;font:800 .86rem var(--city-round);color:var(--city-pink-deep);text-decoration:none;border-bottom:2px solid currentColor;padding-bottom:1px}
+.city-profile-more:hover,.city-profile-more:focus-visible{color:#0d9d8a}
