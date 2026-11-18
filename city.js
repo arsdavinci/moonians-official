@@ -1025,7 +1025,7 @@ function start() {
         FLEET.filter(f => f[0] === id).forEach(([, route, speed, start], i) => {
           const body = gltf.scene.clone(); body.scale.setScalar(spec.height); body.rotation.y = spec.yaw;
           const car = new THREE.Group(); car.add(body); scene.add(car);
-          if (id === 'airship') { for (const side of [1, -1]) { const screen = videoScreen(side > 0 ? 'capsule/complete' : 'capsule/clip-12', .40, .215); screen.position.set(.02, .585, .268 * side); if (side < 0) screen.rotation.y = Math.PI; body.add(screen); } }
+          if (id === 'airship') { for (const side of [1, -1]) { const screen = videoScreen(side > 0 ? 'capsule/complete' : 'capsule/clip-12', .43, .235); screen.position.set(-.085, .545, .31 * side); if (side < 0) screen.rotation.y = Math.PI; body.add(screen); } }
           if (id === 'airship') { const p = new THREE.Mesh(new THREE.SphereGeometry(16, 10, 8)); p.userData = {kind: 'airship', id}; proxies.push(p); car.userData.proxy = p; }
           traffic.push({id, car, body, routeName: route, route: ROUTES[route], speed, d: id === 'airship' && airshipStart !== null ? airshipStart : start, phase: Math.random() * 6, air: /air|lift/.test(route)});
         });
