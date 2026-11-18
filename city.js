@@ -965,7 +965,7 @@ function start() {
   const cast = [], profileEl = $('#city-profile');
   // Pyonpy stays on his stage, but meets you the same way as the others.
   const pyonMember = {id: 'pyon', actions: {}, stopped: false, spec: {height: 2.3, view: [.35, 1], kicker: 'PYONPY', role: 'ボケ担当', name: 'ぴょんぴー',
-    text: '超ポジティブで、みんなの兄貴分。月と地球を笑いでつなぐ、もふもふのボケ担当。スターシードとして、笑いで愛を広めに地球へやって来ました。'}};
+    text: '超ポジティブで、みんなの兄貴分。月と地球を笑いでつなぐ、もふもふのボケ担当。三日月大使館のエースで、新人のらんぴょんのお手本です。'}};
   let meeting = null, shift = 0, shiftT = 0, profileRide = false;
   function loadCast() {
     Object.entries(CAST).forEach(([id, spec], index) => {
