@@ -85,6 +85,11 @@ const sound = (() => {
   document.addEventListener('moonians:languagechange', apply);
   // A returning visitor who chose sound gets it back on their first tap (browsers block it before that).
   addEventListener('pointerdown', () => { if (wanted && !on && !body.classList.contains('is-loading')) set(true); }, {passive: true});
+  // No sound while the page is not in front: another tab, another app, or the phone's screen off. It comes back when you return.
+  const quiet = () => { bgm.pause(); if (ctx && ctx.state === 'running') ctx.suspend(); };
+  const back = () => { if (!on) return; if (ctx && ctx.state === 'suspended') ctx.resume(); bgm.play().catch(() => { /* needs a tap first */ }); };
+  document.addEventListener('visibilitychange', () => { if (document.hidden) quiet(); else back(); });
+  addEventListener('pagehide', quiet); addEventListener('pageshow', () => { if (!document.hidden) back(); });
   apply();
   return {set, setVolume, fx, get on() { return on; }, get wanted() { return wanted; }};
 })();
