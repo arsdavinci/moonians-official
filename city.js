@@ -682,6 +682,12 @@ function start() {
         const member = {id, spec, group, mixer, actions, active: null, d: index * 7, facing: 0, stopped: false};
         member.proxy = new THREE.Mesh(new THREE.SphereGeometry(spec.height * .62, 10, 8)); member.proxy.userData = {kind: 'cast', id}; proxies.push(member.proxy);
         mixer.addEventListener('finished', () => playCast(member, member.stopped || spec.glide || spec.ride ? 'Idle' : 'Walk'));
+        if (id === 'robot') {          // Yanavis's face is a display: six expressions that change by themselves and when it is clicked
+          const map = textures.load('assets/city/yanavis-faces.webp', t => { t.colorSpace = THREE.SRGBColorSpace; }); map.repeat.set(1 / 6, 1);
+          const face = new THREE.Mesh(new THREE.CircleGeometry(.158, 40), new THREE.MeshBasicMaterial({map, transparent: true, toneMapped: false}));
+          face.position.set(0, .612, .268); model.add(face);
+          member.face = {map, now: 0, until: 0, set(i, seconds) { this.now = i; this.until = time + seconds; map.offset.x = i / 6; }};
+        }
         playCast(member, 'Walk'); cast.push(member);
       }, undefined, () => { /* the city works without them */ });
     });
@@ -696,6 +702,7 @@ function start() {
   function updateCast(dt, still) {
     if (lineup) { cast.forEach((m, i) => { m.group.position.set(-4.5 + i * 3, .3, 8.5); m.group.rotation.y = 0; if (!still) m.mixer.update(dt); }); return; }
     for (const m of cast) {
+      if (m.face && time > m.face.until) { const happy = m.face.now !== 0; m.face.set(happy ? 0 : [1, 2, 3, 4, 5, 1, 2][Math.floor(Math.random() * 7)], happy ? 3 + Math.random() * 4 : 1.6 + Math.random() * 1.4); }
       // A rider goes wherever their vehicle goes (Ranpyon on the plaza scooter); everyone else walks their own route.
       const mount = m.spec.ride ? traffic.find(t => t.id === m.spec.ride && t.routeName === 'plaza') : null;
       if (mount) {
@@ -740,6 +747,7 @@ function start() {
     if (motionOff()) { camPos.copy(p).addScaledVector(away, m.spec.height * 2.5).add(V(0, eye, 0)); camLook.copy(p).add(V(0, eye, 0)); }
     else await fly(p.clone().addScaledVector(away, m.spec.height * 2.5).add(V(0, eye, 0)), p.clone().add(V(0, eye, 0)), 1.5, 1.2);
     playCast(m, 'React', true); sound.fx.pop(); sound.fx.arrive();
+    if (m.face) { m.face.set(3, .7); setTimeout(() => m.face && m.face.set(0, 4), 700); }
     burst(p.clone().add(V(0, m.spec.height * .9, 0)), PASTEL, 46, 5, .7);
     $('#profile-kicker').textContent = m.spec.kicker; $('#profile-role').textContent = tr(m.spec.role);
     $('#profile-name').textContent = tr(m.spec.name); $('#profile-text').textContent = tr(m.spec.text);
