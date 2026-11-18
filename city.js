@@ -1599,7 +1599,7 @@ function start() {
     }
     travelled += Math.abs(dx) + Math.abs(dy);
     const k = 2.6 / Math.min(innerWidth, 900);
-    view.azT -= dx * k * 1.9; view.tiltT = clamp(view.tiltT + dy * k * .9, -.9, 1);
+    view.azT += dx * k * 1.9; view.tiltT = clamp(view.tiltT + dy * k * .9, -.9, 1);
   });
   function release(event) {
     if (!pointers.has(event.pointerId)) return;
