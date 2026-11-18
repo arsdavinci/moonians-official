@@ -1247,7 +1247,7 @@ function start() {
   const ROUTES = {
     plaza: circle(6.6, .32), road: stadium(2.1, 21, 62, .22), ringA: circle(46, .06), ringB: circle(75, .06),
     low1: circle(34, -69.9), low2: circle(50, -69.9), low3: circle(22, -69.9),
-    air1: circle(20, 27), air2: circle(38, 22), air3: circle(58, 12), lift: helix(29, -62, 9, 3), sky: circle(90, 20),
+    air1: circle(20, 27), air2: circle(38, 22), air3: circle(58, 12), lift: helix(29, -62, 9, 3), sky: circle(125, 22),
     // Delivery rounds: each courier has its own winding path laid out in advance, at its own heights.
     airTourA: tour([[0, 11, -16], [14, 13, -6], [10, 10, 14], [5, 12, 34], [6, 15, 56], [-6, 17, 56], [-5, 13, 32], [-12, 11, 12], [-14, 14, -6]]),   // plaza, down the main road and back
     airTourB: tour([[-17, 19, 0], [-7, 23, 13], [5, 19, 6], [17, 22, -3], [9, 24, -15], [-3, 20, -7], [-12, 23, -16]]),                             // criss-crossing above the plaza
@@ -1265,7 +1265,7 @@ function start() {
     ['bus', 'ringA', 6, 0], ['bubble', 'ringA', 6, 120], ['van', 'ringA', -5, 60], ['bus', 'ringB', -6, 0], ['scooter', 'ringB', 7, 200],
     ['cart', 'low1', 3.5, 0], ['van', 'low1', 3.5, 90], ['roadster', 'low2', -6, 0], ['cart', 'low2', -3, 130], ['scooter', 'low3', 4, 0], ['bubble', 'low2', -6, 240],
     ['patrol', 'air1', 4, 0], ['patrol', 'air2', 5, 80], ['patrol', 'air3', 6, 200], ['delivery', 'lift', 7, 0], ['delivery', 'airTourA', 5, 0], ['delivery', 'airTourB', 4.4, 30], ['delivery', 'airTourC', 4.8, 60],
-    ['airship', 'sky', -2.1, 58]
+    ['airship', 'sky', -2.7, 80]
   ];
   const traffic = []; let lineup = false;
   function loadTraffic() {
@@ -1406,7 +1406,7 @@ function start() {
   function finishIntro() {
     orbitPose(camPos, camLook);
     mode = 'orbit'; body.classList.add('is-exploring');
-    ufoAngle = 3.927; ufoRise = 0; const ship0 = traffic.find(t => t.id === 'airship'); if (ship0) ship0.d = -96.4; else airshipStart = -96.4;
+    ufoAngle = 3.927; ufoRise = 0; const ship0 = traffic.find(t => t.id === 'airship'); if (ship0) ship0.d = -133.9; else airshipStart = -133.9;
     hintEl.classList.add('is-on');
     setTimeout(() => { if (mode === 'orbit') hintEl.textContent = tr('ぴょんぴーをタップしてみてね。'); }, 7000);
     setTimeout(() => hintEl.classList.remove('is-on'), 14000);
