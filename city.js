@@ -898,21 +898,26 @@ function start() {
   // The airship plays the SNS videos one after the other. Each is tall, so the screen shows a wide slice of it
   // that drifts up and down and pushes in and out, picking a new framing every few seconds.
   const SNS_CLIPS = ['assets/city/sns/1.mp4', 'assets/city/sns/2.mp4'];
-  let sns = null;
-  function snsScreen(w, h) {
+  // Each player is its own video with its own framing. The airship has one; a monitor in town has another that
+  // starts on the other clip, part-way through, so the two never show the same picture.
+  const snsPlayers = {};
+  function snsScreen(w, h, key = 'ship', startClip = 0, startAt = 0) {
+    let sns = snsPlayers[key];
     if (!sns) {
-      const el = document.createElement('video'); el.muted = true; el.playsInline = true; el.preload = 'auto'; el.src = SNS_CLIPS[0];
+      const el = document.createElement('video'); el.muted = true; el.playsInline = true; el.preload = 'auto'; el.src = SNS_CLIPS[startClip];
       const texture = new THREE.VideoTexture(el); texture.colorSpace = THREE.SRGBColorSpace;
-      sns = {el, texture, index: 0, planes: [], zoom: 1, pan: .5, zoomT: 1, panT: .5, next: 0};
+      sns = snsPlayers[key] = {el, texture, index: startClip, planes: [], zoom: 1, pan: .5, zoomT: 1, panT: .5, next: 0};
+      if (startAt) el.addEventListener('loadedmetadata', () => { try { el.currentTime = Math.min(startAt, el.duration - 1); } catch { /* not seekable yet */ } }, {once: true});
       el.addEventListener('ended', () => { sns.index = (sns.index + 1) % SNS_CLIPS.length; el.src = SNS_CLIPS[sns.index]; el.play().catch(() => {}); });
       el.play().catch(() => {});
       addEventListener('pointerdown', () => { if (el.paused) el.play().catch(() => {}); }, {passive: true});
     }
-    const plane = new THREE.Mesh(new THREE.PlaneGeometry(w, h), holo(sns.texture, 4.2 + sns.planes.length));
+    const plane = new THREE.Mesh(new THREE.PlaneGeometry(w, h), holo(sns.texture, 4.2 + sns.planes.length + Object.keys(snsPlayers).length));
     plane.userData.want = w / h; sns.planes.push(plane); return plane;
   }
-  function updateSns(dt) {
-    if (!sns || !sns.el.videoWidth) return;
+  function updateSns(dt) { for (const sns of Object.values(snsPlayers)) updateSnsPlayer(sns, dt); }
+  function updateSnsPlayer(sns, dt) {
+    if (!sns.el.videoWidth) return;
     if (time > sns.next) {
       // Pyonpy's face is about half way up both videos. Shots that show it stay on for a while and drift slowly;
       // shots of anything else (feet, signs, the street) are quick cuts.
@@ -933,7 +938,18 @@ function start() {
     // Go round the city in order and hand out the clips in turn, so screens that stand side by side never show the same one.
     const screens = Object.entries(N).filter(([name, node]) => /^Scr\d+$/.test(name) && node.userData.w).map(([, node]) => node)
       .sort((a, b) => Math.atan2(a.position.z, a.position.x) - Math.atan2(b.position.z, b.position.x));
-    screens.forEach((node, i) => node.add(videoScreen(CLIPS[i % CLIPS.length], node.userData.w, node.userData.h)));
+    // There are more monitors than clips, so each clip plays on two. Every monitor takes the clip whose other
+    // showing is furthest away, so the same footage is never seen side by side (or even in the same view).
+    const shown = CLIPS.map(() => []);
+    screens.forEach(node => {
+      if (node.name === 'Scr001') { node.add(snsScreen(node.userData.w, node.userData.h, 'town', 1, 6)); return; }   // the wide monitor by the workshop plays the dance videos, out of step with the airship
+      const here = node.getWorldPosition(V(0, 0, 0)); let pick = 0, best = -1;
+      CLIPS.forEach((clip, k) => { const apart = p => { let d = Math.abs(Math.atan2(p.z, p.x) - Math.atan2(here.z, here.x)); if (d > Math.PI) d = Math.PI * 2 - d; return d * 60 + p.distanceTo(here) * .15; };   // mostly: how far round the city
+        const near = shown[k].length ? Math.min(...shown[k].map(apart)) : 1e4; const score = near - shown[k].length * 25; if (score > best) { best = score; pick = k; } });
+      shown[pick].push(here); node.userData.clip = pick;
+      node.add(videoScreen(CLIPS[pick], node.userData.w, node.userData.h));
+    });
+    window.__clipGap = Math.min(...shown.flatMap(list => list.flatMap((p, i) => list.slice(i + 1).map(q => p.distanceTo(q)))));
     const anchor = PLACES.anime.node, big = videoScreen('anime/uchu-ramen', 11.9, 6.7);
     const holder = new THREE.Group(); holder.position.copy(anchor.position); holder.quaternion.copy(anchor.quaternion);
     big.position.set(0, 10.5, 5.8); holder.add(big); scene.add(holder); N.bigScreen = holder; holder.visible = !!landmarkModels.anime;   // shown once its building is there
