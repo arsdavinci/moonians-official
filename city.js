@@ -1173,7 +1173,7 @@ function start() {
     if (m === pyonMember) playPyon(pyonActions.Cheer ? 'Cheer' : 'Jump', true);
     if (m.face) { m.face.set(3, .7); setTimeout(() => m.face && m.face.set(0, 4), 700); }
     burst(p.clone().add(V(0, m.spec.height * .9, 0)), PASTEL, 46, 5, .7);
-    const photo = $('#profile-photo'); photo.hidden = !PHOTOS[m.id]; if (PHOTOS[m.id]) { photo.src = 'assets/city/faces/' + m.id + '.jpg'; photo.alt = tr(m.spec.name); }
+    const photo = $('#profile-photo'); photo.hidden = !PHOTOS[m.id]; if (PHOTOS[m.id]) { photo.src = 'assets/city/faces/' + m.id + '.jpg?v=2'; photo.alt = tr(m.spec.name); }
     $('#profile-kicker').textContent = m.spec.kicker; $('#profile-role').textContent = tr(m.spec.role);
     $('#profile-name').textContent = tr(m.spec.name); $('#profile-text').textContent = tr(m.spec.text);
     profileEl.hidden = false; mode = 'meet'; profileRide = !!m.spec.ride;
