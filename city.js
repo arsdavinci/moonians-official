@@ -923,7 +923,7 @@ function start() {
     pt:      {height: 1.1, yaw: 0, route: circle(4.4, .3), speed: .9, ride: 'roadster', seat: [.5, .62, -.2], kicker: 'PTPUTY / PT', role: 'らむねの相方', name: 'ピーティープティ',
               text: 'ニックネームは「PT」。DJらむねの相方で、親友。好きなのは、ぴょんぴー。身長はおよそ45cm。'},
     // Grouper grooves on the spot in front of the Music Dome.
-    grouper: {height: 3.0, yaw: 0, route: circle(.6, .22, 20.4, 6.5), speed: .35, dance: true, view: [-.75, -.65], kicker: 'GROUPER', role: '音楽の星のエイリアン', name: 'グルーパー',
+    grouper: {height: 3.0, yaw: 0, route: circle(.6, .22, 20.4, 6.5), speed: .35, dance: true, view: [-1, .3], side: 'right', kicker: 'GROUPER', role: '音楽の星のエイリアン', name: 'グルーパー',
               text: '音楽の星「グルーヴィア星」から来た、機械の体のエイリアン。「地球の音楽はクソすぎる！」と地球を破壊しに来たけれど、ぴょんぴーとのラップバトルでそのバイブスに感化され、まさかの友達に。地球滅亡は、ギリギリで回避されました。'},
     // Yanavis rolls on wheels: a smooth glide round the outer ring of the plaza, with a little bump now and then.
     robot:   {height: 1.9, yaw: 0, route: circle(16, .3), speed: -1.7, glide: true, view: 'out', kicker: 'Y.A.N.A.V.I.S', role: '人工知能', name: 'ヤナビス',
@@ -1126,7 +1126,7 @@ function start() {
     // stand where the view is clear: a set side for those on the roads, otherwise wherever the camera already is
     const away = (m.spec.view === 'out' ? p.clone().setY(0).applyAxisAngle(V(0, 1, 0), .9) : m.spec.view ? V(m.spec.view[0], 0, m.spec.view[1]) : camPos.clone().sub(p).setY(0)).normalize();
     const reach = m.spec.ride ? 4.4 : m.spec.height * 1.75, lift = m.spec.ride ? 1.0 : 0;   // riders in the car are seen from a little further back and above
-    shiftT = 1;
+    shiftT = m.spec.side === 'right' ? -1 : 1; profileEl.classList.toggle('is-right', m.spec.side === 'right');   // most stand on the right of their card; a few on the left
     if (motionOff()) { camPos.copy(p).addScaledVector(away, reach).add(V(0, eye + lift, 0)); camLook.copy(p).add(V(0, eye, 0)); }
     else if (m.spec.ride) {            // a rider keeps moving, so the camera aims at where they are each moment and arrives right in step with them
       const fromPos = camPos.clone(), fromLook = camLook.clone(), goal = V(0, 0, 0), look = V(0, 0, 0);

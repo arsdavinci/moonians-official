@@ -221,3 +221,9 @@ body.is-meeting .city-menu a,body.is-asking .city-menu a,body.is-meeting .city-s
 .city-edit div{display:flex;flex-wrap:wrap;gap:6px}
 .city-edit button{flex:1;padding:7px 8px;border-radius:999px;border:0;background:linear-gradient(90deg,#ff8cc8,#8fd8ff);color:#fff;font:inherit;cursor:pointer;white-space:nowrap}
 .city-edit p{margin:0;font-weight:500;opacity:.75}
+
+/* profile cards sit in from the edge, like a character introduction; some characters have theirs on the right */
+@media (min-width:760px){
+  .city-profile{left:clamp(28px,9vw,190px)}
+  .city-profile.is-right{left:auto;right:clamp(28px,9vw,190px)}
+}
