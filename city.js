@@ -1148,6 +1148,10 @@ function start() {
   /* ── traffic: hover cars on the roads and bridges, the lower town, and drones in the air ── */
   // Each route returns a position for a distance travelled; cars face along it and bob as they hover.
   const TAU = Math.PI * 2;
+  function tour(points) {                      // a smooth closed path through the given points, travelled at an even speed
+    const curve = new THREE.CatmullRomCurve3(points.map(p => new THREE.Vector3(p[0], p[1], p[2])), true, 'catmullrom', .5), length = curve.getLength();
+    return {length, at: (d, out) => { curve.getPointAt((((d / length) % 1) + 1) % 1, out); }};
+  }
   function circle(r, y, cx = 0, cz = 0) { return {length: Math.PI * 2 * r, at: (d, out) => { const a = d / r; out.set(cx + Math.cos(a) * r, y, cz + Math.sin(a) * r); }}; }
   function stadium(x, z0, z1, y) {            // up one lane, round the end, back down the other
     const r = x, straight = z1 - z0, total = straight * 2 + Math.PI * r * 2;
@@ -1163,7 +1167,11 @@ function start() {
   const ROUTES = {
     plaza: circle(6.6, .32), road: stadium(2.1, 21, 62, .22), ringA: circle(46, .06), ringB: circle(75, .06),
     low1: circle(34, -69.9), low2: circle(50, -69.9), low3: circle(22, -69.9),
-    air1: circle(24, 15), air2: circle(38, 22), air3: circle(58, 12), lift: helix(29, -62, 9, 3), sky: circle(62, 50)
+    air1: circle(20, 27), air2: circle(38, 22), air3: circle(58, 12), lift: helix(29, -62, 9, 3), sky: circle(62, 50),
+    // Delivery rounds: each courier has its own winding path laid out in advance, at its own heights.
+    airTourA: tour([[0, 11, -16], [14, 13, -6], [10, 10, 14], [5, 12, 34], [6, 15, 56], [-6, 17, 56], [-5, 13, 32], [-12, 11, 12], [-14, 14, -6]]),   // plaza, down the main road and back
+    airTourB: tour([[-17, 19, 0], [-7, 23, 13], [5, 19, 6], [17, 22, -3], [9, 24, -15], [-3, 20, -7], [-12, 23, -16]]),                             // criss-crossing above the plaza
+    airTourC: tour([[18, 17, 10], [12, 20, 30], [-2, 22, 44], [-11, 19, 30], [-18, 16, 14], [-6, 18, 20], [6, 21, 16]])                              // between the plaza and the road's shops
   };
   // yaw: how far each model's own front is turned from +Z.
   const CARS = {
@@ -1176,7 +1184,7 @@ function start() {
     ['bubble', 'road', 5, 0], ['van', 'road', 5, 38], ['roadster', 'road', 5, 70],
     ['bus', 'ringA', 6, 0], ['bubble', 'ringA', 6, 120], ['van', 'ringA', -5, 60], ['bus', 'ringB', -6, 0], ['scooter', 'ringB', 7, 200],
     ['cart', 'low1', 3.5, 0], ['van', 'low1', 3.5, 90], ['roadster', 'low2', -6, 0], ['cart', 'low2', -3, 130], ['scooter', 'low3', 4, 0], ['bubble', 'low2', -6, 240],
-    ['patrol', 'air1', 4, 0], ['patrol', 'air2', 5, 80], ['patrol', 'air3', 6, 200], ['delivery', 'lift', 7, 0], ['delivery', 'air2', 5, 10], ['delivery', 'lift', 7, 500],
+    ['patrol', 'air1', 4, 0], ['patrol', 'air2', 5, 80], ['patrol', 'air3', 6, 200], ['delivery', 'lift', 7, 0], ['delivery', 'airTourA', 5, 0], ['delivery', 'airTourB', 4.4, 30], ['delivery', 'airTourC', 4.8, 60],
     ['airship', 'sky', -1.6, 40]
   ];
   const traffic = []; let lineup = false;
@@ -1208,8 +1216,16 @@ function start() {
   function updateTraffic(dt, still) {
     if (lineup) { Object.keys(CARS).forEach((id, i) => { const t = traffic.find(x => x.id === id); if (t) { t.car.position.set(-10.5 + i * 3, .4, 5); t.car.rotation.set(0, 0, 0); } }); return; }
     for (const t of traffic) {
-      if (!still && !t.halt) t.d += t.speed * dt;
-      t.route.at(t.d, carPos); t.route.at(t.d + Math.sign(t.speed) * .6, carNext);
+      if (t.air && t.id !== 'airship') {       // fliers give way to one another (and to the UFO): the later one slows right down and slips over or under
+        let slow = 1, dodge = 0;
+        const mind = (p, reach, tall, own) => { const dx = t.car.position.x - p.x, dz = t.car.position.z - p.z, dy = t.car.position.y - p.y;
+          if (dx * dx + dz * dz < reach * reach && Math.abs(dy) < tall) { slow = Math.min(slow, own); dodge = dy >= 0 ? 3.6 : -3.6; } };
+        for (const o of traffic) { if (o === t) break; if (o.air && o.id !== 'airship') mind(o.car.position, 10, 5.5, .15); }
+        if (N.UFO) mind(N.UFO.position, 11, 7, .3);
+        t.ease = lerp(t.ease ?? 1, slow, 1 - Math.pow(.05, dt)); t.dodge = lerp(t.dodge ?? 0, dodge, 1 - Math.pow(.25, dt));
+      }
+      if (!still && !t.halt) t.d += t.speed * dt * (t.ease ?? 1);
+      t.route.at(t.d, carPos); carPos.y += t.dodge ?? 0; t.route.at(t.d + Math.sign(t.speed) * .6, carNext);
       t.car.position.copy(carPos); t.car.position.y += (t.air ? .5 : .12) * Math.sin(time * (t.air ? 1.6 : 2.4) + t.phase) + (t.air ? 0 : .25);
       t.car.rotation.y = Math.atan2(carNext.x - carPos.x, carNext.z - carPos.z);
       t.body.rotation.z = Math.sin(time * 1.7 + t.phase) * (t.id === 'airship' ? .012 : .04);
@@ -1400,7 +1416,7 @@ function start() {
     const channel = new MessageChannel(); let wake = null;
     channel.port1.onmessage = () => { if (wake) wake(); };
     window.__city = {
-      get mode() { return mode; }, get debug() { return {signs, N, camera, landmarkModels}; },
+      get mode() { return mode; }, get debug() { return {signs, N, camera, landmarkModels, traffic}; },
       lineup(on) { lineup = on; }, enter() { return enterPlace(); }, back() { return backToCity(); }, meet(id) { return meet(id); }, leave() { return leave(); },
       async advance(seconds) { for (let t = 0; t < seconds; t += 1 / 30) { step(1 / 30); await new Promise(resolve => { wake = resolve; channel.port2.postMessage(0); }); } return mode; }
     };
