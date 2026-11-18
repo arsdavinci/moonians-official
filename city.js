@@ -936,7 +936,7 @@ function start() {
   const segment = (x0, z0, x1, z1, y) => { const L = Math.hypot(x1 - x0, z1 - z0); return {length: L * 2, at: (d, out) => { d = ((d % (L * 2)) + L * 2) % (L * 2); const k = (d < L ? d : L * 2 - d) / L; out.set(lerp(x0, x1, k), y, lerp(z0, z1, k)); }}; };
   const CAST = {
     ranpyon: {height: 2.3, yaw: 0, route: circle(4.4, .3), speed: .9, ride: 'scooter', seat: [0, .62, -.12], kicker: 'RANPYON', role: 'ツッコミ担当', name: 'らんぴょん',
-              text: '地球人とムーニアンのハーフ。自分の「好き」を形にする、クリエイターなツッコミ担当。'},
+              text: '地球人とムーニアン（月人）のハーフ。自分の「好き」を形にする、クリエイターなツッコミ担当。スターシードとして、愛と気づきを広めに地球へやって来ました。'},
     luva:    {height: 3.1, yaw: 0, route: segment(-1.3, -19.5, -1.3, -33, .22), speed: .7, view: [.25, 1], kicker: 'ZA-LUVA SELES', role: '二人の上司', name: 'ザ・ルーヴァ・セレス',
               text: '三日月大使館（クレッセントエンバシー）の偉い人。らんぴょんとぴょんぴーの上司です。胸には三日月、手にはマイク。二人の地球での活動を、おだやかな笑顔で見守っています。'},
     kaguya:  {height: 11.5, yaw: 0, route: circle(1, 0), speed: .5, holo: [0, 3.3, 74], glide: true, view: [.18, -1], kicker: 'PRINCESS KAGUYA', role: '月の宮の皇族', name: 'かぐや様',
@@ -957,7 +957,7 @@ function start() {
   const cast = [], profileEl = $('#city-profile');
   // Pyonpy stays on his stage, but meets you the same way as the others.
   const pyonMember = {id: 'pyon', actions: {}, stopped: false, spec: {height: 2.3, view: [.35, 1], kicker: 'PYONPY', role: 'ボケ担当', name: 'ぴょんぴー',
-    text: '超ポジティブで、みんなの兄貴分。月と地球を笑いでつなぐ、もふもふのボケ担当。'}};
+    text: '超ポジティブで、みんなの兄貴分。月と地球を笑いでつなぐ、もふもふのボケ担当。スターシードとして、笑いで愛を広めに地球へやって来ました。'}};
   let meeting = null, shift = 0, shiftT = 0, profileRide = false;
   function loadCast() {
     Object.entries(CAST).forEach(([id, spec], index) => {
