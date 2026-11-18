@@ -203,3 +203,8 @@ body.is-loading .city-name{display:none}
   .city-enter .city-profile-actions{margin-top:20px}
 }
 @keyframes city-enter-in{from{opacity:0;transform:perspective(1100px) translateY(-50%) translateX(70px) rotateY(-46deg) rotateX(3deg)}}
+
+/* Only the buttons themselves take the pointer; the empty space round the menu lets you drag the city. */
+.city-menu,.city-menu ol,.city-menu li,.city-sns,.city-hint{pointer-events:none}
+.city-menu a,.city-sns a{pointer-events:auto}
+body.is-meeting .city-menu a,body.is-asking .city-menu a,body.is-meeting .city-sns a,body.is-asking .city-sns a,body.is-travelling .city-sns a{pointer-events:none}
