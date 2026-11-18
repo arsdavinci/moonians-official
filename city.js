@@ -1019,7 +1019,7 @@ function start() {
     pt:      {height: 1.1, yaw: 0, route: circle(4.4, .3), speed: .9, ride: 'roadster', seat: [.5, .62, -.2], kicker: 'PTPUTY / PT', role: 'らむねの相方', name: 'ピーティープティ',
               text: 'ニックネームは「PT」。DJらむねの相方で、親友。好きなのは、ぴょんぴー。身長はおよそ45cm。'},
     // Grouper grooves on the spot in front of the Music Dome.
-    grouper: {height: 3.0, yaw: 0, route: circle(.6, .22, 20.4, 6.5), speed: .35, dance: true, view: [-1, .3], side: 'right', kicker: 'GROUPER', role: '音楽の星のエイリアン', name: 'グルーパー',
+    grouper: {height: 3.0, yaw: 0, route: circle(.5, .22, 15.9, 16.6), speed: .35, dance: true, view: [-.79, -.61], side: 'right', kicker: 'GROUPER', role: '音楽の星のエイリアン', name: 'グルーパー',
               text: '音楽の星「グルーヴィア星」から来た、機械の体のエイリアン。「地球の音楽はクソすぎる！」と地球を破壊しに来たけれど、ぴょんぴーとのラップバトルでそのバイブスに感化され、まさかの友達に。地球滅亡は、ギリギリで回避されました。'},
     // Yanavis rolls on wheels: a smooth glide round the outer ring of the plaza, with a little bump now and then.
     robot:   {height: 1.9, yaw: 0, route: circle(16, .3), speed: -1.7, glide: true, view: 'out', kicker: 'Y.A.N.A.V.I.S', role: '人工知能', name: 'ヤナビス',
