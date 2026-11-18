@@ -135,7 +135,7 @@ function start() {
   // the rooftop picture, so the merged low-poly city needs no UVs. At night the pictures glow a little.
   const uSkinGlow = {value: .42}, uNight = {value: 0};
   // Which parts of a picture are lights: warm yellow and cyan panes (windows, lamps) and hot pink (neon, the insides of bunny ears).
-  const LIGHTS = 'float lightMask(vec3 c){ float warm = smoothstep(0.10, 0.30, min(c.r, c.g) - c.b); float cool = smoothstep(0.12, 0.32, min(c.g, c.b) - c.r); float pink = smoothstep(0.22, 0.45, c.r - c.g) * step(0.5, c.b); return clamp(warm + cool + pink * 0.8, 0.0, 1.0); }';
+  const LIGHTS = 'float lightMask(vec3 c){ float warm = smoothstep(0.10, 0.30, min(c.r, c.g) - c.b); float cool = smoothstep(0.12, 0.32, min(c.g, c.b) - c.r) * smoothstep(-0.02, 0.06, c.b - c.g); float pink = smoothstep(0.16, 0.36, c.r - c.g) * step(0.45, c.b); return clamp(warm + cool + pink * 0.8, 0.0, 1.0); }';
   const skinTextures = {};
   const skinTexture = name => skinTextures[name] || (skinTextures[name] = textures.load(`assets/city/tex/${name}.jpg`, t => { t.colorSpace = THREE.SRGBColorSpace; t.wrapS = t.wrapT = THREE.RepeatWrapping; t.anisotropy = 4; }));
   function skinned(source, wall, roof, size) {
