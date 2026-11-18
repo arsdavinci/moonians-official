@@ -94,6 +94,14 @@ const sound = (() => {
   return {set, setVolume, fx, get on() { return on; }, get wanted() { return wanted; }};
 })();
 
+// Phone: the top-right controls open and close from one button, and close again when the city is touched.
+{ const tools = $('#city-tools'), toggle = $('#tools-toggle');
+  if (tools && toggle) {
+    const set = open => { tools.classList.toggle('is-open', open); toggle.setAttribute('aria-expanded', String(open)); };
+    toggle.addEventListener('click', () => set(!tools.classList.contains('is-open')));
+    $('#city-canvas').addEventListener('pointerdown', () => set(false), {passive: true});
+  } }
+
 /* ───────────── page elements ───────────── */
 const loaderEl = $('#city-loader'), progressEl = $('#city-progress'), gateEl = $('#city-gate');
 const percentEl = $('#city-percent'), barEl = $('#city-bar'), wipeEl = $('#city-wipe');

@@ -236,3 +236,17 @@ body.is-meeting .city-menu a,body.is-asking .city-menu a,body.is-meeting .city-s
 .city-menu a.is-work{background:linear-gradient(90deg,rgba(255,140,200,.85),rgba(143,216,255,.85));border-color:#fff}
 .city-menu a.is-work .name,.city-menu a.is-work .num,.city-menu a.is-work .where{color:#fff}
 .city-menu ol > li:last-child:nth-child(odd){grid-column:1 / -1}
+
+/* On a phone the language, night and sound controls fold away behind one small button, and stay folded while a profile or a question is up. */
+.city-tools-toggle{display:none}
+@media (max-width:759px){
+  .city-tools-toggle{display:grid;place-items:center;width:44px;height:44px;border-radius:50%;border:1.5px solid #fff;background:rgba(255,255,255,.78);box-shadow:0 8px 22px rgba(98,74,190,.25);
+    -webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);cursor:pointer;padding:0}
+  .city-tools-toggle span{width:18px;height:14px;background:linear-gradient(#5a4f8c,#5a4f8c) 0 0/100% 2.5px no-repeat,linear-gradient(#5a4f8c,#5a4f8c) 0 50%/100% 2.5px no-repeat,linear-gradient(#5a4f8c,#5a4f8c) 0 100%/100% 2.5px no-repeat;border-radius:2px}
+  .city-tools.is-open .city-tools-toggle{background:linear-gradient(135deg,#ff8cc8,#8fd8ff)}
+  .city-tools.is-open .city-tools-toggle span{background:linear-gradient(#fff,#fff) 50% 50%/100% 2.5px no-repeat;transform:rotate(45deg);position:relative}
+  .city-tools.is-open .city-tools-toggle span::after{content:"";position:absolute;inset:0;background:linear-gradient(#fff,#fff) 50% 50%/100% 2.5px no-repeat;transform:rotate(90deg)}
+  .city-tools:not(.is-open) > :not(.city-tools-toggle){display:none}
+  body.is-meeting .city-tools > :not(.city-tools-toggle),body.is-asking .city-tools > :not(.city-tools-toggle){display:none}
+  body.is-meeting .city-tools-toggle,body.is-asking .city-tools-toggle{opacity:.55}
+}
