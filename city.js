@@ -1113,7 +1113,7 @@ function start() {
   function applyOffset() {
     const w = innerWidth, h = innerHeight;
     if (w < 760) camera.setViewOffset(w, h, 0, h * (.15 + .1 * Math.abs(shift)), w, h);
-    else if (shift !== 0) camera.setViewOffset(w, h, -w * (shift > 0 ? .2 : .11) * shift, 0, w, h);   // profile: character on the right; question: place on the left
+    else if (shift !== 0) camera.setViewOffset(w, h, -w * (shift > 0 ? .1 : .11) * shift, 0, w, h);   // profile: character on the right; question: place on the left
     else camera.clearViewOffset();
     camera.updateProjectionMatrix();
   }
