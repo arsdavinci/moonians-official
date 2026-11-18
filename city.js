@@ -760,10 +760,13 @@ function start() {
         mixer.addEventListener('finished', () => playCast(member, member.stopped || spec.glide || spec.ride ? 'Idle' : spec.dance ? 'React' : 'Walk'));
         if (id === 'robot') {          // Yanavis's face is a display: six expressions that change by themselves and when it is clicked
           const map = textures.load('assets/city/yanavis-faces.webp', t => { t.colorSpace = THREE.SRGBColorSpace; }); map.repeat.set(1 / 6, 1);
-          const face = new THREE.Mesh(new THREE.CircleGeometry(.158, 40), new THREE.MeshBasicMaterial({map, transparent: true, toneMapped: false}));
-          face.position.set(0, .612, .268); model.add(face);
-          // fix it to the head bone, so it moves exactly with the head when the body sways or hops
-          const headBone = model.getObjectByName('head'); if (headBone) { group.updateMatrixWorld(true); headBone.attach(face); }
+          // The display is a curved cap that hugs the round head, instead of a flat disc standing off it.
+          const R = .262, geo = new THREE.PlaneGeometry(.31, .31, 18, 18), pos = geo.attributes.position;
+          for (let i = 0; i < pos.count; i++) { const d2 = pos.getX(i) ** 2 + pos.getY(i) ** 2; pos.setZ(i, Math.sqrt(Math.max(0, R * R - d2)) + .004); }
+          const face = new THREE.Mesh(geo, new THREE.MeshBasicMaterial({map, transparent: true, toneMapped: false}));
+          face.position.set(0, .612, 0); model.add(face);
+          // Its face sits on the body section of the rig (the "head" bone of this model only carries the ears), so fix it there.
+          const faceBone = model.getObjectByName('chest'); if (faceBone) { group.updateMatrixWorld(true); faceBone.attach(face); }
           member.face = {map, now: 0, until: 0, set(i, seconds) { this.now = i; this.until = time + seconds; map.offset.x = i / 6; }};
         }
         playCast(member, 'Walk'); cast.push(member);
