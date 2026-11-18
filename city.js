@@ -724,7 +724,8 @@ function start() {
         clip.tracks = clip.tracks.filter(track => !/^(root|RootNode)\.position$/.test(track.name));
         pyonActions[clip.name] = pyonMixer.clipAction(clip);
       });
-      pyonMixer.addEventListener('finished', () => { if (!pyonTurning) dance(); });
+      for (const name of ['hips', 'spine', 'chest', 'head', 'upperarmL', 'forearmL', 'upperarmR', 'forearmR']) PB[name] = model.getObjectByName(name);
+      pyonMixer.addEventListener('finished', () => { if (move && move.once) dance(); else if (move) playPyon(pyonActions[move.clip] ? move.clip : 'Idle'); });
       dance();
       burst(V(0, 2, 0), PASTEL, 50, 6, .8);
     }, undefined, () => { /* the city works without him */ });
@@ -781,14 +782,51 @@ function start() {
       }, undefined, () => { /* the hand-built landmark stays */ });
     }
   }
-  // He dances on the stage: his happy moves one after another, with a little bounce and sway on top.
-  const DANCE = ['Cheer', 'Jump', 'Talk', 'Cheer', 'Idle', 'Jump'];
-  let danceIndex = 0, pyonTurning = false, pyonFacing = 0;
+  // He dances on the stage, facing the main road. A routine of moves runs one after another: some are his own clips
+  // (cheer, jump, talk), the others are made here by swinging his arms, chest and hips in time, with spins and side steps.
+  const MOVES = [{n: 'wave', d: 4, clip: 'Idle'}, {n: 'point', d: 4, clip: 'Idle'}, {n: 'Cheer', once: true}, {n: 'spin', d: 3, clip: 'Idle'}, {n: 'side', d: 4, clip: 'Idle'},
+    {n: 'Jump', once: true}, {n: 'run', d: 4, clip: 'Run'}, {n: 'pump', d: 4, clip: 'Idle'}, {n: 'Talk', once: true}, {n: 'spin', d: 3, clip: 'Idle'}];
+  const PB = {}, danceAxis = V(0, 0, 0), danceQ = new THREE.Quaternion(), danceP = new THREE.Quaternion();
+  let moveIndex = -1, move = null, moveT = 0, moveD = 0, pyonTurning = false, pyonFacing = 0;
   function dance() {
-    const moves = DANCE.filter(name => pyonActions[name]); if (!moves.length) return;
-    const name = moves[danceIndex++ % moves.length];
-    playPyon(name, true);
-    if (name === 'Idle') setTimeout(() => { if (pyonActive === pyonActions.Idle && !pyonTurning) dance(); }, 1600);
+    for (let tries = 0; tries < MOVES.length; tries++) {
+      moveIndex = (moveIndex + 1) % MOVES.length; move = MOVES[moveIndex]; moveT = 0;
+      if (move.once) { const action = pyonActions[move.n]; if (!action) continue; playPyon(move.n, true); moveD = action.getClip().duration + 1; return; }
+      playPyon(pyonActions[move.clip] ? move.clip : 'Idle'); moveD = move.d; return;
+    }
+  }
+  function bend(name, ax, ay, az, angle) {      // turn one of his bones about an axis given in his own frame (x = his left, y = up, z = his front)
+    const bone = PB[name]; if (!bone || !angle) return;
+    danceQ.setFromAxisAngle(danceAxis.set(ax, ay, az).normalize().applyQuaternion(pyon.quaternion), angle); bone.parent.getWorldQuaternion(danceP);
+    bone.quaternion.premultiply(danceP.clone().invert().multiply(danceQ).multiply(danceP));
+  }
+  function updateDance(dt) {
+    if (!move) return;
+    moveT += dt; if (moveT > moveD) { dance(); }
+    let spin = 0, slide = 0, hop = Math.abs(Math.sin(time * Math.PI * 2)) * .09, lean = Math.sin(time * Math.PI) * .07, sway = Math.sin(time * Math.PI) * .2;
+    if (!move.once) {
+      const w = Math.min(1, moveT / .45, (moveD - moveT) / .45), beat = time * 2, s1 = Math.sin(beat * Math.PI), s2 = Math.sin(beat * Math.PI / 2);   // 120 beats a minute
+      pyon.updateMatrixWorld(true);
+      if (move.n === 'wave') {                 // both arms up, swaying side to side
+        bend('chest', 0, 0, 1, s2 * .16 * w); bend('upperarmL', 0, 0, 1, (2.3 + s2 * .4) * w); bend('upperarmR', 0, 0, 1, (-2.3 + s2 * .4) * w); bend('head', 0, 0, 1, -s2 * .14 * w);
+      } else if (move.n === 'point') {         // one arm to the sky, then the other, hips twisting
+        const k = s2 > 0 ? 1 : -1, e = Math.abs(s2);
+        bend('hips', 0, 1, 0, s2 * .3 * w); bend('chest', 0, 1, 0, -s2 * .5 * w);
+        bend('upperarmL', 0, 0, 1, (k > 0 ? 2.5 * e : .5 * e) * w); bend('upperarmR', 0, 0, 1, -(k < 0 ? 2.5 * e : .5 * e) * w);
+        hop = Math.abs(s1) * .14;
+      } else if (move.n === 'spin') {          // arms out, all the way round twice
+        const k = clamp(moveT / (moveD - .3), 0, 1); spin = (k * k * (3 - 2 * k)) * Math.PI * 4; sway = 0;
+        bend('upperarmL', 0, 0, 1, 1.45 * w); bend('upperarmR', 0, 0, 1, -1.45 * w); hop = Math.abs(s1) * .05;
+      } else if (move.n === 'side') {          // hopping from side to side with rolling arms
+        slide = s2 * .55 * w; hop = Math.abs(s1) * .26; lean = -s2 * .16; sway = s2 * .3;
+        bend('upperarmL', 1, 0, 0, (-.9 + s1 * .5) * w); bend('upperarmR', 1, 0, 0, (-.9 - s1 * .5) * w); bend('forearmL', 1, 0, 0, -1.0 * w); bend('forearmR', 1, 0, 0, -1.0 * w);
+      } else if (move.n === 'pump') {          // fists pumping over his head, knees bouncing
+        bend('upperarmL', 0, 0, 1, (2.0 + Math.max(0, s1) * .6) * w); bend('upperarmR', 0, 0, 1, -(2.0 + Math.max(0, -s1) * .6) * w);
+        bend('chest', 1, 0, 0, Math.abs(s1) * .12 * w); hop = Math.abs(s1) * .2; sway = s2 * .45;
+      } else if (move.n === 'run') { hop = Math.abs(s1) * .08; sway = s2 * .55; }   // running on the spot, turning from side to side
+    }
+    pyon.rotation.y = pyonFacing + spin + sway; pyon.rotation.z = lean;
+    pyon.position.set(slide, .68 + hop, 0);
   }
   /* ── monitors: clips from the site play on every screen; the big Moon Vision screen loops the 3D anime ── */
   const CLIPS = ['11', '03', '16', '05', '23', '01', '12', '09', '20', '14', '22', '07', '18', '25', '02', '27'].map(n => 'capsule/clip-' + n).concat(['capsule2/clip-01']);
@@ -894,7 +932,7 @@ function start() {
   const PHOTOS = {ranpyon: 1, pyon: 1, luva: 1, kaguya: 1, ramune: 1, pt: 1, robot: 1, grouper: 1};   // close-up face pictures in assets/city/faces
   const cast = [], profileEl = $('#city-profile');
   // Pyonpy stays on his stage, but meets you the same way as the others.
-  const pyonMember = {id: 'pyon', actions: {}, stopped: false, spec: {height: 2.3, kicker: 'PYONPY', role: 'ボケ担当', name: 'ぴょんぴー',
+  const pyonMember = {id: 'pyon', actions: {}, stopped: false, spec: {height: 2.3, view: [.35, 1], kicker: 'PYONPY', role: 'ボケ担当', name: 'ぴょんぴー',
     text: '超ポジティブで、みんなの兄貴分。月と地球を笑いでつなぐ、もふもふのボケ担当。'}};
   let meeting = null, shift = 0, shiftT = 0, profileRide = false;
   function loadCast() {
@@ -922,7 +960,7 @@ function start() {
         // Characters with a full skeleton come with a seated or dancing clip; that is their everyday pose.
         if (actions.Sit) actions.Idle = actions.Walk = actions.Sit;
         if (actions.Dance) actions.Idle = actions.Walk = actions.Dance;
-        const member = {id, spec, group, mixer, actions, active: null, d: index * 7, facing: 0, stopped: false, head: model.getObjectByName('Hips') ? model.getObjectByName('Head') : null, look: 0};
+        const member = {id, spec, group, mixer, actions, active: null, d: index * 7, facing: 0, stopped: false, head: model.getObjectByName('Hips') ? model.getObjectByName('Head') : null, chest: model.getObjectByName('Hips') ? (model.getObjectByName('Spine02') || model.getObjectByName('Spine')) : null, look: 0, hop: 0};
         member.proxy = new THREE.Mesh(new THREE.SphereGeometry(spec.height * .62, 10, 8)); member.proxy.userData = {kind: 'cast', id}; proxies.push(member.proxy);
         mixer.addEventListener('finished', () => playCast(member, member.stopped || spec.glide || spec.ride ? 'Idle' : spec.dance ? 'React' : 'Walk'));
         if (id === 'robot') {          // Yanavis's face is a display: six expressions that change by themselves and when it is clicked
@@ -973,21 +1011,25 @@ function start() {
           if (!m.stopped && !m.spec.holo) castPos.y += p < .14 ? Math.sin(p / .14 * Math.PI) * .07 : p > .24 && p < .36 ? Math.sin((p - .24) / .12 * Math.PI) * .045 : 0;
         }
       }
+      if (m.hop > 0) { m.hop = Math.max(0, m.hop - dt * 1.1); castPos.y += Math.abs(Math.sin(m.hop * Math.PI * 2)) * .2 * m.hop * m.spec.height / 2; }   // "me?" - two small hops
       m.group.position.copy(castPos);
       let want = m.stopped && !mount ? Math.atan2(camPos.x - castPos.x, camPos.z - castPos.z) : Math.atan2(castNext.x - castPos.x, castNext.z - castPos.z), delta = want - m.facing;
       while (delta > Math.PI) delta -= Math.PI * 2; while (delta < -Math.PI) delta += Math.PI * 2;
       m.facing += delta * (1 - Math.pow(.01, dt)); m.group.rotation.y = m.facing;
       if (!still) m.mixer.update(dt);
-      if (m.head && !still) {          // a character with a real skeleton turns their head to look into the camera while they are being met
-        m.look = lerp(m.look, m.stopped ? 1 : 0, 1 - Math.pow(.02, dt));
+      if (m.head && !still) {          // a character with a real skeleton turns to look into the camera while they are the one chosen
+        m.look = lerp(m.look, m.stopped || meeting === m ? 1 : 0, 1 - Math.pow(.02, dt));   // riders are chosen without being stopped
         if (m.look > .01) {
           m.group.updateMatrixWorld(true); m.head.getWorldPosition(tmp);
           const dx = camPos.x - tmp.x, dy = camPos.y - tmp.y, dz = camPos.z - tmp.z;
           let yaw = Math.atan2(dx, dz) - m.facing; while (yaw > Math.PI) yaw -= Math.PI * 2; while (yaw < -Math.PI) yaw += Math.PI * 2;
-          yaw = clamp(yaw, -1.25, 1.25) * m.look; const pitch = clamp(Math.atan2(dy, Math.hypot(dx, dz)), -.45, .45) * m.look;
-          lookQ.setFromEuler(lookE.set(-pitch, m.facing + yaw, 0, 'YXZ')).multiply(lookQ2.setFromAxisAngle(UP, -m.facing));   // a turn in world space
-          m.head.parent.getWorldQuaternion(lookQ2);
-          m.head.quaternion.premultiply(lookQ2.clone().invert().multiply(lookQ).multiply(lookQ2));
+          yaw = clamp(yaw, -1.75, 1.75) * m.look; const pitch = clamp(Math.atan2(dy, Math.hypot(dx, dz)), -.45, .45) * m.look;
+          const turnBone = (bone, y, p) => {     // a turn in world space, whatever way the bone itself lies
+            lookQ.setFromEuler(lookE.set(-p, m.facing + y, 0, 'YXZ')).multiply(lookQ2.setFromAxisAngle(UP, -m.facing));
+            bone.parent.getWorldQuaternion(lookQ2); bone.quaternion.premultiply(lookQ2.clone().invert().multiply(lookQ).multiply(lookQ2));
+          };
+          if (m.chest) { turnBone(m.chest, yaw * .28, 0); m.chest.updateMatrixWorld(true); turnBone(m.head, yaw * .72, pitch); }   // the shoulders come round too
+          else turnBone(m.head, yaw, pitch);
         }
       }
       m.proxy.position.copy(castPos); m.proxy.position.y += m.spec.height * .55; m.proxy.updateMatrixWorld();
@@ -1079,13 +1121,22 @@ function start() {
     const m = id === 'pyon' ? (pyon ? Object.assign(pyonMember, {group: pyon}) : null) : cast.find(x => x.id === id); if (!m || mode !== 'orbit') return;
     mode = 'fly'; meeting = m; m.stopped = !m.spec.ride; body.classList.add('is-meeting');   // riders keep driving; the camera rides along
     hintEl.classList.remove('is-on'); bubbleEl.hidden = true;
-    sound.fx.select(); playCast(m, 'Idle');
+    sound.fx.select(); playCast(m, 'Idle'); m.hop = 1;
     const p = m.group.position.clone(), eye = m.spec.height * .58;
     // stand where the view is clear: a set side for those on the roads, otherwise wherever the camera already is
     const away = (m.spec.view === 'out' ? p.clone().setY(0).applyAxisAngle(V(0, 1, 0), .9) : m.spec.view ? V(m.spec.view[0], 0, m.spec.view[1]) : camPos.clone().sub(p).setY(0)).normalize();
     const reach = m.spec.ride ? 4.4 : m.spec.height * 1.75, lift = m.spec.ride ? 1.0 : 0;   // riders in the car are seen from a little further back and above
     shiftT = 1;
     if (motionOff()) { camPos.copy(p).addScaledVector(away, reach).add(V(0, eye + lift, 0)); camLook.copy(p).add(V(0, eye, 0)); }
+    else if (m.spec.ride) {            // a rider keeps moving, so the camera aims at where they are each moment and arrives right in step with them
+      const fromPos = camPos.clone(), fromLook = camLook.clone(), goal = V(0, 0, 0), look = V(0, 0, 0);
+      await run(1.5, k => {
+        const q = m.group.position, yaw = m.group.rotation.y + .55;
+        goal.set(q.x + Math.sin(yaw) * 4.4, q.y + eye + 1.0, q.z + Math.cos(yaw) * 4.4); look.set(q.x, q.y + eye, q.z);
+        camPos.lerpVectors(fromPos, goal, k); camPos.y += Math.sin(k * Math.PI) * 1.2; camLook.lerpVectors(fromLook, look, Math.min(1, k * 1.6));   // eyes on them early
+      }, easeInOut);
+      p.copy(m.group.position);
+    }
     else await fly(p.clone().addScaledVector(away, reach).add(V(0, eye + lift, 0)), p.clone().add(V(0, eye, 0)), 1.5, 1.2);
     playCast(m, 'React', true); sound.fx.pop(); sound.fx.arrive();
     if (m === pyonMember) playPyon(pyonActions.Cheer ? 'Cheer' : 'Jump', true);
@@ -1445,7 +1496,7 @@ function start() {
     const channel = new MessageChannel(); let wake = null;
     channel.port1.onmessage = () => { if (wake) wake(); };
     window.__city = {
-      get mode() { return mode; }, get debug() { return {signs, N, camera, landmarkModels, traffic}; },
+      get mode() { return mode; }, get debug() { return {signs, N, camera, landmarkModels, traffic, jump(i, t) { moveIndex = i - 1; dance(); moveT = t; }}; },
       lineup(on) { lineup = on; }, enter() { return enterPlace(); }, back() { return backToCity(); }, meet(id) { return meet(id); }, leave() { return leave(); },
       async advance(seconds) { for (let t = 0; t < seconds; t += 1 / 30) { step(1 / 30); await new Promise(resolve => { wake = resolve; channel.port2.postMessage(0); }); } return mode; }
     };
@@ -1516,18 +1567,7 @@ function start() {
     if (N.Statue) { statueBounce = Math.max(0, statueBounce - dt * 1.6); N.Statue.scale.setScalar(1 + Math.sin(statueBounce * Math.PI * 3) * .12 * statueBounce); }
     if (pyon) {
       if (pyonMixer && !still) pyonMixer.update(dt);
-      // When the view moves round, he steps round slowly on the spot until he faces it again, then goes back to dancing.
-      let delta = Math.atan2(camPos.x, camPos.z) - pyonFacing;
-      while (delta > Math.PI) delta -= Math.PI * 2; while (delta < -Math.PI) delta += Math.PI * 2;
-      if (!pyonTurning && Math.abs(delta) > .3 && !still) { pyonTurning = true; playPyon(pyonActions.Walk ? 'Walk' : 'Idle'); if (pyonActive) pyonActive.timeScale = .7; }
-      if (pyonTurning) {
-        pyonFacing += Math.sign(delta) * Math.min(Math.abs(delta), dt * .55);
-        if (Math.abs(delta) < .04) { pyonTurning = false; if (pyonActive) pyonActive.timeScale = 1; dance(); }
-      } else if (still) pyonFacing += delta * (1 - Math.pow(.02, dt));
-      const groove = pyonTurning || still ? 0 : 1;
-      pyon.rotation.y = pyonFacing + Math.sin(time * 1.6) * .22 * groove;
-      pyon.rotation.z = Math.sin(time * 3.2) * .07 * groove;
-      pyon.position.y = .68 + Math.abs(Math.sin(time * 3.2)) * .09 * groove;
+      if (!still) updateDance(dt);
     }
     for (const m of holos) {
       if (m.userData.ring) { const g = m.userData.ring, a = g.a + time * .12; m.position.set(Math.cos(a) * g.r, g.y + Math.sin(time * 1.3 + g.a * 5) * .6, Math.sin(a) * g.r); m.rotation.y = -a + Math.PI / 2 + time * .8; }
