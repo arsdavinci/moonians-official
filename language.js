@@ -5,6 +5,7 @@
     'ムーニアンズ ロードマップ｜月の内側のあるきかた':'Moonians Roadmap | A guide to the inner Moon', '街のホーム':'City home',
     'パステルムーンシティ。ムーニアンズが暮らす月の内側の街を3Dで見回して、行きたい場所をえらべます。':'Pastel Moon City. Look around the Moonians’ city inside the Moon in 3D and choose where to go.',
     '夜にする':'Night', '昼にする':'Day',
+    'かぐや様のキャラクターモデルシート。三面図と、ディテール。':'Princess Kaguya’s character model sheet: three views and details.', 'かぐや様のキャラクターモデルシート。正面・横・後ろの三面図と、顔・髪飾り・扇・帯のディテール':'Princess Kaguya’s character model sheet: front, side and back views, with details of her face, hair ornament, fan and sash.',
     'ムーニアンズ SNS｜空飛ぶ放送局':'Moonians SNS | The flying broadcast station', '空飛ぶ放送局へ、ようこそ。':'Welcome to the flying station.',
     'ムーニアンズのSNSがぜんぶ集まる、空飛ぶ放送局。X、Instagram、TikTok、YouTubeへは、ここからどうぞ。':'The flying station where all of the Moonians’ social channels meet. X, Instagram, TikTok and YouTube start here.',
     'ムーニアンズのSNSは、この飛行船からぜんぶ届けています。気になるチャンネルを、えらんでな。':'Every Moonians channel is broadcast from this airship. Pick the one you like.',
