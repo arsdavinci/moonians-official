@@ -746,7 +746,7 @@ function start() {
   // Pyonpy stays on his stage, but meets you the same way as the others.
   const pyonMember = {id: 'pyon', actions: {}, stopped: false, spec: {height: 2.3, kicker: 'PYONPY', role: 'ボケ担当', name: 'ぴょんぴー',
     text: '超ポジティブで、みんなの兄貴分。月と地球を笑いでつなぐ、もふもふのボケ担当。'}};
-  let meeting = null, shift = 0, shiftT = 0;
+  let meeting = null, shift = 0, shiftT = 0, profileRide = false;
   function loadCast() {
     Object.entries(CAST).forEach(([id, spec], index) => {
       new GLTFLoader().load(`assets/city/cast/${id}.glb?v=20261118-1`, gltf => {
@@ -809,6 +809,11 @@ function start() {
       if (!still) m.mixer.update(dt);
       m.proxy.position.copy(castPos); m.proxy.position.y += m.spec.height * .55; m.proxy.updateMatrixWorld();
     }
+    // While a rider's profile is open, the camera keeps pace just ahead of their vehicle.
+    if (meeting && meeting.spec.ride && (mode === 'meet' || mode === 'fly') && profileRide) {
+      const p = meeting.group.position, yaw = meeting.group.rotation.y + .55, eye = meeting.spec.height * .58, k = 1 - Math.pow(.004, dt);
+      camPos.lerp(tmp.set(p.x + Math.sin(yaw) * 4.4, p.y + eye + 1.0, p.z + Math.cos(yaw) * 4.4), k); camLook.lerp(tmp2.set(p.x, p.y + eye, p.z), k);
+    }
     // slide the view sideways while a profile is open, so the character stands on the right
     if (Math.abs(shiftT - shift) > .001) { shift = lerp(shift, shiftT, 1 - Math.pow(.01, dt)); applyOffset(); } else if (shift !== shiftT) { shift = shiftT; applyOffset(); }
   }
@@ -821,13 +826,13 @@ function start() {
   }
   async function meet(id) {
     const m = id === 'pyon' ? (pyon ? Object.assign(pyonMember, {group: pyon}) : null) : cast.find(x => x.id === id); if (!m || mode !== 'orbit') return;
-    mode = 'fly'; meeting = m; m.stopped = true; body.classList.add('is-meeting');
+    mode = 'fly'; meeting = m; m.stopped = !m.spec.ride; body.classList.add('is-meeting');   // riders keep driving; the camera rides along
     hintEl.classList.remove('is-on'); bubbleEl.hidden = true;
     sound.fx.select(); playCast(m, 'Idle');
     const p = m.group.position.clone(), eye = m.spec.height * .58;
     // stand where the view is clear: a set side for those on the roads, otherwise wherever the camera already is
     const away = (m.spec.view ? V(m.spec.view[0], 0, m.spec.view[1]) : camPos.clone().sub(p).setY(0)).normalize();
-    const reach = m.spec.ride === 'roadster' ? 6.2 : m.spec.height * 2.5, lift = m.spec.ride === 'roadster' ? 1.6 : 0;   // riders in the car are seen from a little further back and above
+    const reach = m.spec.ride ? 4.4 : m.spec.height * 1.75, lift = m.spec.ride ? 1.0 : 0;   // riders in the car are seen from a little further back and above
     shiftT = 1;
     if (motionOff()) { camPos.copy(p).addScaledVector(away, reach).add(V(0, eye + lift, 0)); camLook.copy(p).add(V(0, eye, 0)); }
     else await fly(p.clone().addScaledVector(away, reach).add(V(0, eye + lift, 0)), p.clone().add(V(0, eye, 0)), 1.5, 1.2);
@@ -837,12 +842,12 @@ function start() {
     burst(p.clone().add(V(0, m.spec.height * .9, 0)), PASTEL, 46, 5, .7);
     $('#profile-kicker').textContent = m.spec.kicker; $('#profile-role').textContent = tr(m.spec.role);
     $('#profile-name').textContent = tr(m.spec.name); $('#profile-text').textContent = tr(m.spec.text);
-    profileEl.hidden = false; mode = 'meet';
+    profileEl.hidden = false; mode = 'meet'; profileRide = !!m.spec.ride;
     $('#profile-link').focus({preventScroll: true});
   }
   async function leave() {
     if (mode !== 'meet' || !meeting) return;
-    const m = meeting; profileEl.hidden = true; mode = 'fly'; shiftT = 0;
+    const m = meeting; profileEl.hidden = true; mode = 'fly'; shiftT = 0; profileRide = false;
     orbitPose(tmp, tmp2);
     if (!motionOff()) await fly(tmp.clone(), tmp2.clone(), 1.3, 1);
     m.stopped = false; playCast(m, m.spec.ride || m.spec.glide ? 'Idle' : 'Walk'); meeting = null; body.classList.remove('is-meeting'); mode = 'orbit';
@@ -855,6 +860,37 @@ function start() {
     sound.fx.select(); wipeEl.classList.add('is-on'); setTimeout(() => { location.href = href; }, 720);
   });
   canvas.addEventListener('click', () => { if (mode === 'meet' && meeting) { playCast(meeting, 'React', true); if (meeting === pyonMember) playPyon(pyonActions.Jump ? 'Jump' : 'Cheer', true); sound.fx.pop(); burst(meeting.group.position.clone().add(V(0, meeting.spec.height * .9, 0)), PASTEL, 30, 5, .7); } });
+
+  /* ── plants: 3D models close to the plaza, flat pictures further away (lighter to draw) ── */
+  function loadPlants() {
+    const spots = Object.entries(N).filter(([name]) => /^P[bt]\d+$/.test(name)).map(([name, node]) => ({tree: name[1] === 't', p: node.getWorldPosition(V(0, 0, 0)), s: node.scale.x || 1}));
+    for (let i = 0; i < 18; i++) { const a = i / 18 * Math.PI * 2 + .2; spots.push({tree: true, far: true, p: V(Math.cos(a) * 75, .05, Math.sin(a) * 75), s: 1.3}); }   // a ring of picture trees on the outer bridge
+    const near = spots.filter(o => !o.far && Math.hypot(o.p.x, o.p.z) < 34), far = spots.filter(o => !near.includes(o));
+    const KINDS = {bush: [['bush-pink', 1.5], ['bush-yellow', 1.5]], tree: [['tree-round', 5.2], ['tree-tall', 6], ['tree-fruit', 5]]};
+    const dummy = new THREE.Object3D();
+    for (const group of ['bush', 'tree']) {
+      const mine = near.filter(o => o.tree === (group === 'tree'));
+      KINDS[group].forEach(([file, height], k) => {
+        const list = mine.filter((_, i) => i % KINDS[group].length === k); if (!list.length) return;
+        new GLTFLoader().load(`assets/city/plants/${file}.glb?v=20261118-1`, gltf => {
+          let mesh = null; gltf.scene.traverse(o => { if (o.isMesh && !mesh) mesh = o; }); if (!mesh) return;
+          mesh.material.envMapIntensity = .4; mesh.material.roughness = .6; mesh.material.metalness = 0;
+          const inst = new THREE.InstancedMesh(mesh.geometry, mesh.material, list.length);
+          list.forEach((o, i) => { dummy.position.copy(o.p); dummy.rotation.set(0, i * 2.4, 0); dummy.scale.setScalar(height * o.s * (.85 + (i % 3) * .1)); dummy.updateMatrix(); inst.setMatrixAt(i, dummy.matrix); });
+          inst.frustumCulled = false; scene.add(inst);
+        }, undefined, () => { /* optional */ });
+      });
+    }
+    const PICS = {bush: ['bush-pink', 'bush-purple', 'bush-yellow', 'bush-mix'], tree: ['tree-round', 'tree-tall', 'tree-fruit']};
+    far.forEach((o, i) => {
+      const names = PICS[o.tree ? 'tree' : 'bush'], file = names[i % names.length];
+      textures.load(`assets/city/plants/${file}.webp`, map => {
+        map.colorSpace = THREE.SRGBColorSpace;
+        const sprite = new THREE.Sprite(new THREE.SpriteMaterial({map, transparent: true, alphaTest: .35, fog: true}));
+        const h = (o.tree ? 5.4 : 1.6) * o.s; sprite.center.set(.5, 0); sprite.scale.set(h * map.image.width / map.image.height, h, 1); sprite.position.copy(o.p); scene.add(sprite);
+      });
+    });
+  }
 
   /* ── traffic: hover cars on the roads and bridges, the lower town, and drones in the air ── */
   // Each route returns a position for a distance travelled; cars face along it and bob as they hover.
@@ -990,7 +1026,7 @@ function start() {
     await wait(.72);
     body.classList.remove('is-loading');
     wipeEl.classList.remove('is-on');
-    loadPyonpy(); loadLandmarks(); loadTraffic(); loadScreens(); loadCast();
+    loadPyonpy(); loadLandmarks(); loadTraffic(); loadScreens(); loadCast(); loadPlants();
     const token = ++introToken;
     if (motionOff()) { finishIntro(); return; }
     mode = 'intro';
@@ -1033,7 +1069,7 @@ function start() {
     profileEl.hidden = true; shiftT = 0; body.classList.remove('is-meeting'); if (meeting) { meeting.stopped = false; meeting = null; }
   });
 
-  new GLTFLoader().load('assets/city/pastel-moon-city.glb?v=20261118-5', gltf => {
+  new GLTFLoader().load('assets/city/pastel-moon-city.glb?v=20261118-6', gltf => {
     try { build(gltf); } catch (error) { console.error(error); fail(); return; }
     progress = 1;
   }, event => { progress = Math.min(.98, event.loaded / (event.total || 3460872)); }, () => fail());
