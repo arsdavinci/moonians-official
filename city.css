@@ -257,5 +257,6 @@ body.is-meeting .city-menu a,body.is-asking .city-menu a,body.is-meeting .city-s
 /* phone: an item that has been tapped once is "pointed at" and says so; tap again to go */
 .city-menu a{position:relative}
 .city-menu a.is-armed{outline:3px solid #fff;box-shadow:0 0 0 5px rgba(255,127,192,.6),0 10px 26px rgba(255,127,192,.5)}
-.city-menu a.is-armed::after{content:attr(data-again);position:absolute;left:50%;top:-11px;transform:translateX(-50%);padding:3px 10px;border-radius:999px;background:linear-gradient(90deg,#ff7fc0,#8fd8ff);color:#fff;
-  font:800 .64rem var(--city-round);white-space:nowrap;box-shadow:0 4px 12px rgba(98,74,190,.35);pointer-events:none;z-index:2}
+.city-menu a.is-armed::after{content:attr(data-again);position:absolute;right:8px;left:auto;top:-13px;width:auto;height:auto;transform:none;opacity:1;padding:4px 14px 5px;border-radius:999px;
+  background:linear-gradient(90deg,#ff5fb0,#a57bff 55%,#39c9e8);border:2px solid #fff;color:#fff;font:900 .74rem/1 var(--city-round);letter-spacing:.04em;white-space:nowrap;text-shadow:0 1px 2px rgba(60,30,120,.55);
+  box-shadow:0 5px 14px rgba(98,74,190,.45);pointer-events:none;z-index:3}

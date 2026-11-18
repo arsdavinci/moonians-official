@@ -738,7 +738,7 @@ function start() {
   const disarm = () => { if (!armed) return; armed.classList.remove('is-armed'); armed = null; clearTimeout(armTimer); hot(null); hotSns = false; snsLink.classList.remove('is-hot'); if (mode === 'orbit') view.tiltT = .12; };
   const arm = link => {                 // true: this tap only pointed at it
     if (!byTouch || armed === link) return false;
-    disarm(); armed = link; link.classList.add('is-armed'); link.dataset.again = tr('もう一度タップで入る'); sound.fx.hover();
+    disarm(); armed = link; link.classList.add('is-armed'); link.dataset.again = tr('もう一度タップ'); sound.fx.hover();
     if (link === snsLink) { hotSns = true; snsLink.classList.add('is-hot'); } else if (link.dataset.place) hot(link.dataset.place);
     clearTimeout(armTimer); armTimer = setTimeout(disarm, 9000);
     return true;
