@@ -12,7 +12,7 @@
     'ムーニアンズのSNSは、この飛行船からぜんぶ届けています。気になるチャンネルを、えらんでな。':'Every Moonians channel is broadcast from this airship. Pick the one you like.',
     '飛行船をつつく':'Poke the airship', 'ひらく →':'Open →', 'らんぴょんの、日々のひとこと。':'Ranpyon’s daily notes.', 'ぴょんぴーの、写真と動画。':'Pyonpy’s photos and videos.',
     'みじかい動画は、こちら。':'Short videos live here.', 'ネタ動画と、3Dアニメ。':'Comedy videos and 3D anime.',
-    'グッズ':'Goods', 'SNSの飛行船':'SNS airship',
+    'グッズ':'Goods', 'お仕事のご依頼はこちら':'Work with us', 'お仕事のご依頼':'Work with us', 'SNSの飛行船':'SNS airship',
     '超ポジティブで、みんなの兄貴分。月と地球を笑いでつなぐ、もふもふのボケ担当。':'Super positive, and everyone’s big brother. The fluffy funny man who links the Moon and Earth with laughter.',
     '他の仲間たちを見る':'Meet the other friends', '街にもどる':'Back to the city', 'うさぎロボ':'Bunny Robot', '街の案内ロボ':'City guide robot',
     '街を走りまわる、うさぎ型の案内ロボ。困っている人を見つけると、すぐにかけつけます。名前は、まだ調査中です。':'A rabbit-shaped guide robot that rolls around the city and hurries over to anyone who needs help. Its name is still being researched.',

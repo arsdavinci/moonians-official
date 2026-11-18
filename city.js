@@ -294,15 +294,16 @@ function start() {
     const sk = sky.material.uniforms;
     ['c0', 'c1', 'c2', 'c3'].forEach((name, i) => sk[name].value.copy(skyDay[i]).lerp(skyNight[i], k));
     scene.fog.color.copy(fogDay).lerp(fogNight, k);
-    hemi.color.copy(hemiSkyDay).lerp(hemiSkyNight, k); hemi.groundColor.copy(hemiGroundDay).lerp(hemiGroundNight, k); hemi.intensity = lerp(2.5, .75, k);
-    sun.color.copy(sunDay).lerp(sunNight, k); sun.intensity = lerp(2.6, .55, k);
+    hemi.color.copy(hemiSkyDay).lerp(hemiSkyNight, k); hemi.groundColor.copy(hemiGroundDay).lerp(hemiGroundNight, k); hemi.intensity = lerp(2.5, 1.45, k);
+    sun.color.copy(sunDay).lerp(sunNight, k); sun.intensity = lerp(2.6, .9, k);
     scene.environment = k > .5 ? envNight : envDay;
-    uGlow.value = lerp(1, 1.75, k);
+    uGlow.value = lerp(1, 1.4, k);
     stageLight.intensity = lerp(6, 70, k); stageFill.intensity = lerp(0, 55, k);
     sk.panoMix.value = panoReady ? 1 - k : 0;
-    uSkinGlow.value = lerp(.42, .02, k); uNight.value = k;   // the pictures light themselves a little, so shading does not darken their pastel colours if (N.skylineDay) { N.skylineDay.material.opacity = 1 - k; N.skylineNight.material.opacity = k; N.skylineNight.visible = k > .01; N.skylineDay.visible = k < .99; }
-    if (N.plazaArt) N.plazaArt.material.color.setScalar(lerp(1, .55, k));
-    if (N.mistLayers) N.mistLayers.forEach(m => m.material.color.setRGB(lerp(.925, .2, k), lerp(.894, .16, k), lerp(1, .42, k), THREE.SRGBColorSpace));
+    uSkinGlow.value = lerp(.42, .16, k); uNight.value = k;   // the pictures light themselves a little, so shading does not darken their pastel colours
+    if (N.skylineDay) { N.skylineDay.material.opacity = 1 - k; N.skylineNight.material.opacity = k; N.skylineNight.visible = k > .01; N.skylineDay.visible = k < .99; }
+    if (N.plazaArt) N.plazaArt.material.color.setScalar(lerp(1, .72, k));
+    if (N.mistLayers) N.mistLayers.forEach(m => m.material.color.setRGB(lerp(.925, .3, k), lerp(.894, .25, k), lerp(1, .52, k), THREE.SRGBColorSpace));
     stars.material.opacity = k; moonDisc.material.opacity = k * .95; sunDisc.material.opacity = (1 - k) * .95;
     if (keep.cloud) keep.cloud.emissiveIntensity = lerp(.34, .04, k);
     if (keep.mist) keep.mist.opacity = lerp(.13, .3, k);
@@ -1422,9 +1423,6 @@ function start() {
     orbitPose(camPos, camLook);
     mode = 'orbit'; body.classList.add('is-exploring');
     ufoAngle = 3.927; ufoRise = 0; const ship0 = traffic.find(t => t.id === 'airship'); if (ship0) ship0.d = -176.7; else airshipStart = -176.7;
-    hintEl.classList.add('is-on');
-    setTimeout(() => { if (mode === 'orbit') hintEl.textContent = tr('ぴょんぴーをタップしてみてね。'); }, 7000);
-    setTimeout(() => hintEl.classList.remove('is-on'), 14000);
   }
   gateEl.addEventListener('submit', event => { event.preventDefault(); enter(!event.submitter || event.submitter.value !== 'off'); });
 

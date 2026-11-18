@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#cdbdf7">
+  <title>お仕事のご依頼｜ムーニアンズ</title>
+  <meta name="description" content="ムーニアンズへの出演、イベント、制作、コラボレーション、取材などのご依頼は、こちらのフォームからお送りください。">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="お仕事のご依頼｜ムーニアンズ">
+  <meta property="og:image" content="https://moonians-official.com/assets/moon-city.png">
+  <link rel="canonical" href="https://moonians-official.com/work.html">
+  <link rel="icon" href="assets/favicon.png?v=1" type="image/png" sizes="256x256">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DotGothic16&family=M+PLUS+Rounded+1c:wght@500;700;800;900&display=swap" rel="stylesheet">
+  <script src="language.js?v=20261118-9"></script>
+  <style>
+    :root{--ink:#2a2152;--soft:#5a4f8c;--pink:#ff7fc0;--pink-d:#e2439a;--mint:#3fe3c8;--mint-d:#0d9d8a;--lav:#b9a3f5;
+      --round:"M PLUS Rounded 1c","Hiragino Maru Gothic ProN","Yu Gothic",sans-serif;--dot:"DotGothic16",monospace}
+    *{box-sizing:border-box}
+    body{margin:0;min-height:100vh;color:var(--ink);font-family:var(--round);font-weight:700;overflow-x:hidden;
+      background:linear-gradient(#7fb2fb 0,#b7cdff 38%,#f3d6f2 78%,#fdeefa 100%) fixed}
+    .wrap{max-width:860px;margin:0 auto;padding:calc(18px + env(safe-area-inset-top,0px)) max(18px,env(safe-area-inset-right,0px)) 72px max(18px,env(safe-area-inset-left,0px))}
+    header{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+    .brand{display:block;width:min(40vw,180px);filter:drop-shadow(0 2px 0 #fff) drop-shadow(0 6px 14px rgba(120,90,220,.35))}
+    .brand img{display:block;width:100%;height:auto}
+    .tools{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+    .pill,.language-switch{background:rgba(255,255,255,.7);border:1.5px solid #fff;border-radius:999px;-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);box-shadow:0 8px 24px rgba(98,74,190,.2)}
+    .pill{padding:8px 16px;color:var(--ink);text-decoration:none;font-size:.82rem}
+    .pill:hover{background:#fff}
+    .language-switch{display:flex;gap:2px;padding:3px}
+    .language-switch button{font:800 .78rem var(--round);color:var(--soft);background:transparent;border:0;border-radius:999px;padding:5px 12px;cursor:pointer}
+    .language-switch button[aria-pressed="true"]{background:linear-gradient(135deg,var(--pink),var(--lav));color:#fff}
+    .kicker{margin:26px 0 0;font:.82rem var(--dot);letter-spacing:.24em;color:#fff;text-shadow:0 0 10px var(--pink),0 1px 0 rgba(80,50,160,.6)}
+    h1{margin:6px 0 12px;font:900 clamp(1.9rem,6vw,3.2rem)/1.15 var(--round);color:#fff;text-shadow:0 2px 0 var(--pink-d),0 0 24px rgba(255,127,192,.75),0 8px 26px rgba(70,40,150,.4)}
+    .lead{margin:0 0 22px;font-size:1rem;line-height:1.9;font-weight:500}
+    .panel{background:rgba(255,255,255,.82);border:2px solid #fff;border-radius:26px;padding:24px;-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);box-shadow:0 14px 36px rgba(98,74,190,.22)}
+    .panel + .panel{margin-top:18px}
+    h2{margin:0 0 12px;font-size:1.15rem;font-weight:900}
+    .steps{margin:0;padding:0;list-style:none;counter-reset:s;display:grid;gap:10px}
+    .steps li{counter-increment:s;display:grid;grid-template-columns:2.2em 1fr;gap:10px;align-items:start;font-weight:500;line-height:1.75;font-size:.94rem}
+    .steps li::before{content:counter(s);display:grid;place-items:center;width:2.2em;height:2.2em;border-radius:50%;background:linear-gradient(135deg,var(--pink),var(--lav));color:#fff;font-weight:900}
+    .notes{margin:14px 0 0;padding-left:1.2em;font-weight:500;font-size:.86rem;line-height:1.8;color:var(--soft)}
+    form{display:grid;gap:16px}
+    .row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+    label{display:block;font-size:.9rem}
+    label > input,label > select,label > textarea{display:block;margin-top:6px}
+    .need,.any{display:inline-block}
+    .need{margin-left:6px;font:.68rem var(--dot);color:#fff;background:var(--pink-d);border-radius:999px;padding:1px 8px;vertical-align:middle}
+    .any{margin-left:6px;font:.68rem var(--dot);color:var(--soft);background:#ece6ff;border-radius:999px;padding:1px 8px;vertical-align:middle}
+    input,select,textarea{width:100%;font:500 1rem var(--round);color:var(--ink);background:#fff;border:2px solid #d9cdf8;border-radius:14px;padding:12px 14px}
+    textarea{min-height:170px;resize:vertical;line-height:1.7}
+    input:focus,select:focus,textarea:focus{outline:3px solid rgba(63,227,200,.55);border-color:var(--mint-d)}
+    .agree{display:flex;gap:10px;align-items:flex-start;font-weight:500;line-height:1.7}
+    .agree input{width:20px;height:20px;margin-top:4px;flex:none}
+    .send{justify-self:start;font:900 1.05rem var(--round);color:#fff;border:0;border-radius:999px;padding:14px 38px;cursor:pointer;background:linear-gradient(90deg,var(--pink),#8fd8ff);box-shadow:0 10px 24px rgba(255,127,192,.45)}
+    .send:disabled{opacity:.55;cursor:default}
+    .trap{position:absolute;left:-9999px;width:1px;height:1px;opacity:0}
+    .result{margin:0;padding:14px 16px;border-radius:14px;font-weight:700;line-height:1.8}
+    .result.ok{background:#e3fbf5;border:2px solid var(--mint-d);color:#0b6d60}
+    .result.ng{background:#ffe9f3;border:2px solid var(--pink-d);color:#a11f68}
+    .result[hidden]{display:none}
+    footer{margin-top:34px;display:flex;gap:10px;flex-wrap:wrap}
+    @media (max-width:640px){.row{grid-template-columns:1fr}.panel{padding:18px}}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <a class="brand" href="./" data-language-link aria-label="ムーニアンズ ホーム"><img src="assets/logo.png?v=20261110-11" alt="ムーニアンズ" width="2421" height="833"></a>
+      <div class="tools">
+        <a class="pill" href="./" data-language-link>← ムーニアンズの街へ戻る</a>
+        <div class="language-switch" data-language-switch role="group" aria-label="Language / 言語"><button type="button" data-language="ja" lang="ja" aria-pressed="true">日本語</button><button type="button" data-language="en" lang="en" aria-pressed="false">EN</button></div>
+      </div>
+    </header>
+
+    <main>
+      <p class="kicker">WORK WITH MOONIANS</p>
+      <h1>お仕事のご依頼</h1>
+      <p class="lead">ムーニアンズへの出演、イベント、楽曲や映像の制作、コラボレーション、取材などのご相談は、下のフォームからお送りください。</p>
+
+      <section class="panel" aria-labelledby="flow-title">
+        <h2 id="flow-title">ご依頼の流れ</h2>
+        <ol class="steps">
+          <li>下のフォームに、ご依頼の内容をご記入のうえ送信してください。</li>
+          <li>受付後、所属事務所にて内容を確認いたします。</li>
+          <li>確認が済みしだい、担当者よりご記入のご連絡先へお返事いたします。</li>
+        </ol>
+        <ul class="notes">
+          <li>フォームの送信は「ご相談の受付」です。この時点では、ご依頼をお引き受けすることは確定しておりません。</li>
+          <li>正式なお引き受けは、所属事務所の確認と、条件のご相談を経てからとなります。</li>
+          <li>内容や日程によっては、お返事までお時間をいただく場合や、お引き受けできない場合がございます。あらかじめご了承ください。</li>
+          <li>営業・勧誘を目的としたご連絡には、お返事を差し上げておりません。</li>
+        </ul>
+      </section>
+
+      <section class="panel" aria-labelledby="form-title">
+        <h2 id="form-title">ご依頼フォーム</h2>
+        <form id="work-form" novalidate>
+          <div class="row">
+            <label>お名前<span class="need">必須</span><input name="name" autocomplete="name" required maxlength="80"></label>
+            <label>会社名・団体名<span class="any">任意</span><input name="company" autocomplete="organization" maxlength="120"></label>
+          </div>
+          <div class="row">
+            <label>メールアドレス<span class="need">必須</span><input name="email" type="email" autocomplete="email" inputmode="email" required maxlength="160"></label>
+            <label>電話番号<span class="any">任意</span><input name="tel" type="tel" autocomplete="tel" inputmode="tel" maxlength="30"></label>
+          </div>
+          <div class="row">
+            <label>ご依頼の種類<span class="need">必須</span>
+              <select name="kind" required>
+                <option value="">えらんでください</option>
+                <option>出演・イベント</option>
+                <option>楽曲・映像などの制作</option>
+                <option>コラボレーション・タイアップ</option>
+                <option>取材・メディア掲載</option>
+                <option>その他</option>
+              </select>
+            </label>
+            <label>ご希望の日程・納期<span class="any">任意</span><input name="date" maxlength="120" placeholder="例：来年3月ごろ、未定 など"></label>
+          </div>
+          <label>ご予算の目安<span class="any">任意</span><input name="budget" maxlength="120" placeholder="例：ご相談のうえ決めたい など"></label>
+          <label>ご依頼の内容<span class="need">必須</span><textarea name="message" required maxlength="4000" placeholder="企画の概要、場所、ご希望の内容などをお書きください。"></textarea></label>
+          <label class="trap" aria-hidden="true">このらんは空のままにしてください<input name="website" tabindex="-1" autocomplete="off"></label>
+          <label class="agree"><input type="checkbox" name="agree" required><span>ご記入いただいた内容は、ご依頼の確認とお返事のためだけに使用し、所属事務所と共有します。上の「ご依頼の流れ」と合わせて確認し、同意します。</span></label>
+          <button class="send" type="submit">この内容で送信する</button>
+          <p class="result ok" id="work-ok" hidden role="status">送信しました。ありがとうございます。<br>所属事務所にて内容を確認のうえ、担当者よりご連絡いたします。</p>
+          <p class="result ng" id="work-ng" hidden role="alert"></p>
+        </form>
+      </section>
+
+      <footer>
+        <a class="pill" href="./" data-language-link>← ムーニアンズの街へ戻る</a>
+        <a class="pill" href="sns.html" data-language-link>SNS</a>
+        <a class="pill" href="roadmap.html" data-language-link>ロードマップ</a>
+      </footer>
+    </main>
+  </div>
+
+  <script>
+  (function () {
+    'use strict';
+    // Where the form is delivered. Set this to the notification webhook's address; while it is empty the form says so instead of pretending to send.
+    var ENDPOINT = '';
+    var form = document.getElementById('work-form'), ok = document.getElementById('work-ok'), ng = document.getElementById('work-ng'), button = form.querySelector('.send');
+    var opened = Date.now();
+    function fail(text) { ng.textContent = text; ng.hidden = false; ok.hidden = true; ng.scrollIntoView({block: 'nearest', behavior: 'smooth'}); }
+    form.addEventListener('submit', function (event) {
+      event.preventDefault(); ng.hidden = true; ok.hidden = true;
+      var data = new FormData(form), need = [['name', 'お名前'], ['email', 'メールアドレス'], ['kind', 'ご依頼の種類'], ['message', 'ご依頼の内容']];
+      for (var i = 0; i < need.length; i++) if (!String(data.get(need[i][0]) || '').trim()) { fail('「' + need[i][1] + '」をご記入ください。'); form.elements[need[i][0]].focus(); return; }
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(data.get('email')).trim())) { fail('メールアドレスの形をご確認ください。'); form.elements.email.focus(); return; }
+      if (!form.elements.agree.checked) { fail('内容をご確認のうえ、同意のチェックを入れてください。'); return; }
+      if (data.get('website') || Date.now() - opened < 3000) return;            // filled by a robot, or sent faster than a person can type
+      if (!ENDPOINT) { fail('申し訳ありません。フォームはただいま準備中です。お急ぎの場合は、SNSのメッセージからご連絡ください。'); return; }
+      var body = new URLSearchParams();
+      data.forEach(function (value, key) { if (key !== 'website' && key !== 'agree') body.append(key, String(value).trim()); });
+      body.append('page', location.href); body.append('sent_at', new Date().toISOString());
+      button.disabled = true; button.textContent = '送信しています…';
+      fetch(ENDPOINT, {method: 'POST', mode: 'no-cors', body: body}).then(function () {
+        form.reset(); ok.hidden = false; button.textContent = '送信しました'; ok.scrollIntoView({block: 'nearest', behavior: 'smooth'});
+      }).catch(function () {
+        button.disabled = false; button.textContent = 'この内容で送信する';
+        fail('送信できませんでした。通信の状態をご確認のうえ、もう一度お試しください。');
+      });
+    });
+  })();
+  </script>
+</body>
+</html>

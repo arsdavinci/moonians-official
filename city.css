@@ -227,3 +227,7 @@ body.is-meeting .city-menu a,body.is-asking .city-menu a,body.is-meeting .city-s
   .city-profile{left:clamp(28px,9vw,190px)}
   .city-profile.is-right{left:auto;right:clamp(28px,9vw,190px)}
 }
+
+/* the hint line is gone; the row under the menu is now one link to the work request page */
+.city-hint{display:none}
+.city-sns a.city-work{padding:9px 20px;font-size:.84rem;background:linear-gradient(90deg,#ff8cc8,#8fd8ff);border:2px solid #fff;box-shadow:0 8px 20px rgba(255,127,192,.4)}
