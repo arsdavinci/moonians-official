@@ -117,7 +117,7 @@ function fail() {
 
 let renderer;
 try {
-  renderer = new THREE.WebGLRenderer({canvas, antialias: true, powerPreference: 'high-performance'});
+  renderer = new THREE.WebGLRenderer({canvas, antialias: true, powerPreference: 'high-performance', preserveDrawingBuffer: new URL(location.href).searchParams.has('quiet-test')});   // the test hook can save pictures of the canvas
 } catch { renderer = null; }
 
 if (!renderer) fail(); else start();
