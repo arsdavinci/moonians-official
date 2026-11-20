@@ -3,6 +3,9 @@
 // The city model is built in Blender (D:\Development\03_Game\PastelMoonCity\blender\build_city.py --low).
 import * as THREE from 'three';
 import { GLTFLoader } from './vendor/three/GLTFLoader.js';
+import { MeshoptDecoder } from './vendor/three/meshopt_decoder.module.js';
+// The models are packed (same shapes, about a third of the size), so every loader needs the unpacker.
+const modelLoader = () => new GLTFLoader().setMeshoptDecoder(MeshoptDecoder);
 
 const $ = selector => document.querySelector(selector);
 const body = document.body;
@@ -994,7 +997,7 @@ function start() {
   const LINES = ['ようこそ、パステルムーンシティへ！ 吾輩が案内するじょ〜。', '行きたい建物をタップしてだ！', 'ぶどうまんじゅう、食べたいんじゃ〜。', 'らんぴょん、どこ行ったんじゃろ？'];
   let lineIndex = 0, bubbleTimer = 0;
   function loadPyonpy() {
-    new GLTFLoader().load('assets/models/pyonpy.glb', gltf => {
+    modelLoader().load('assets/models/pyonpy.glb?v=20261120-1', gltf => {
       const model = gltf.scene, box = new THREE.Box3().setFromObject(model), size = box.getSize(V(0, 0, 0)), scale = 1.65 / size.y;
       model.scale.setScalar(scale);
       model.position.set(-(box.min.x + size.x / 2) * scale, -box.min.y * scale, -(box.min.z + size.z / 2) * scale);
@@ -1029,7 +1032,7 @@ function start() {
         if (++tries < 3) { setTimeout(fetchModel, 1500 * tries); return; }
         spec.hide.forEach(name => { if (N[name]) N[name].visible = true; }); if (id === 'anime' && N.bigScreen) N.bigScreen.visible = false;
       };
-      const fetchModel = () => new GLTFLoader().load(`assets/city/lm/${id}.glb?v=20261118-3`, gltf => {
+      const fetchModel = () => modelLoader().load(`assets/city/lm/${id}.glb?v=20261120-1`, gltf => {
         const model = gltf.scene;
         model.traverse(node => { if (node.isMesh) (Array.isArray(node.material) ? node.material : [node.material]).forEach(m => { m.envMapIntensity = .45; m.roughness = .5; m.metalness = 0; nightLights(m); }); });
         model.scale.setScalar(spec.height);
@@ -1120,7 +1123,7 @@ function start() {
     if (pyonShadow) { pyonShadow.position.set(pyon.position.x, .725, 0); const k = 1 - hop * 1.4; pyonShadow.scale.set(k, 1, k); }   // he is small now, so his hops and steps are smaller too
   }
   /* ── monitors: clips from the site play on every screen; the big Moon Vision screen loops the 3D anime ── */
-  const CLIPS = ['11', '03', '16', '05', '23', '01', '12', '09', '20', '14', '22', '07', '18', '25', '02', '27'].map(n => 'capsule/clip-' + n).concat(['capsule2/clip-01']);
+  const CLIPS = ['11', '03', '16', '05', '23', '01', '12', '09', '20', '14', '22', '07', '18', '25', '02', '27'].map(n => 'city/v/c' + n).concat(['city/v/d01']);   // small silent copies made for these screens; the full clips stay with the workshop pages
   const videos = [];
   function holo(texture, seed) {
     const material = new THREE.MeshBasicMaterial({map: texture, toneMapped: false, transparent: true, opacity: .86, side: THREE.DoubleSide, depthWrite: false});
@@ -1132,15 +1135,22 @@ function start() {
     material.customProgramCacheKey = () => 'holo-screen';
     return material;
   }
+  // The screens' videos wait their turn: nothing is fetched until the city is on show, and then they start one after
+  // another, so they never crowd out the models that people see first.
+  const videoQueue = []; let videoNext = 0;
+  function startVideos(now) {
+    if (!videoQueue.length || now < videoNext || mode === 'loading' || mode === 'gate') return;
+    const el = videoQueue.shift(); videoNext = now + .45; el.preload = 'auto'; el.play().catch(() => { /* starts on the first tap */ });
+  }
   function videoScreen(src, w, h) {
     let entry = videos.find(v => v.src === src);
     if (!entry) {
       const el = document.createElement('video');
-      el.src = 'assets/' + src + '.mp4'; el.muted = true; el.loop = true; el.playsInline = true; el.preload = 'auto'; el.crossOrigin = 'anonymous';
+      el.src = 'assets/' + src + '.mp4'; el.muted = true; el.loop = true; el.playsInline = true; el.preload = 'none'; el.crossOrigin = 'anonymous';
       const texture = new THREE.VideoTexture(el); texture.colorSpace = THREE.SRGBColorSpace;
       entry = {src, el, texture, planes: []}; videos.push(entry);
       el.addEventListener('loadedmetadata', () => entry.planes.forEach(fit));
-      el.play().catch(() => { /* starts on the first tap */ });
+      videoQueue.push(el);
     }
     // Hologram look: see-through, scan lines sliding up, a soft tint, bright edges and an occasional flicker.
     const material = holo(entry.texture, videos.length * 1.37 + entry.planes.length * .61);
@@ -1156,23 +1166,23 @@ function start() {
   }
   // The airship plays the SNS videos one after the other. Each is tall, so the screen shows a wide slice of it
   // that drifts up and down and pushes in and out, picking a new framing every few seconds.
-  const SNS_CLIPS = ['assets/city/sns/1.mp4', 'assets/city/sns/2.mp4'];
+  const SNS_CLIPS = ['assets/city/v/sns1.mp4', 'assets/city/v/sns2.mp4'];
   // Each player is its own video with its own framing. The airship has one; a monitor in town has another that
   // starts on the other clip, part-way through, so the two never show the same picture.
   const snsPlayers = {};
   const QUIET_SCREENS = ['Scr005', 'Scr006'];
   const LINKS = {};                     // things in the city that open another site when clicked (after asking)
-  const RAMUNE_CLIPS = ['assets/city/ramune/1.mp4', 'assets/city/ramune/2.mp4'];
+  const RAMUNE_CLIPS = ['assets/city/v/ramune1.mp4', 'assets/city/v/ramune2.mp4'];
   function snsScreen(w, h, key = 'ship', startClip = 0, startAt = 0, clips = SNS_CLIPS, faceAt = .5) {
     let sns = snsPlayers[key];
     if (!sns) {
-      const el = document.createElement('video'); el.muted = true; el.playsInline = true; el.preload = 'auto'; el.src = clips[startClip];
+      const el = document.createElement('video'); el.muted = true; el.playsInline = true; el.preload = 'none'; el.src = clips[startClip];
       const texture = new THREE.VideoTexture(el); texture.colorSpace = THREE.SRGBColorSpace;
       sns = snsPlayers[key] = {el, texture, clips, faceAt, index: startClip, planes: [], zoom: 1, pan: faceAt, zoomT: 1, panT: faceAt, next: 0};
       if (startAt) el.addEventListener('loadedmetadata', () => { try { el.currentTime = Math.min(startAt, el.duration - 1); } catch { /* not seekable yet */ } }, {once: true});
       el.addEventListener('ended', () => { sns.index = (sns.index + 1) % clips.length; el.src = clips[sns.index]; el.play().catch(() => {}); });
-      el.play().catch(() => {});
-      addEventListener('pointerdown', () => { if (el.paused) el.play().catch(() => {}); }, {passive: true});
+      videoQueue.unshift(el);
+      addEventListener('pointerdown', () => { if (el.paused && !videoQueue.includes(el)) el.play().catch(() => {}); }, {passive: true});
     }
     const plane = new THREE.Mesh(new THREE.PlaneGeometry(w, h), holo(sns.texture, 4.2 + sns.planes.length + Object.keys(snsPlayers).length));
     plane.userData.want = w / h; sns.planes.push(plane); return plane;
@@ -1227,10 +1237,10 @@ function start() {
       node.add(videoScreen(CLIPS[pick], node.userData.w, node.userData.h));
     });
     window.__clipGap = Math.min(...shown.flatMap(list => list.flatMap((p, i) => list.slice(i + 1).map(q => p.distanceTo(q)))));
-    const anchor = PLACES.anime.node, big = videoScreen('anime/uchu-ramen', 11.9, 6.7);
+    const anchor = PLACES.anime.node, big = videoScreen('city/v/ramen', 11.9, 6.7);
     const holder = new THREE.Group(); holder.position.copy(anchor.position); holder.quaternion.copy(anchor.quaternion);
     big.position.set(0, 10.5, 5.8); holder.add(big); scene.add(holder); N.bigScreen = holder; holder.visible = !!landmarkModels.anime;   // shown once its building is there
-    addEventListener('pointerdown', () => videos.forEach(v => { if (v.el.paused) v.el.play().catch(() => {}); }), {passive: true});
+    addEventListener('pointerdown', () => videos.forEach(v => { if (v.el.paused && !videoQueue.includes(v.el)) v.el.play().catch(() => {}); }), {passive: true});
   }
 
   /* ── the cast: characters who walk about the city. Click one to meet them. ── */
@@ -1276,7 +1286,7 @@ function start() {
   let meeting = null, shift = 0, shiftT = 0, profileRide = false;
   function loadCast() {
     Object.entries(CAST).forEach(([id, spec], index) => {
-      new GLTFLoader().load(`assets/city/cast/${spec.file || id}.glb?v=20261118-3`, gltf => {
+      modelLoader().load(`assets/city/cast/${spec.file || id}.glb?v=20261120-1`, gltf => {
         const model = gltf.scene; model.scale.setScalar(spec.height); model.rotation.y = spec.yaw;
         if (spec.fit) {                // a model in its own units: stand it on the ground at the wanted height
           model.scale.setScalar(1); model.updateMatrixWorld(true);
@@ -1602,7 +1612,7 @@ function start() {
       const mine = near.filter(o => o.tree === (group === 'tree'));
       KINDS[group].forEach(([file, height], k) => {
         const list = mine.filter((_, i) => i % KINDS[group].length === k); if (!list.length) return;
-        new GLTFLoader().load(`assets/city/plants/${file}.glb?v=20261118-1`, gltf => {
+        modelLoader().load(`assets/city/plants/${file}.glb?v=20261120-1`, gltf => {
           let mesh = null; gltf.scene.traverse(o => { if (o.isMesh && !mesh) mesh = o; }); if (!mesh) return;
           mesh.material.envMapIntensity = .4; mesh.material.roughness = .6; mesh.material.metalness = 0;
           const inst = new THREE.InstancedMesh(mesh.geometry, mesh.material, list.length);
@@ -1704,7 +1714,7 @@ function start() {
   const traffic = []; let lineup = false;
   function loadTraffic() {
     for (const [id, spec] of Object.entries(CARS)) {
-      new GLTFLoader().load(`assets/city/cars/${id}.glb?v=20261118-2`, gltf => {
+      modelLoader().load(`assets/city/cars/${id}.glb?v=20261120-1`, gltf => {
         gltf.scene.traverse(node => { if (node.isMesh) (Array.isArray(node.material) ? node.material : [node.material]).forEach(m => { m.envMapIntensity = .5; m.roughness = .45; m.metalness = 0; if (id !== 'airship') nightLights(m); else shipLights(m); if (id === 'roadster') glassy(m); if (id === 'airship') node.renderOrder = -.5; }); });
         FLEET.filter(f => f[0] === id).forEach(([, route, speed, start], i) => {
           const body = gltf.scene.clone(); body.scale.setScalar(spec.height); body.rotation.y = spec.yaw;
@@ -1885,7 +1895,7 @@ function start() {
     profileEl.hidden = true; shiftT = 0; body.classList.remove('is-meeting'); if (meeting) { meeting.stopped = false; meeting = null; }
   });
 
-  new GLTFLoader().load('assets/city/pastel-moon-city.glb?v=20261118-6', gltf => {
+  modelLoader().load('assets/city/pastel-moon-city.glb?v=20261118-6', gltf => {
     try { build(gltf); } catch (error) { console.error(error); fail(); return; }
     progress = 1;
   }, event => { progress = Math.min(.98, event.loaded / (event.total || 3460872)); }, () => fail());
@@ -1964,7 +1974,7 @@ function start() {
     if (!still) uTime.value = time;
     night = Math.abs(nightT - night) < .002 ? nightT : lerp(night, nightT, 1 - Math.pow(.02, dt));
     applyNight(night);
-    sunTestTick();
+    sunTestTick(); startVideos(time);
     beams.forEach((m, i) => { m.material.opacity = (1 - night) * (.07 + .07 * (Math.sin(time * .35 + i * 1.7) * .5 + .5)); m.visible = night < .98; });
     if (mode === 'orbit') {
       view.idle += dt;
