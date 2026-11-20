@@ -496,11 +496,26 @@ function start() {
     place(); show();
     // The city is lit so brightly that plain shadows wash out. So whatever the sun does not reach is also tinted violet:
     // the ground under a building, and the side of a building that is turned away from the sun.
+    const uCityCube = {value: null}, uCityMirror = {value: 0};
     const tint = material => {
       if (!material.isMeshStandardMaterial || material.userData.sunTint) return; material.userData.sunTint = true;
-      const before = material.onBeforeCompile, key = material.customProgramCacheKey;
+      const before = material.onBeforeCompile, key = material.customProgramCacheKey, kind = key.call(material);
+      // Windows that are only painted on a wall mirror the city too: the panes are picked out of the picture by their colour.
+      const pane = kind.indexOf('skin-') === 0 ? ['skinRaw', '0.05, 0.15', '0.10, 0.22'] : kind === 'night-lights' && /^M_R\d/.test(material.name || '') ? ['lit', '0.12, 0.30', '9.0, 9.1'] : null;
       material.onBeforeCompile = (shader, r) => {
         before.call(material, shader, r);
+        if (pane) {
+          shader.uniforms.uCityCube = uCityCube; shader.uniforms.uCityMirror = uCityMirror;
+          shader.fragmentShader = shader.fragmentShader.replace('#include <common>', '#include <common>'+String.fromCharCode(10)+'uniform samplerCube uCityCube; uniform float uCityMirror;')
+            .replace('#include <tonemapping_fragment>', `${pane[0] === 'lit' ? '#ifdef USE_MAP' : '#if 1'}
+          vec3 paneC = ${pane[0]};
+          float paneMask = clamp(smoothstep(${pane[1]}, min(paneC.g, paneC.b) - paneC.r) * smoothstep(-.06, .0, paneC.b - paneC.g) + smoothstep(${pane[2]}, min(paneC.r, paneC.g) - paneC.b), 0., 1.);
+          vec3 paneRay = inverseTransformDirection(reflect(-normalize(vViewPosition), normal), viewMatrix);
+          float paneEdge = mix(.55, 1., pow(1. - clamp(dot(normal, normalize(vViewPosition)), 0., 1.), 3.));
+          gl_FragColor.rgb = mix(gl_FragColor.rgb, textureCube(uCityCube, paneRay).rgb, paneMask * paneEdge * uCityMirror * mix(1., .3, uNight));
+        #endif
+        #include <tonemapping_fragment>`);
+        }
         shader.fragmentShader = shader.fragmentShader.replace('#include <tonemapping_fragment>', `#if defined( USE_SHADOWMAP ) && NUM_DIR_LIGHT_SHADOWS > 0
           DirectionalLightShadow sunShadow = directionalLightShadows[ 0 ];
           float sunLit = getShadow( directionalShadowMap[ 0 ], sunShadow.shadowMapSize, sunShadow.shadowIntensity, sunShadow.shadowBias, sunShadow.shadowRadius, vDirectionalShadowCoord[ 0 ] );
@@ -513,7 +528,8 @@ function start() {
       material.customProgramCacheKey = () => key.call(material) + '-sun'; material.needsUpdate = true;
     };
     let tick = 0, envFor = -1;
-    const glass = [], mirrors = [], glows = [], cubeRT = new THREE.WebGLCubeRenderTarget(256, {type: THREE.HalfFloatType}), cubeCam = new THREE.CubeCamera(1, 1200, cubeRT); cubeCam.position.set(0, 10, 0);
+    const glass = [], mirrors = [], glows = [], cubes = [0, 1].map(() => { const rt = new THREE.WebGLCubeRenderTarget(coarse ? 256 : 512, {type: THREE.HalfFloatType}), cam = new THREE.CubeCamera(1, 1200, rt); cam.position.set(0, 10, 0); return {rt, cam}; });
+    let cubeAt = 0;                 // two photographs take turns: the panes show one while the next is being taken
     sunTestTick = () => {           // the models arrive one by one, so new ones are picked up as they come
       const dark = state.dark / 100 * (1 - night);      // no sun at night, so its shade and shadows fade out with the daylight
       sun.shadow.intensity = dark; for (const m of catchers) m.material.opacity = dark * .6;
@@ -523,8 +539,8 @@ function start() {
       if (settled >= 0 && settled !== envFor) { envFor = settled; envWait = 8; }
       if (envWait && !--envWait && mode !== 'loading' && envFor >= 0) {          // photograph the city all round, for the glass to mirror
         for (const m of mirrors) m.envMap = null;                                 // so one photograph does not pile onto the last
-        cubeCam.update(renderer, scene);
-        const old = cityEnv[envFor]; cityEnv[envFor] = pmrem.fromCubemap(cubeRT.texture).texture; if (old) old.dispose();
+        const cube = cubes[cubeAt ^= 1]; cube.cam.update(renderer, scene); uCityCube.value = cube.rt.texture; uCityMirror.value = 1;
+        const old = cityEnv[envFor]; cityEnv[envFor] = pmrem.fromCubemap(cube.rt.texture).texture; if (old) old.dispose();
         for (const m of mirrors) { if (!m.envMap) m.needsUpdate = true; m.envMap = cityEnv[envFor]; }
       }
       // Each screen round the plaza throws its light on what stands near it, shifting colour as the picture on it changes.
