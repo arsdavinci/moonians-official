@@ -237,7 +237,6 @@ function start() {
     r.addColorStop(0, '#fff'); r.addColorStop(.35, 'rgba(255,255,255,.8)'); r.addColorStop(1, 'rgba(255,255,255,0)'); g.fillStyle = r; g.fillRect(0, 0, 64, 64); return new THREE.CanvasTexture(c); })();
   const envDay = pmrem.fromScene(envScene, .03).texture;
   scene.environment = envDay;
-  const cityEnv = [null, null];     // what the glass mirrors: the city itself, photographed all round from the plaza, by day and by night
 
   /* ── day and night ── */
   const NIGHT_SKY = ['#5a3d9c', '#2c2170', '#140f45', '#070522'];
@@ -448,149 +447,195 @@ function start() {
   }
   let sparkle = null, pyon = null, pyonMixer = null, pyonActions = {}, pyonActive = null, statueBounce = 0;
   const ufoBase = V(0, 0, 0), shutterBase = {};
-  /* ── sunlight: the sun stands in one place, so buildings have a bright side and a shaded side and throw shadows.
-        The shadows of everything that stays put are worked out once and kept (a phone could not redraw them every frame);
-        whatever moves keeps its round shadow instead. With ?sun, sliders turn the sun and the shadows are redrawn live. ── */
-  let sunTestTick = () => {};
+  /* ── sunlight: the sun stands in one place (settled at 290 / 46 / 68), so buildings have a bright side and a shaded side
+        and throw shadows. Nothing here is worked out again from frame to frame:
+        · shadows – the city is drawn once from the sun into one picture when it opens; after that a point is in shadow
+          or not by reading that picture (four reads, blended). Whatever moves keeps its round shadow instead.
+        · the screens' light – how much lands on each corner of every building is worked out once and kept on the model.
+        · mirror glass – the panes show a picture of the city saved as a file (assets/city/bake/mirror-*.webp).
+        · relief – the lines drawn on the walls sink in a little, read from the wall pictures themselves.
+        ?sun brings back sliders that turn the sun; the 凹凸 button opens sliders for the relief. ── */
+  let sunTestTick = () => {}, mirrorShot = null;
   const SUN_TEST = new URL(location.href).searchParams.has('sun');
   {
-    const coarse = matchMedia('(pointer: coarse)').matches;
-    renderer.shadowMap.enabled = true; renderer.shadowMap.type = coarse && !SUN_TEST ? THREE.PCFShadowMap : THREE.PCFSoftShadowMap; renderer.shadowMap.autoUpdate = SUN_TEST;
-    const size = coarse ? 2048 : 4096, box = sun.shadow.camera;
-    sun.castShadow = true; sun.shadow.mapSize.set(size, size); sun.shadow.bias = -.0004; sun.shadow.normalBias = .08;
+    const coarse = matchMedia('(pointer: coarse)').matches, size = coarse ? 2048 : 4096, box = sun.shadow.camera;
+    renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.BasicShadowMap; renderer.shadowMap.autoUpdate = false;
+    sun.castShadow = true; sun.shadow.mapSize.set(size, size);
     box.left = box.bottom = -130; box.right = box.top = 130; box.near = 20; box.far = 560; box.updateProjectionMatrix();
     scene.add(sun.target);
-    const state = {turn: 290, rise: 46, dark: 68};     // where the sun was settled
-    let moved = false;
+    const state = {turn: 290, rise: 46, dark: 68, wall: 30, model: 30};     // where the sun was settled; how deep the relief is
+    let moved = false, open = SUN_TEST;
+    try { const kept = JSON.parse(localStorage.getItem('moonians.city-relief')); if (kept) { state.wall = kept.wall; state.model = kept.model; } } catch { /* optional */ }
     if (SUN_TEST) try { const kept = JSON.parse(localStorage.getItem('moonians.city-sun3')); if (kept) Object.assign(state, kept); } catch { /* optional */ }
-    const catchers = [];            // the plaza and stage pictures are unlit, so a see-through sheet over each one catches the shadows
+    const uSunMap = {value: null}, uSunMatrix = {value: sun.shadow.matrix}, uSunDark = {value: 0}, uSunTexel = {value: 1 / size};
+    const uCityCube = {value: null}, uCityMirror = {value: 0}, uGlowK = {value: 1}, uBumpWall = {value: 0}, uBumpModel = {value: 0}, uBumpNone = {value: 0};
     const place = () => {
       const a = state.turn * Math.PI / 180, e = state.rise * Math.PI / 180;
       sunDir.set(Math.sin(a) * Math.cos(e), Math.sin(e), Math.cos(a) * Math.cos(e)); sun.position.copy(sunDir).multiplyScalar(280);
+      uBumpWall.value = state.wall / 100 * .14; uBumpModel.value = state.model / 100 * .14;
       renderer.shadowMap.needsUpdate = true;
-      envWait = 20;
-      if (moved) try { localStorage.setItem('moonians.city-sun3', JSON.stringify(state)); } catch { /* optional */ }
+      if (moved) try { localStorage.setItem('moonians.city-sun3', JSON.stringify(state)); localStorage.setItem('moonians.city-relief', JSON.stringify({wall: state.wall, model: state.model})); } catch { /* optional */ }
     };
-    const panel = document.createElement('div'); let show = () => {}, open = SUN_TEST, envWait = 0;
-    {
-    panel.style.cssText = 'position:fixed;left:50%;top:calc(env(safe-area-inset-top,0px) + 70px);transform:translateX(-50%);z-index:60;width:min(340px,88vw);padding:10px 14px;border-radius:16px;background:rgba(255,255,255,.86);color:#3a2f66;font:600 13px/1.5 system-ui,sans-serif;box-shadow:0 6px 24px rgba(60,40,120,.18)';
-    const out = document.createElement('div'); out.style.cssText = 'text-align:center;font-size:15px;margin-bottom:4px';
-    panel.append(out);
-    show = () => { out.textContent = `太陽  向き ${state.turn}°  高さ ${state.rise}°  濃さ ${state.dark}`; };
-    for (const [key, label, min, max] of [['turn', '向き', 0, 359], ['rise', '高さ', 8, 88], ['dark', '濃さ', 10, 100]]) {
-      const row = document.createElement('label'); row.style.cssText = 'display:flex;align-items:center;gap:8px';
-      const input = document.createElement('input'); Object.assign(input, {type: 'range', min, max, step: 1, value: state[key]}); input.style.cssText = 'flex:1;height:30px';
+    const panel = document.createElement('div'), out = document.createElement('div');
+    panel.style.cssText = 'position:fixed;left:50%;top:calc(env(safe-area-inset-top,0px) + 70px);transform:translateX(-50%);z-index:60;width:min(340px,88vw);padding:10px 14px;border-radius:16px;background:rgba(255,255,255,.86);color:#3a2f66;font:600 13px/1.5 system-ui,sans-serif;box-shadow:0 6px 24px rgba(60,40,120,.18);display:none';
+    out.style.cssText = 'text-align:center;font-size:15px;margin-bottom:4px'; panel.append(out);
+    const show = () => { out.textContent = (SUN_TEST ? `太陽 ${state.turn}° / ${state.rise}° / ${state.dark}　` : '') + `凹凸  壁 ${state.wall}  建物 ${state.model}`; };
+    const rows = [['wall', 'ビルの壁', 0, 100], ['model', '大きな建物', 0, 100]];
+    if (SUN_TEST) rows.unshift(['turn', '向き', 0, 359], ['rise', '高さ', 8, 88], ['dark', '濃さ', 10, 100]);
+    for (const [key, label, min, max] of rows) {
+      const row = document.createElement('label'), name = document.createElement('span'), input = document.createElement('input');
+      row.style.cssText = 'display:flex;align-items:center;gap:8px'; name.textContent = label; name.style.cssText = 'width:5.4em';
+      Object.assign(input, {type: 'range', min, max, step: 1, value: state[key]}); input.style.cssText = 'flex:1;height:30px';
       input.addEventListener('input', () => { state[key] = +input.value; moved = true; place(); show(); });
-      row.append(label, input); panel.append(row);
+      row.append(name, input); panel.append(row);
     }
-    const hide = document.createElement('button'), menu = $('.city-menu'); hide.type = 'button'; hide.textContent = 'メニューを隠す';
-    hide.style.cssText = 'display:block;margin:6px auto 0;padding:4px 14px;border:0;border-radius:999px;background:#e9e2ff;color:inherit;font:inherit';
-    hide.addEventListener('click', () => { const off = menu.style.display !== 'none'; menu.style.display = off ? 'none' : ''; hide.textContent = off ? 'メニューを出す' : 'メニューを隠す'; });
-    panel.append(hide); panel.style.display = 'none';
-    document.body.append(panel);
-      // a sun button beside the night button opens and closes the sliders; while they are open the shadows are redrawn live
-      const button = document.createElement('button'), nightButton = $('#night-toggle'); button.type = 'button'; button.className = 'city-night-toggle'; button.textContent = '☀ 太陽';
-      button.addEventListener('click', () => { open = !open; renderer.shadowMap.autoUpdate = open; renderer.shadowMap.needsUpdate = true; });
-      if (nightButton && SUN_TEST) nightButton.after(button);      // the sun is settled; the button only comes back with ?sun
+    {
+      const hide = document.createElement('button'), menu = $('.city-menu'); hide.type = 'button'; hide.textContent = 'メニューを隠す';
+      hide.style.cssText = 'display:block;margin:6px auto 0;padding:4px 14px;border:0;border-radius:999px;background:#e9e2ff;color:inherit;font:inherit';
+      hide.addEventListener('click', () => { const off = menu.style.display !== 'none'; menu.style.display = off ? 'none' : ''; hide.textContent = off ? 'メニューを出す' : 'メニューを隠す'; });
+      panel.append(hide); document.body.append(panel);
+      const button = document.createElement('button'), nightButton = $('#night-toggle'); button.type = 'button'; button.className = 'city-night-toggle'; button.textContent = '凹凸';
+      button.addEventListener('click', () => { open = !open; });
+      if (nightButton) nightButton.after(button);
     }
     place(); show();
-    // The city is lit so brightly that plain shadows wash out. So whatever the sun does not reach is also tinted violet:
+
+    // Read from the sun's picture whether a point is lit: four reads, blended, so the shadow's edge is smooth.
+    const REACH = `
+      uniform sampler2D uSunMap; uniform mat4 uSunMatrix; uniform float uSunDark; uniform float uSunTexel;
+      float sunTap(vec2 uv, float z) { return step(z, unpackRGBAToDepth(texture2D(uSunMap, uv))); }
+      float sunReach(vec3 at) {
+        vec4 c = uSunMatrix * vec4(at, 1.); c.xyz /= c.w;
+        if (c.x < 0. || c.x > 1. || c.y < 0. || c.y > 1. || c.z > 1.) return 1.;
+        vec2 cell = c.xy / uSunTexel - .5, f = fract(cell), uv = (floor(cell) + .5) * uSunTexel; float z = c.z - .0004;
+        return mix(mix(sunTap(uv, z), sunTap(uv + vec2(0., uSunTexel), z), f.y), mix(sunTap(uv + vec2(uSunTexel, 0.), z), sunTap(uv + vec2(uSunTexel), z), f.y), f.x);
+      }`;
+    // The lines drawn on a wall sink in: the picture's own brightness is read as height, and the surface leans accordingly.
+    const LEAN = `
+      vec3 reliefLean(vec3 n, float h0, float hx, float hy, float deep) {
+        vec3 sx = dFdx(-vViewPosition), sy = dFdy(-vViewPosition), r1 = cross(sy, n), r2 = cross(n, sx); float det = dot(sx, r1);
+        return normalize(abs(det) * n - sign(det) * deep * ((hx - h0) * r1 + (hy - h0) * r2));
+      }
+      float reliefH(vec3 c) { return dot(c, vec3(.299, .587, .114)); }`;
+    // The city is lit so brightly that plain shadows wash out. So whatever the sun does not reach is tinted violet:
     // the ground under a building, and the side of a building that is turned away from the sun.
-    const uCityCube = {value: null}, uCityMirror = {value: 0};
-    const uGlowK = {value: 1};
-    const tint = material => {
+    const tint = (material, still) => {
       if (!material.isMeshStandardMaterial || material.userData.sunTint) return; material.userData.sunTint = true;
-      const before = material.onBeforeCompile, key = material.customProgramCacheKey, kind = key.call(material);
+      const before = material.onBeforeCompile, key = material.customProgramCacheKey, kind = key.call(material), skin = kind.indexOf('skin-') === 0;
       // Windows that are only painted on a wall mirror the city too: the panes are picked out of the picture by their colour.
-      const pane = kind.indexOf('skin-') === 0 ? ['skinRaw', '0.05, 0.15', '0.10, 0.22'] : kind === 'night-lights' && /^M_R\d/.test(material.name || '') ? ['lit', '0.12, 0.30', '9.0, 9.1'] : null;
+      const pane = skin ? ['skinRaw', '0.05, 0.15', '0.10, 0.22'] : kind === 'night-lights' && /^M_R\d/.test(material.name || '') ? ['lit', '0.12, 0.30', '9.0, 9.1'] : null;
       material.onBeforeCompile = (shader, r) => {
         before.call(material, shader, r);
-        // The screens' light is baked: each corner of every building already carries how much of it lands there (see bake below),
-        // so drawing it is one multiplication. Only its strength changes, between day and night.
-        shader.uniforms.uGlowK = uGlowK;
-        shader.vertexShader = shader.vertexShader.replace('#include <common>', '#include <common>'+String.fromCharCode(10)+'attribute vec3 glow; varying vec3 vGlow;').replace('#include <begin_vertex>', '#include <begin_vertex>'+String.fromCharCode(10)+'vGlow = glow;');
-        shader.fragmentShader = shader.fragmentShader.replace('#include <common>', '#include <common>'+String.fromCharCode(10)+'varying vec3 vGlow; uniform float uGlowK;')
-          .replace('#include <tonemapping_fragment>', 'gl_FragColor.rgb += (gl_FragColor.rgb * .85 + .04) * vGlow * uGlowK;'+String.fromCharCode(10)+'#include <tonemapping_fragment>');
-        if (pane) {
-          shader.uniforms.uCityCube = uCityCube; shader.uniforms.uCityMirror = uCityMirror;
-          shader.fragmentShader = shader.fragmentShader.replace('#include <common>', '#include <common>'+String.fromCharCode(10)+'uniform samplerCube uCityCube; uniform float uCityMirror;')
-            .replace('#include <tonemapping_fragment>', `${pane[0] === 'lit' ? '#ifdef USE_MAP' : '#if 1'}
+        Object.assign(shader.uniforms, {uSunMap, uSunMatrix, uSunDark, uSunTexel, uGlowK, uCityCube, uCityMirror, uBump: skin ? uBumpWall : still ? uBumpModel : uBumpNone});
+        shader.vertexShader = shader.vertexShader.replace('#include <common>', '#include <common>\nattribute vec3 glow; varying vec3 vGlow;').replace('#include <begin_vertex>', '#include <begin_vertex>\nvGlow = glow;');
+        let f = shader.fragmentShader.replace('void main() {', `varying vec3 vGlow; uniform float uGlowK; uniform float uBump; uniform samplerCube uCityCube; uniform float uCityMirror;${REACH}${LEAN}\nvoid main() {`);
+        f = f.replace('#include <normal_fragment_maps>', '#include <normal_fragment_maps>\n' + (skin ? `if (uBump > 0.) {
+          bool top = abs(sn.y) > 0.75; vec2 at = top ? vSkinPos.xz * uSkinSize : vSkinUv * uSkinSize, ax = dFdx(at), ay = dFdy(at);
+          normal = top ? reliefLean(normal, reliefH(texture2D(uRoof, at).rgb), reliefH(texture2D(uRoof, at + ax).rgb), reliefH(texture2D(uRoof, at + ay).rgb), uBump)
+                       : reliefLean(normal, reliefH(texture2D(uWall, at).rgb), reliefH(texture2D(uWall, at + ax).rgb), reliefH(texture2D(uWall, at + ay).rgb), uBump);
+        }` : `#ifdef USE_MAP
+        if (uBump > 0.) { vec2 ax = dFdx(vMapUv), ay = dFdy(vMapUv);
+          normal = reliefLean(normal, reliefH(texture2D(map, vMapUv).rgb), reliefH(texture2D(map, vMapUv + ax).rgb), reliefH(texture2D(map, vMapUv + ay).rgb), uBump); }
+        #endif`));
+        // the screens' light (baked onto the corners), the panes' mirror picture, then the sun's shade
+        f = f.replace('#include <tonemapping_fragment>', `gl_FragColor.rgb += (gl_FragColor.rgb * .85 + .04) * vGlow * uGlowK;
+        ${pane ? `${pane[0] === 'lit' ? '#ifdef USE_MAP' : '#if 1'}
           vec3 paneC = ${pane[0]};
           float paneMask = clamp(smoothstep(${pane[1]}, min(paneC.g, paneC.b) - paneC.r) * smoothstep(-.06, .0, paneC.b - paneC.g) + smoothstep(${pane[2]}, min(paneC.r, paneC.g) - paneC.b), 0., 1.);
           vec3 paneRay = inverseTransformDirection(reflect(-normalize(vViewPosition), normal), viewMatrix);
           float paneEdge = mix(.55, 1., pow(1. - clamp(dot(normal, normalize(vViewPosition)), 0., 1.), 3.));
-          gl_FragColor.rgb = mix(gl_FragColor.rgb, textureCube(uCityCube, paneRay).rgb, paneMask * paneEdge * uCityMirror * mix(1., .3, uNight));
-        #endif
-        #include <tonemapping_fragment>`);
+          gl_FragColor.rgb = mix(gl_FragColor.rgb, textureCube(uCityCube, paneRay).rgb * 2., paneMask * paneEdge * uCityMirror * mix(1., .3, uNight));
+        #endif` : ''}
+        #if NUM_DIR_LIGHTS > 0
+        {
+          vec3 sunAt = (vec4(-vViewPosition, 0.) * viewMatrix).xyz + cameraPosition + inverseTransformDirection(normal, viewMatrix) * .1;
+          float sunLit = mix(1., sunReach(sunAt), uSunDark), sunFace = mix(1., smoothstep(-.08, .42, dot(normal, directionalLights[ 0 ].direction)), uSunDark);
+          gl_FragColor.rgb *= mix(vec3(.3, .27, .58), vec3(1. + .08 * uSunDark, 1. + .05 * uSunDark, 1.), min(sunLit, sunFace));
         }
-        shader.fragmentShader = shader.fragmentShader.replace('#include <tonemapping_fragment>', `#if defined( USE_SHADOWMAP ) && NUM_DIR_LIGHT_SHADOWS > 0
-          DirectionalLightShadow sunShadow = directionalLightShadows[ 0 ];
-          float sunLit = getShadow( directionalShadowMap[ 0 ], sunShadow.shadowMapSize, sunShadow.shadowIntensity, sunShadow.shadowBias, sunShadow.shadowRadius, vDirectionalShadowCoord[ 0 ] );
-          // sides turned away from the sun fall into shade as well, so every building has a bright side and a dark side
-          float sunFace = mix(1., smoothstep(-.08, .42, dot(normal, directionalLights[ 0 ].direction)), sunShadow.shadowIntensity);
-          gl_FragColor.rgb *= mix(vec3(.3, .27, .58), vec3(1. + .08 * sunShadow.shadowIntensity, 1. + .05 * sunShadow.shadowIntensity, 1.), min(sunLit, sunFace));
         #endif
         #include <tonemapping_fragment>`);
+        shader.fragmentShader = f;
       };
-      material.customProgramCacheKey = () => key.call(material) + '-sun'; material.needsUpdate = true;
+      material.customProgramCacheKey = () => key.call(material) + '-sun' + (pane ? pane[0] : ''); material.needsUpdate = true;
     };
-    let tick = 0, envFor = -1;
-    const glass = [], mirrors = [], glows = [], cubes = [0, 1].map(() => { const rt = new THREE.WebGLCubeRenderTarget(coarse ? 256 : 512, {type: THREE.HalfFloatType}), cam = new THREE.CubeCamera(1, 1200, rt); cam.position.set(0, 10, 0); return {rt, cam}; });
-    let cubeAt = 0;                 // two photographs take turns: the panes show one while the next is being taken
-    sunTestTick = () => {           // the models arrive one by one, so new ones are picked up as they come
-      const dark = state.dark / 100 * (1 - night);      // no sun at night, so its shade and shadows fade out with the daylight
-      sun.shadow.intensity = dark; for (const m of catchers) m.material.opacity = dark * .6;
-      panel.style.display = !open || mode === 'loading' || mode === 'gate' || mode === 'intro' ? 'none' : '';
-      for (const m of glass) m.emissiveIntensity = lerp(.1, .82, night);      // by day the windows are mirrors; at night they light up as before
-      const settled = night === 0 ? 0 : night === 1 ? 1 : -1;
-      if (settled >= 0 && settled !== envFor) { envFor = settled; envWait = 8; }
-      if (envWait && !--envWait && mode !== 'loading' && envFor >= 0) {          // photograph the city all round, for the glass to mirror
-        for (const m of mirrors) m.envMap = null;                                 // so one photograph does not pile onto the last
-        const cube = cubes[cubeAt ^= 1]; cube.cam.update(renderer, scene); uCityCube.value = cube.rt.texture; uCityMirror.value = 1;
-        const old = cityEnv[envFor]; cityEnv[envFor] = pmrem.fromCubemap(cube.rt.texture).texture; if (old) old.dispose();
-        for (const m of mirrors) { if (!m.envMap) m.needsUpdate = true; m.envMap = cityEnv[envFor]; }
+    // The plaza and stage pictures are unlit, so a see-through sheet over each one shows the shadows that fall there.
+    const catcher = (radius, y) => {
+      const m = new THREE.Mesh(new THREE.CircleGeometry(radius, 64), new THREE.ShaderMaterial({uniforms: {uSunMap, uSunMatrix, uSunDark, uSunTexel}, transparent: true, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -4, polygonOffsetUnits: -4,
+        vertexShader: 'varying vec3 vAt; void main() { vec4 w = modelMatrix * vec4(position, 1.); vAt = w.xyz; gl_Position = projectionMatrix * viewMatrix * w; }',
+        fragmentShader: `#include <packing>\nvarying vec3 vAt;${REACH}\nvoid main() { gl_FragColor = vec4(.165, .1, .47, (1. - sunReach(vAt + vec3(0., .1, 0.))) * uSunDark * .6); }`}));
+      m.rotation.x = -Math.PI / 2; m.position.y = y; m.renderOrder = 2; m.userData.sunSeen = true; scene.add(m); return m;
+    };
+    // The picture the panes mirror: six views of the city side by side in one file, cut apart here. Night has its own.
+    const mirrors = [null, null];
+    const loadMirror = which => {
+      if (mirrors[which]) return; mirrors[which] = 'loading';
+      const image = new Image(); image.onload = () => {
+        const s = image.height, faces = Array.from({length: 6}, (_, i) => { const c = document.createElement('canvas'); c.width = c.height = s; c.getContext('2d').drawImage(image, -i * s, 0); return c; });
+        const cube = new THREE.CubeTexture(faces); cube.colorSpace = THREE.SRGBColorSpace; cube.generateMipmaps = false; cube.minFilter = THREE.LinearFilter; cube.needsUpdate = true; mirrors[which] = cube;
+      };
+      image.onerror = () => { mirrors[which] = null; }; image.src = `assets/city/bake/mirror-${which ? 'night' : 'day'}.webp?v=1`;
+    };
+    // Making that file (test hook only): photograph the city all round from the plaza, without whoever is walking or driving past.
+    mirrorShot = (edge = 256) => {
+      const rt = new THREE.WebGLCubeRenderTarget(edge, {type: THREE.FloatType}), cam = new THREE.CubeCamera(1, 1200, rt), gone = [pyon, ...cast.map(m => m.group), ...traffic.map(t => t.car), shadows].filter(o => o && o.visible);
+      cam.position.set(0, 10, 0); gone.forEach(o => { o.visible = false; }); cam.update(renderer, scene); gone.forEach(o => { o.visible = true; });
+      const canvas = document.createElement('canvas'), g = canvas.getContext('2d'), px = new Float32Array(edge * edge * 4); canvas.width = edge * 6; canvas.height = edge;
+      const curve = v => { v = Math.min(1, Math.max(0, v * .5)); return 255 * (v <= .0031308 ? 12.92 * v : 1.055 * Math.pow(v, 1 / 2.4) - .055); };
+      for (let face = 0; face < 6; face++) {
+        renderer.readRenderTargetPixels(rt, 0, 0, edge, edge, px, face);
+        const data = g.createImageData(edge, edge); for (let i = 0; i < edge * edge * 4; i += 4) { data.data[i] = curve(px[i]); data.data[i + 1] = curve(px[i + 1]); data.data[i + 2] = curve(px[i + 2]); data.data[i + 3] = 255; }
+        g.putImageData(data, face * edge, 0);
       }
-      // Each screen round the plaza throws its light on what stands near it, shifting colour as the picture on it changes.
+      rt.dispose(); return canvas.toDataURL('image/webp', .86);
+    };
+    let tick = 0;
+    const glass = [], glows = [], catchers = [];
+    sunTestTick = () => {           // the models arrive one by one, so new ones are picked up as they come
+      uSunMap.value = sun.shadow.map ? sun.shadow.map.texture : null;
+      uSunDark.value = uSunMap.value ? state.dark / 100 * (1 - night) : 0;      // no sun at night, so its shade and shadows fade out with the daylight
+      uGlowK.value = lerp(.5, 1.5, night);
+      const which = night > .5 ? 1 : 0; loadMirror(which);
+      const cube = mirrors[which] && mirrors[which].isTexture ? mirrors[which] : mirrors[1 - which] && mirrors[1 - which].isTexture ? mirrors[1 - which] : null;
+      uCityCube.value = cube; uCityMirror.value = cube ? 1 : 0;
+      panel.style.display = !open || mode === 'loading' || mode === 'gate' || mode === 'intro' ? 'none' : '';
+      if (SUN_TEST && open) renderer.shadowMap.needsUpdate = true;
+      for (const m of glass) m.emissiveIntensity = lerp(.1, .82, night);      // by day the windows are mirrors; at night they light up as before
+      // Each screen round the plaza throws its light on what stands near it.
       if (!glows.length && N.Scr023 && N.Anime_Screen) {
-        const names = ['Anime_Screen', ...Array.from({length: 12}, (_, i) => 'Scr0' + (23 + i))];
-        for (const name of names) { const node = N[name]; if (!node) continue;
+        for (const name of ['Anime_Screen', ...Array.from({length: 12}, (_, i) => 'Scr0' + (23 + i))]) { const node = N[name]; if (!node) continue;
           const at = V(0, 0, 0), big = name === 'Anime_Screen';
-          node.getWorldPosition(at).add(V(0, 0, name === 'Anime_Screen' ? 4 : 2.5).applyQuaternion(node.getWorldQuaternion(new THREE.Quaternion())));
+          node.getWorldPosition(at).add(V(0, 0, big ? 4 : 2.5).applyQuaternion(node.getWorldQuaternion(new THREE.Quaternion())));
           glows.push({at, color: new THREE.Color().setHSL((.62 + .3 * Math.sin(glows.length * 1.7) + 1) % 1, .75, .6).multiplyScalar(big ? 1.6 : 1)}); }
       }
-      uGlowK.value = lerp(.5, 1.5, night);
-      if (tick++ % 40) return;
+      if (tick++ % 40 || !glows.length) return;
+      if (!catchers.length && N.plazaArt) catchers.push(catcher(17.2, .3), catcher(2.62, .715));
       const movers = [pyon, N.UFO, ...cast.map(m => m.group), ...traffic.map(t => t.car)];
       const moves = o => { for (; o; o = o.parent) if (movers.includes(o)) return true; return false; };
-      if (!catchers.length && N.plazaArt) for (const [radius, y] of [[17.2, .3], [2.62, .715]]) {
-        const m = new THREE.Mesh(new THREE.CircleGeometry(radius, 64), new THREE.ShadowMaterial({color: 0x2a1a78, opacity: .25, depthWrite: false, fog: false, polygonOffset: true, polygonOffsetFactor: -4, polygonOffsetUnits: -4}));
-        m.rotation.x = -Math.PI / 2; m.position.y = y; m.renderOrder = 2; m.receiveShadow = true; m.userData.sunSeen = true; scene.add(m); catchers.push(m); place();
-      }
-      if (!glows.length) return;
       const bake = o => {             // how much screen light reaches each corner of this thing, worked out once and kept on the model
         if (o.geometry.attributes.glow) o.geometry = o.geometry.clone();
         const pos = o.geometry.attributes.position, nor = o.geometry.attributes.normal; if (!pos || !nor) return;
         o.updateWorldMatrix(true, false);
-        const out = new Float32Array(pos.count * 3), turn = new THREE.Matrix3().getNormalMatrix(o.matrixWorld), p = V(0, 0, 0), n = V(0, 0, 0), d = V(0, 0, 0);
+        const light = new Float32Array(pos.count * 3), turn = new THREE.Matrix3().getNormalMatrix(o.matrixWorld), p = V(0, 0, 0), n = V(0, 0, 0), d = V(0, 0, 0);
         for (let i = 0; i < pos.count; i++) {
           p.fromBufferAttribute(pos, i).applyMatrix4(o.matrixWorld); n.fromBufferAttribute(nor, i).applyMatrix3(turn).normalize();
           for (const g of glows) {
             const far = d.copy(g.at).sub(p).lengthSq(), near = Math.max(0, 1 - far / 900); if (!near || !far) continue;
             const k = near * near * Math.max(n.dot(d) / Math.sqrt(far) * .6 + .4, 0);
-            out[i * 3] += g.color.r * k; out[i * 3 + 1] += g.color.g * k; out[i * 3 + 2] += g.color.b * k;
+            light[i * 3] += g.color.r * k; light[i * 3 + 1] += g.color.g * k; light[i * 3 + 2] += g.color.b * k;
           }
         }
-        o.geometry.setAttribute('glow', new THREE.BufferAttribute(out, 3));
+        o.geometry.setAttribute('glow', new THREE.BufferAttribute(light, 3));
       };
       scene.traverse(o => {
         if (!o.isMesh || o.userData.sunSeen) return; o.userData.sunSeen = true;
         const m = Array.isArray(o.material) ? o.material[0] : o.material; if (!m || !m.isMeshStandardMaterial) return;
-        o.receiveShadow = true; o.castShadow = (!m.transparent || m.alphaTest > 0) && !o.isSkinnedMesh && !moves(o); if (o.castShadow) { renderer.shadowMap.needsUpdate = true; envWait = 50; }
-        if (!o.isSkinnedMesh && !o.isInstancedMesh && !moves(o)) bake(o);
-        for (const one of Array.isArray(o.material) ? o.material : [o.material]) if (/M_(W_|GLASS$)/.test(one.name || '') && !mirrors.includes(one)) {
-          one.metalness = 1; one.roughness = .04; one.envMapIntensity = 1.1; one.color.set(0xe6efff); mirrors.push(one); if (/M_W_/.test(one.name)) glass.push(one); envWait = 50;
+        const still = !o.isSkinnedMesh && !moves(o);
+        o.castShadow = still && (!m.transparent || m.alphaTest > 0); if (o.castShadow) renderer.shadowMap.needsUpdate = true;
+        if (still && !o.isInstancedMesh) bake(o);
+        for (const one of Array.isArray(o.material) ? o.material : [o.material]) {
+          if (/M_(W_|GLASS$)/.test(one.name || '') && !one.userData.sunGlass) { one.userData.sunGlass = true; one.metalness = 1; one.roughness = .04; one.envMapIntensity = 1.1; one.color.set(0xe6efff); if (/M_W_/.test(one.name)) glass.push(one); }
+          tint(one, still);
         }
-        for (const one of Array.isArray(o.material) ? o.material : [o.material]) tint(one);
       });
     };
   }
@@ -1908,7 +1953,7 @@ function start() {
     const channel = new MessageChannel(); let wake = null;
     channel.port1.onmessage = () => { if (wake) wake(); };
     window.__city = {
-      get mode() { return mode; }, get debug() { return {signs, N, camera, landmarkModels, traffic, cast, peek(p, l) { mode = 'peek'; camPos.set(p[0], p[1], p[2]); camLook.set(l[0], l[1], l[2]); }, jump(i, t) { moveIndex = i - 1; dance(); moveT = t; }}; },
+      get mode() { return mode; }, get debug() { return {signs, N, camera, landmarkModels, traffic, cast, renderer, scene, sun, mirrorShot, peek(p, l) { mode = 'peek'; camPos.set(p[0], p[1], p[2]); camLook.set(l[0], l[1], l[2]); }, jump(i, t) { moveIndex = i - 1; dance(); moveT = t; }}; },
       lineup(on) { lineup = on; }, enter() { return enterPlace(); }, back() { return backToCity(); }, meet(id) { return meet(id); }, leave() { return leave(); },
       async advance(seconds) { for (let t = 0; t < seconds; t += 1 / 30) { step(1 / 30); await new Promise(resolve => { wake = resolve; channel.port2.postMessage(0); }); } return mode; }
     };
