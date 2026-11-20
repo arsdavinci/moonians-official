@@ -124,10 +124,11 @@ body.is-meeting .city-menu,body.is-meeting .city-hint,body.is-meeting .city-labe
 .city-enter{position:fixed;z-index:25;left:50%;bottom:calc(34px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);width:min(420px,calc(100vw - 32px));padding:20px 22px;border-radius:26px;text-align:center;
   color:var(--city-ink);background:var(--city-glass-strong);border:1.5px solid var(--city-line);-webkit-backdrop-filter:blur(16px) saturate(1.4);backdrop-filter:blur(16px) saturate(1.4);
   box-shadow:0 18px 50px rgba(98,74,190,.32);animation:city-pop .4s cubic-bezier(.2,1.4,.4,1) both}
-.city-enter-where{margin:0;font:.78rem var(--city-dot);letter-spacing:.14em;color:var(--city-pink-deep)}
-.city-enter h2{margin:2px 0 4px;font-size:1.7rem;font-weight:900}
-.city-enter-ask{margin:0;font-size:.92rem;color:var(--city-ink-soft)}
+.city-enter-where{margin:0;font:.9rem var(--city-dot);letter-spacing:.14em;color:var(--city-pink-deep)}
+.city-enter h2{margin:2px 0 4px;font-size:2.1rem;font-weight:900}
+.city-enter-ask{margin:0;font-size:1.05rem;color:var(--city-ink-soft)}
 .city-enter .city-profile-actions{margin-top:14px}
+.city-enter .city-button{min-height:56px;font-size:1.15rem}
 @media (min-width:760px){ .city-enter .city-profile-actions{flex-direction:row} .city-enter .city-button{flex:1} }
 body.is-asking .city-menu,body.is-asking .city-sns,body.is-asking .city-hint{opacity:0;pointer-events:none}
 
@@ -195,12 +196,14 @@ body.is-loading .city-name{display:none}
 
 /* the "go in?" card stands at the right on wide screens, turned a little so it has depth */
 @media (min-width:760px){
-  .city-enter{left:auto;right:clamp(28px,17vw,340px);top:50%;bottom:auto;width:min(440px,36vw);padding:30px 30px 28px;text-align:left;transform-origin:100% 50%;
+  .city-enter{left:auto;right:clamp(24px,7vw,150px);top:50%;bottom:auto;width:clamp(460px,42vw,820px);padding:clamp(40px,5.4vw,100px) clamp(30px,2.8vw,54px);border-radius:clamp(26px,2.4vw,44px);text-align:left;transform-origin:100% 50%;
     transform:perspective(1100px) translateY(-50%) rotateY(-19deg) rotateX(3deg);box-shadow:-26px 30px 60px rgba(98,74,190,.36),0 0 0 1px rgba(255,255,255,.5) inset;
     animation:city-enter-in .55s cubic-bezier(.2,1.2,.35,1) both}
-  .city-enter h2{font-size:2.3rem;line-height:1.15}
-  .city-enter-ask{font-size:1rem}
-  .city-enter .city-profile-actions{margin-top:20px}
+  .city-enter-where{font-size:clamp(1rem,1.45vw,1.8rem)}
+  .city-enter h2{font-size:clamp(2.8rem,4.6vw,5.6rem);line-height:1.15;margin:6px 0 10px}
+  .city-enter-ask{font-size:clamp(1.15rem,1.9vw,2.3rem)}
+  .city-enter .city-profile-actions{margin-top:clamp(22px,2.6vw,44px);gap:clamp(10px,1vw,18px)}
+  .city-enter .city-button{min-height:clamp(64px,6.4vw,124px);font-size:clamp(1.25rem,2vw,2.4rem)}
 }
 @keyframes city-enter-in{from{opacity:0;transform:perspective(1100px) translateY(-50%) translateX(70px) rotateY(-46deg) rotateX(3deg)}}
 

@@ -819,7 +819,8 @@ function start() {
     if (ship && !motionOff()) {
       ship.halt = true; sound.fx.whoosh(2.2);
       const p = ship.car.position.clone().add(V(0, 39, 0)), out = p.clone().setY(0).normalize();
-      await fly(p.clone().addScaledVector(out, -132).add(V(0, -16, 0)), p, 2.3, 8);
+      const tall = innerWidth / innerHeight < .8;            // wide screens go close, so the airship and its screen fill the left half; tall ones stay back to fit it in
+      await fly(p.clone().addScaledVector(out, tall ? -118 : -84).add(V(0, tall ? -14 : -10, 0)), p, 2.3, 8);
       burst(p, PASTEL, 90, 14, 1.4); sound.fx.arrive();
     }
     // the same question as every other place: go in, or back to the city
