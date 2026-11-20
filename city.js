@@ -234,23 +234,28 @@ function start() {
   // The glowing stage lights Pyonpy from below, and spills softly onto everyone on the plaza. Strongest at night.
   const stageLight = new THREE.PointLight(0xffd6f2, 0, 30, 1.5); stageLight.position.set(0, 1.1, 0); scene.add(stageLight);
   const stageFill = new THREE.PointLight(0xbfe9ff, 0, 34, 1.4); stageFill.position.set(0, 6.5, 0); scene.add(stageFill);
-  const pmrem = new THREE.PMREMGenerator(renderer);
-  const envScene = new THREE.Scene(); envScene.add(makeSky(SKY));
   const dot = (() => { const c = document.createElement('canvas'); c.width = c.height = 64; const g = c.getContext('2d'), r = g.createRadialGradient(32, 32, 0, 32, 32, 32);
     r.addColorStop(0, '#fff'); r.addColorStop(.35, 'rgba(255,255,255,.8)'); r.addColorStop(1, 'rgba(255,255,255,0)'); g.fillStyle = r; g.fillRect(0, 0, 64, 64); return new THREE.CanvasTexture(c); })();
-  const envDay = pmrem.fromScene(envScene, .03).texture;
-  scene.environment = envDay;
-
   /* ── day and night ── */
   const NIGHT_SKY = ['#5a3d9c', '#2c2170', '#140f45', '#070522'];
-  const envNightScene = new THREE.Scene(); envNightScene.add(makeSky(NIGHT_SKY));
-  const envNight = pmrem.fromScene(envNightScene, .03).texture;
+  const environments = new Map();
+  function environmentFor(colors) {
+    if (!environments.has(colors)) {
+      const dome = makeSky(colors), enclosure = new THREE.Scene();
+      enclosure.add(dome);
+      const generator = new THREE.PMREMGenerator(renderer);
+      environments.set(colors, generator.fromScene(enclosure, .03).texture);
+      generator.dispose(); dome.geometry.dispose(); dome.material.dispose();
+    }
+    return environments.get(colors);
+  }
   const skyDay = SKY.map(c => new THREE.Color(c)), skyNight = NIGHT_SKY.map(c => new THREE.Color(c));
   const fogDay = new THREE.Color(0xe8e4ff), fogNight = new THREE.Color(0x1b1450);
   const sunDay = new THREE.Color(0xfff2ea), sunNight = new THREE.Color(0x8fa4ff);
   const hemiSkyDay = new THREE.Color(0xf4f6ff), hemiSkyNight = new THREE.Color(0x4a47b0), hemiGroundDay = new THREE.Color(0xe2d4ff), hemiGroundNight = new THREE.Color(0x3a2a80);
   let night = 0, nightT = 0;
   try { nightT = night = JSON.parse(localStorage.getItem('moonians.city-night')) === true ? 1 : 0; } catch { /* optional */ }
+  scene.environment = environmentFor(night > .5 ? NIGHT_SKY : SKY);
   const uTime = {value: 0}, uGlow = {value: 1};
   const nightToggle = $('#night-toggle'), nightLabel = $('#night-label'), keep = {};
   function showNight() {
@@ -312,7 +317,7 @@ function start() {
     scene.fog.color.copy(fogDay).lerp(fogNight, k);
     hemi.color.copy(hemiSkyDay).lerp(hemiSkyNight, k); hemi.groundColor.copy(hemiGroundDay).lerp(hemiGroundNight, k); hemi.intensity = lerp(2.5, 1.45, k);
     sun.color.copy(sunDay).lerp(sunNight, k); sun.intensity = lerp(2.6, .9, k);
-    scene.environment = k > .5 ? envNight : envDay;
+    scene.environment = environmentFor(k > .5 ? NIGHT_SKY : SKY);
     uGlow.value = lerp(1, 1.4, k);
     stageLight.intensity = lerp(6, 70, k); stageFill.intensity = lerp(0, 55, k);
     sk.panoMix.value = panoReady ? 1 - k : 0;
@@ -761,13 +766,15 @@ function start() {
       m.userData.ring = {a, r: 46, y: 11 + (i % 3) * 3};
     });
     // Painted clouds drifting between the towers.
-    for (let i = 0; i < 12; i++) {            // each cloud is its own picture, so none is cut off at an edge
-      textures.load(`assets/city/cloud-${i % 5 + 1}.webp`, map => {
+    for (let kind = 0; kind < 5; kind++) {
+      textures.load(`assets/city/cloud-${kind + 1}.webp`, map => {
         map.colorSpace = THREE.SRGBColorSpace;
-        const sprite = new THREE.Sprite(new THREE.SpriteMaterial({map, transparent: true, depthWrite: false, fog: true}));
-        const a = (i / 12) * Math.PI * 2 + i, r = 90 + (i * 53) % 110, w = 62 + (i * 7) % 20;
-        sprite.userData = {a, r, y: 26 + (i * 17) % 60}; sprite.scale.set(w, w * map.image.height / map.image.width, 1);
-        scene.add(sprite); paintedClouds.push(sprite);
+        for (let i = kind; i < 12; i += 5) {
+          const sprite = new THREE.Sprite(new THREE.SpriteMaterial({map, transparent: true, depthWrite: false, fog: true}));
+          const a = (i / 12) * Math.PI * 2 + i, r = 90 + (i * 53) % 110, w = 62 + (i * 7) % 20;
+          sprite.userData = {a, r, y: 26 + (i * 17) % 60}; sprite.scale.set(w, w * map.image.height / map.image.width, 1);
+          scene.add(sprite); paintedClouds.push(sprite);
+        }
       });
     }
   }
@@ -1135,22 +1142,63 @@ function start() {
     material.customProgramCacheKey = () => 'holo-screen';
     return material;
   }
-  // The screens' videos wait their turn: nothing is fetched until the city is on show, and then they start one after
-  // another, so they never crowd out the models that people see first.
-  const videoQueue = []; let videoNext = 0;
-  function startVideos(now) {
-    if (!videoQueue.length || now < videoNext || mode === 'loading' || mode === 'gate') return;
-    const el = videoQueue.shift(); videoNext = now + .45; el.preload = 'auto'; el.play().catch(() => { /* starts on the first tap */ });
+  const screenView = new THREE.Frustum(), screenProjection = new THREE.Matrix4();
+  let nextScreenCheck = 0;
+  function nearView(plane) {
+    for (let node = plane; node; node = node.parent) {
+      if (!node.visible) return false;
+      if (node === scene) {
+        plane.updateWorldMatrix(true, false);
+        return screenView.intersectsObject(plane);
+      }
+    }
+    return false;
   }
+  function playScreen(player) {
+    if (!player.el.hasAttribute('src')) player.el.src = player.url;
+    player.el.play().catch(() => { /* retry eligible screens on the next gesture */ });
+  }
+  function updateScreenPlayback() {
+    const now = performance.now();
+    if (document.hidden || now < nextScreenCheck) return;
+    nextScreenCheck = now + 240;
+    camera.updateMatrixWorld();
+    screenProjection.copy(camera.projectionMatrix);
+    screenProjection.elements[0] *= .88; screenProjection.elements[5] *= .88; // warm up clips just outside the frame
+    screenView.setFromProjectionMatrix(screenProjection.multiply(camera.matrixWorldInverse));
+    let started = false;
+    for (const player of [...Object.values(snsPlayers), ...videos]) {
+      if (player.planes.some(nearView)) {
+        if (player.active || started) continue;
+        player.active = true;
+        started = true;
+        playScreen(player);
+      } else if (player.active) {
+        player.active = false;
+        player.el.pause();
+      }
+    }
+  }
+  document.addEventListener('visibilitychange', () => {
+    nextScreenCheck = 0;
+    if (document.hidden) for (const player of [...videos, ...Object.values(snsPlayers)]) {
+      player.active = false;
+      player.el.pause();
+    }
+  });
+  addEventListener('pointerdown', () => {
+    if (!document.hidden) for (const player of [...videos, ...Object.values(snsPlayers)]) {
+      if (player.active && player.el.paused) playScreen(player);
+    }
+  }, {passive: true});
   function videoScreen(src, w, h) {
     let entry = videos.find(v => v.src === src);
     if (!entry) {
       const el = document.createElement('video');
-      el.src = 'assets/' + src + '.mp4'; el.muted = true; el.loop = true; el.playsInline = true; el.preload = 'none'; el.crossOrigin = 'anonymous';
+      el.muted = true; el.loop = true; el.playsInline = true; el.preload = 'none'; el.crossOrigin = 'anonymous';
       const texture = new THREE.VideoTexture(el); texture.colorSpace = THREE.SRGBColorSpace;
-      entry = {src, el, texture, planes: []}; videos.push(entry);
+      entry = {src, url: 'assets/' + src + '.mp4', el, texture, planes: []}; videos.push(entry);
       el.addEventListener('loadedmetadata', () => entry.planes.forEach(fit));
-      videoQueue.push(el);
     }
     // Hologram look: see-through, scan lines sliding up, a soft tint, bright edges and an occasional flicker.
     const material = holo(entry.texture, videos.length * 1.37 + entry.planes.length * .61);
@@ -1176,20 +1224,22 @@ function start() {
   function snsScreen(w, h, key = 'ship', startClip = 0, startAt = 0, clips = SNS_CLIPS, faceAt = .5) {
     let sns = snsPlayers[key];
     if (!sns) {
-      const el = document.createElement('video'); el.muted = true; el.playsInline = true; el.preload = 'none'; el.src = clips[startClip];
+      const el = document.createElement('video'); el.muted = true; el.playsInline = true; el.preload = 'none';
       const texture = new THREE.VideoTexture(el); texture.colorSpace = THREE.SRGBColorSpace;
-      sns = snsPlayers[key] = {el, texture, clips, faceAt, index: startClip, planes: [], zoom: 1, pan: faceAt, zoomT: 1, panT: faceAt, next: 0};
+      sns = snsPlayers[key] = {el, texture, clips, url: clips[startClip], faceAt, index: startClip, planes: [], zoom: 1, pan: faceAt, zoomT: 1, panT: faceAt, next: 0};
       if (startAt) el.addEventListener('loadedmetadata', () => { try { el.currentTime = Math.min(startAt, el.duration - 1); } catch { /* not seekable yet */ } }, {once: true});
-      el.addEventListener('ended', () => { sns.index = (sns.index + 1) % clips.length; el.src = clips[sns.index]; el.play().catch(() => {}); });
-      videoQueue.unshift(el);
-      addEventListener('pointerdown', () => { if (el.paused && !videoQueue.includes(el)) el.play().catch(() => {}); }, {passive: true});
+      el.addEventListener('ended', () => {
+        sns.index = (sns.index + 1) % clips.length; sns.url = clips[sns.index];
+        el.removeAttribute('src');
+        if (sns.active && !document.hidden) playScreen(sns);
+      });
     }
     const plane = new THREE.Mesh(new THREE.PlaneGeometry(w, h), holo(sns.texture, 4.2 + sns.planes.length + Object.keys(snsPlayers).length));
     plane.userData.want = w / h; sns.planes.push(plane); return plane;
   }
   function updateSns(dt) { for (const sns of Object.values(snsPlayers)) updateSnsPlayer(sns, dt); }
   function updateSnsPlayer(sns, dt) {
-    if (!sns.el.videoWidth) return;
+    if (!sns.active || !sns.el.videoWidth) return;
     if (sns.full) { sns.zoom = sns.zoomT = 1; sns.pan = sns.panT = .5; sns.next = time + 60; }   // shown whole: no cropping or moving
     if (time > sns.next) {
       // Pyonpy's face is about half way up both videos. Shots that show it stay on for a while and drift slowly;
@@ -1240,7 +1290,6 @@ function start() {
     const anchor = PLACES.anime.node, big = videoScreen('city/v/ramen', 11.9, 6.7);
     const holder = new THREE.Group(); holder.position.copy(anchor.position); holder.quaternion.copy(anchor.quaternion);
     big.position.set(0, 10.5, 5.8); holder.add(big); scene.add(holder); N.bigScreen = holder; holder.visible = !!landmarkModels.anime;   // shown once its building is there
-    addEventListener('pointerdown', () => videos.forEach(v => { if (v.el.paused && !videoQueue.includes(v.el)) v.el.play().catch(() => {}); }), {passive: true});
   }
 
   /* ── the cast: characters who walk about the city. Click one to meet them. ── */
@@ -1622,8 +1671,13 @@ function start() {
       });
     }
     const PICS = {bush: ['bush-pink', 'bush-purple', 'bush-yellow', 'bush-mix'], tree: ['tree-round', 'tree-tall', 'tree-fruit']};
+    const byFile = new Map();
     far.forEach((o, i) => {
       const names = PICS[o.tree ? 'tree' : 'bush'], file = names[i % names.length];
+      if (!byFile.has(file)) byFile.set(file, []);
+      byFile.get(file).push(o);
+    });
+    for (const [file, spots] of byFile) {
       textures.load(`assets/city/plants/${file}.webp`, map => {
         map.colorSpace = THREE.SRGBColorSpace;
         const material = new THREE.SpriteMaterial({map, transparent: true, alphaTest: .35, fog: true});
@@ -1639,10 +1693,12 @@ function start() {
               'diffuseColor.rgb = mix(pc, mix(pc * vec3(0.2, 0.22, 0.36), pc * 1.1, lit), uNight);');
         };
         material.customProgramCacheKey = () => 'plant-night-' + glow;
-        const sprite = new THREE.Sprite(material);
-        const h = (o.tree ? 5.4 : 1.6) * o.s; sprite.center.set(.5, 0); sprite.scale.set(h * map.image.width / map.image.height, h, 1); sprite.position.copy(o.p); scene.add(sprite);
+        for (const o of spots) {
+          const sprite = new THREE.Sprite(material);
+          const h = (o.tree ? 5.4 : 1.6) * o.s; sprite.center.set(.5, 0); sprite.scale.set(h * map.image.width / map.image.height, h, 1); sprite.position.copy(o.p); scene.add(sprite);
+        }
       });
-    });
+    }
   }
 
   /* ── neon signs: glowing outlines in moon letters, hung all over the city (black parts of the pictures add no light) ── */
@@ -1902,10 +1958,10 @@ function start() {
     profileEl.hidden = true; shiftT = 0; body.classList.remove('is-meeting'); if (meeting) { meeting.stopped = false; meeting = null; }
   });
 
-  modelLoader().load('assets/city/pastel-moon-city.glb?v=20261118-6', gltf => {
+  modelLoader().load('assets/city/pastel-moon-city.glb?v=20261120-2', gltf => {
     try { build(gltf); } catch (error) { console.error(error); fail(); return; }
     progress = 1;
-  }, event => { progress = Math.min(.98, event.loaded / (event.total || 3460872)); }, () => fail());
+  }, event => { progress = Math.min(.98, event.loaded / (event.total || 3501824)); }, () => fail());
 
   /* ── frame loop ── */
   function resize() {
@@ -1981,7 +2037,7 @@ function start() {
     if (!still) uTime.value = time;
     night = Math.abs(nightT - night) < .002 ? nightT : lerp(night, nightT, 1 - Math.pow(.02, dt));
     applyNight(night);
-    sunTestTick(); startVideos(time);
+    sunTestTick();
     beams.forEach((m, i) => { m.material.opacity = (1 - night) * (.07 + .07 * (Math.sin(time * .35 + i * 1.7) * .5 + .5)); m.visible = night < .98; });
     if (mode === 'orbit') {
       view.idle += dt;
@@ -2059,7 +2115,7 @@ function start() {
         c.material.opacity = (.95 - night * .7) * (1 - c.userData.thin * .88);
       }
     }
-    updateTraffic(dt, still); updateCast(dt, still); updateSns(dt); updateBigFace(dt);
+    updateTraffic(dt, still); updateScreenPlayback(); updateCast(dt, still); updateSns(dt); updateBigFace(dt);
     if (mode === 'edit' && editPlace) { const v = vantage(editPlace); camPos.copy(v.pos); camLook.copy(v.look); }
     if (mode === 'ask' && asking && asking.id === 'game') { const v = vantage(asking.place), k = 1 - Math.pow(.02, dt); camPos.lerp(v.pos, k); camLook.lerp(v.look, k); }   // the UFO keeps flying, so the camera keeps up with it
     for (const m of signs) m.material.opacity = (.45 + .5 * night) * (.86 + .14 * Math.sin(time * 3.1 + m.userData.phase)) * (Math.sin(time * .7 + m.userData.phase * 2.3) > .985 ? .35 : 1);   // steady glow with a rare flicker

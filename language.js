@@ -805,7 +805,7 @@
       const next = language === 'en' ? img.dataset.srcEn : img.dataset.srcJa;
       if (img.getAttribute('src') !== next) img.setAttribute('src', next);
     });
-    document.querySelectorAll('.brand img').forEach(img => {
+    document.querySelectorAll('.brand img:not([data-src-en])').forEach(img => {
       img.src = language === 'en' ? 'assets/logo-english.png?v=20261110-12' : 'assets/logo.png?v=20261110-11';
       img.width = language === 'en' ? 1024 : 2421;
       img.height = language === 'en' ? 352 : 833;

@@ -15,19 +15,31 @@
   <link rel="icon" href="assets/favicon.png?v=1" type="image/png" sizes="256x256">
   <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png?v=4">
   <meta name="apple-mobile-web-app-title" content="ムーニアンズ">
+  <script>
+    if (location.protocol !== 'file:') {
+      const model = document.createElement('link');
+      model.rel = 'preload';
+      model.as = 'fetch';
+      model.crossOrigin = 'anonymous';
+      model.href = 'assets/city/pastel-moon-city.glb?v=20261120-2';
+      document.head.append(model);
+    }
+  </script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DotGothic16&family=M+PLUS+Rounded+1c:wght@700;800;900&family=Unbounded:wght@700;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="city.css?v=20261118-22">
   <script type="importmap">{"imports":{"three":"./vendor/three/three.module.min.js"}}</script>
-  <script src="language.js?v=20261118-17"></script>
-  <script type="module" src="city.js?v=20261118-111"></script>
+  <script src="language.js?v=20261120-1"></script>
+  <script type="module">
+    if (location.protocol !== 'file:') await import('./city.js?v=20261120-1');
+  </script>
 </head>
 <body class="city-page is-loading">
   <canvas id="city-canvas" aria-hidden="true"></canvas>
 
   <header class="city-top">
-    <a class="brand city-brand" href="./" data-language-link aria-label="ムーニアンズ ホーム"><img src="assets/logo.png?v=20261110-11" alt="ムーニアンズ" width="2421" height="833"></a>
+    <a class="brand city-brand" href="./" data-language-link aria-label="ムーニアンズ ホーム"><img src="assets/city/header-logo.webp" data-src-en="assets/city/header-logo-en.webp" alt="ムーニアンズ" width="570" height="196"></a>
     <div class="city-tools" id="city-tools">
       <button class="city-tools-toggle" id="tools-toggle" type="button" aria-expanded="false" aria-controls="city-tools" aria-label="設定をひらく"><span aria-hidden="true"></span></button>
       <div class="language-switch" data-language-switch role="group" aria-label="Language / 言語"><button type="button" data-language="ja" lang="ja" aria-pressed="true">日本語</button><button type="button" data-language="en" lang="en" aria-pressed="false">EN</button></div>
@@ -96,6 +108,12 @@
   </div>
 
   <div class="city-loader" id="city-loader">
+    <section class="city-gate" id="local-preview" hidden>
+      <h2>手元の3Dプレビュー</h2>
+      <p>プレビューが開かないときは、このフォルダで次のコマンドを実行してから、下のリンクを開いてください。</p>
+      <p><code>python -m http.server 8790 --bind 127.0.0.1</code></p>
+      <a id="local-preview-link" href="http://127.0.0.1:8790/">街のプレビューを開く</a>
+    </section>
     <div class="city-progress" id="city-progress">
       <p class="city-progress-title" translate="no">MOON GATE <i>//</i> DOCKING</p>
       <p class="city-progress-num" translate="no"><span id="city-percent">0</span><small>%</small></p>
@@ -116,6 +134,25 @@
 
   <div class="city-wipe" id="city-wipe" aria-hidden="true"></div>
   <audio id="city-bgm" src="assets/audio/download/moonians-bokura-wa-moonians-instrumental.mp3" preload="none" loop></audio>
+  <script>
+    if (location.protocol === 'file:') {
+      document.getElementById('city-progress').hidden = true;
+      document.getElementById('local-preview').hidden = false;
+      const link = document.getElementById('local-preview-link');
+      const preview = new URL(link.href);
+      preview.search = location.search;
+      preview.hash = location.hash;
+      link.href = preview.href;
+      // Only switch automatically when the city's own preview assets are available.
+      const logo = new Image();
+      logo.onload = () => {
+        if (logo.naturalWidth === 570 && logo.naturalHeight === 196) location.replace(preview.href);
+      };
+      const probe = new URL('assets/city/header-logo.webp', preview);
+      probe.searchParams.set('check', Date.now()); // a cached logo cannot confirm the server is running
+      logo.src = probe.href;
+    }
+  </script>
   <noscript><style>.city-loader{display:none}.city-page{background:url("assets/moon-city.png") center/cover fixed}</style></noscript>
   <!-- Cloudflare Web Analytics --><script type='module' src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "1cb8e603855941a5a322d69a4580dd87"}'></script><!-- End Cloudflare Web Analytics -->
 </body>
