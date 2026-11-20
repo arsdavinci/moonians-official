@@ -447,6 +447,73 @@ function start() {
   }
   let sparkle = null, pyon = null, pyonMixer = null, pyonActions = {}, pyonActive = null, statueBounce = 0;
   const ufoBase = V(0, 0, 0), shutterBase = {};
+  /* ── sun test (?sun): real shadows, and two sliders that turn the sun round the city and raise or lower it.
+        Only for choosing where the shadows should fall; once chosen they get painted onto the ground and this goes. ── */
+  let sunTestTick = () => {};
+  if (new URL(location.href).searchParams.has('sun')) {
+    renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    const size = matchMedia('(pointer: coarse)').matches ? 2048 : 4096, box = sun.shadow.camera;
+    sun.castShadow = true; sun.shadow.mapSize.set(size, size); sun.shadow.bias = -.0004; sun.shadow.normalBias = .08;
+    box.left = box.bottom = -130; box.right = box.top = 130; box.near = 20; box.far = 560; box.updateProjectionMatrix();
+    scene.add(sun.target);
+    const state = {turn: 318, rise: 50, dark: 70};
+    try { Object.assign(state, JSON.parse(localStorage.getItem('moonians.city-sun')) || {}); } catch { /* optional */ }
+    const catchers = [];            // the plaza and stage pictures are unlit, so a see-through sheet over each one catches the shadows
+    const place = () => {
+      const a = state.turn * Math.PI / 180, e = state.rise * Math.PI / 180;
+      sunDir.set(Math.sin(a) * Math.cos(e), Math.sin(e), Math.cos(a) * Math.cos(e)); sun.position.copy(sunDir).multiplyScalar(280);
+      sun.shadow.intensity = state.dark / 100; for (const m of catchers) m.material.opacity = state.dark / 100 * .6;
+      try { localStorage.setItem('moonians.city-sun', JSON.stringify(state)); } catch { /* optional */ }
+    };
+    const panel = document.createElement('div');
+    panel.style.cssText = 'position:fixed;left:50%;top:calc(env(safe-area-inset-top,0px) + 70px);transform:translateX(-50%);z-index:60;width:min(340px,88vw);padding:10px 14px;border-radius:16px;background:rgba(255,255,255,.86);color:#3a2f66;font:600 13px/1.5 system-ui,sans-serif;box-shadow:0 6px 24px rgba(60,40,120,.18)';
+    const out = document.createElement('div'); out.style.cssText = 'text-align:center;font-size:15px;margin-bottom:4px';
+    panel.append(out);
+    const show = () => { out.textContent = `太陽  向き ${state.turn}°  高さ ${state.rise}°  濃さ ${state.dark}`; };
+    for (const [key, label, min, max] of [['turn', '向き', 0, 359], ['rise', '高さ', 8, 88], ['dark', '濃さ', 10, 100]]) {
+      const row = document.createElement('label'); row.style.cssText = 'display:flex;align-items:center;gap:8px';
+      const input = document.createElement('input'); Object.assign(input, {type: 'range', min, max, step: 1, value: state[key]}); input.style.cssText = 'flex:1;height:30px';
+      input.addEventListener('input', () => { state[key] = +input.value; place(); show(); });
+      row.append(label, input); panel.append(row);
+    }
+    const hide = document.createElement('button'), menu = $('.city-menu'); hide.type = 'button'; hide.textContent = 'メニューを隠す';
+    hide.style.cssText = 'display:block;margin:6px auto 0;padding:4px 14px;border:0;border-radius:999px;background:#e9e2ff;color:inherit;font:inherit';
+    hide.addEventListener('click', () => { const off = menu.style.display !== 'none'; menu.style.display = off ? 'none' : ''; hide.textContent = off ? 'メニューを出す' : 'メニューを隠す'; });
+    panel.append(hide); panel.style.display = 'none';
+    document.body.append(panel); place(); show();
+    // The city is lit so brightly that plain shadows wash out. So wherever the ground faces up, the shadow is also
+    // tinted violet: that is how the painted shadows will look, and they will lie on the ground only.
+    const tint = material => {
+      if (!material.isMeshStandardMaterial || material.userData.sunTint) return; material.userData.sunTint = true;
+      const before = material.onBeforeCompile, key = material.customProgramCacheKey;
+      material.onBeforeCompile = (shader, r) => {
+        before.call(material, shader, r);
+        shader.fragmentShader = shader.fragmentShader.replace('#include <tonemapping_fragment>', `#if defined( USE_SHADOWMAP ) && NUM_DIR_LIGHT_SHADOWS > 0
+          DirectionalLightShadow sunShadow = directionalLightShadows[ 0 ];
+          float sunLit = getShadow( directionalShadowMap[ 0 ], sunShadow.shadowMapSize, sunShadow.shadowIntensity, sunShadow.shadowBias, sunShadow.shadowRadius, vDirectionalShadowCoord[ 0 ] );
+          gl_FragColor.rgb *= mix(vec3(1.), vec3(.5, .45, .8), (1. - sunLit) * smoothstep(.6, .95, dot(normal, normalize((viewMatrix * vec4(0., 1., 0., 0.)).xyz))));
+        #endif
+        #include <tonemapping_fragment>`);
+      };
+      material.customProgramCacheKey = () => key.call(material) + '-sun'; material.needsUpdate = true;
+    };
+    let tick = 0;
+    sunTestTick = () => {           // the models arrive one by one, so new ones are picked up as they come
+      panel.style.display = mode === 'loading' || mode === 'gate' || mode === 'intro' ? 'none' : '';
+      if (tick++ % 40) return;
+      shadows.visible = false;      // the round shadows under the characters would double up with the real ones
+      if (!catchers.length && N.plazaArt) for (const [radius, y] of [[17.2, .3], [2.62, .715]]) {
+        const m = new THREE.Mesh(new THREE.CircleGeometry(radius, 64), new THREE.ShadowMaterial({color: 0x2a1a78, opacity: .25, depthWrite: false, fog: false, polygonOffset: true, polygonOffsetFactor: -4, polygonOffsetUnits: -4}));
+        m.rotation.x = -Math.PI / 2; m.position.y = y; m.renderOrder = 2; m.receiveShadow = true; m.userData.sunSeen = true; scene.add(m); catchers.push(m); place();
+      }
+      scene.traverse(o => {
+        if (!o.isMesh || o.userData.sunSeen) return; o.userData.sunSeen = true;
+        const m = Array.isArray(o.material) ? o.material[0] : o.material; if (!m || !m.isMeshStandardMaterial) return;
+        o.receiveShadow = true; o.castShadow = !m.transparent || m.alphaTest > 0;
+        for (const one of Array.isArray(o.material) ? o.material : [o.material]) tint(one);
+      });
+    };
+  }
   let ufoAngle = 2.4, ufoRise = 1, airshipStart = null;
   const UFO_R = 66, UFO_Y = 34, UFO_TURN = .16;      // the UFO's circle: radius, height, radians a second
 
@@ -1772,6 +1839,7 @@ function start() {
     if (!still) uTime.value = time;
     night = Math.abs(nightT - night) < .002 ? nightT : lerp(night, nightT, 1 - Math.pow(.02, dt));
     applyNight(night);
+    sunTestTick();
     beams.forEach((m, i) => { m.material.opacity = (1 - night) * (.07 + .07 * (Math.sin(time * .35 + i * 1.7) * .5 + .5)); m.visible = night < .98; });
     if (mode === 'orbit') {
       view.idle += dt;
