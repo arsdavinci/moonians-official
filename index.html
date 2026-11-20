@@ -28,11 +28,11 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DotGothic16&family=M+PLUS+Rounded+1c:wght@700;800;900&family=Unbounded:wght@700;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="city.css?v=20261118-22">
+  <link rel="stylesheet" href="city.css?v=20261120-entry3">
   <script type="importmap">{"imports":{"three":"./vendor/three/three.module.min.js"}}</script>
-  <script src="language.js?v=20261120-1"></script>
+  <script src="language.js?v=20261120-entry3"></script>
   <script type="module">
-    if (location.protocol !== 'file:') await import('./city.js?v=20261120-2');
+    if (location.protocol !== 'file:') await import('./city.js?v=20261120-entry3');
   </script>
 </head>
 <body class="city-page is-loading">
@@ -120,6 +120,11 @@
       <div class="city-progress-bar" aria-hidden="true"><i id="city-bar"></i></div>
       <p class="city-progress-note">月の街につないでいます</p>
     </div>
+    <section class="city-gate city-arrival" id="city-arrival" role="status" hidden>
+      <p class="city-gate-kicker" translate="no">PASTEL MOON CITY</p>
+      <h2>もうすぐ、ムーンシティ！</h2>
+      <p>街を映す準備をしているよ。ちょっと待ってね。</p>
+    </section>
     <form class="city-gate" id="city-gate" hidden>
       <p class="city-gate-kicker" translate="no">SOUND CHECK</p>
       <h2>この街には、音があります。</h2>
@@ -133,7 +138,7 @@
   </div>
 
   <div class="city-wipe" id="city-wipe" aria-hidden="true"></div>
-  <audio id="city-bgm" src="assets/audio/download/moonians-bokura-wa-moonians-instrumental.mp3" preload="none" loop></audio>
+  <audio id="city-bgm" src="assets/audio/city-bgm.m4a" preload="none" loop></audio>
   <script>
     if (location.protocol === 'file:') {
       document.getElementById('city-progress').hidden = true;

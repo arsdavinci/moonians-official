@@ -38,6 +38,8 @@
     '行き先をえらぶ':'Choose where to go', 'ムーンビジョン':'Moon Vision', 'パステルUFO':'Pastel UFO', 'ミュージックドーム':'Music Dome',
     'うさぎロボ案内所':'Rabbit Robot Info', 'からくり工房':'Karakuri Workshop', 'ムーンタワー':'Moon Tower', 'ロードマップ':'Roadmap',
     '画面をドラッグすると、街を見回せます。':'Drag to look around the city.', 'ぴょんぴーをタップしてみてね。':'Try tapping Pyonpy.',
+    '街を読み込んでいるよ。ちょっと待ってね。':'Loading the city. Just a moment!',
+    'もうすぐ、ムーンシティ！':'Almost in Moon City!', '街を映す準備をしているよ。ちょっと待ってね。':'Getting the city ready to show you. Just a moment!',
     '月の街につないでいます':'Connecting to the Moon city', 'この街には、音があります。':'This city has sound.',
     '音楽と効果音を流してもいいですか？ 音量はあとからでも変えられます。':'May we play music and sound effects? You can change the volume any time.',
     '音ありで入る':'Enter with sound', '音なしで入る':'Enter without sound', '音のオンとオフ':'Sound on or off',

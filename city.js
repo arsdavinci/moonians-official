@@ -114,7 +114,7 @@ const wait = seconds => new Promise(resolve => setTimeout(resolve, seconds * 100
 
 function fail() {
   body.classList.add('no-3d', 'is-exploring');
-  body.classList.remove('is-loading');
+  body.classList.remove('is-loading', 'is-arriving');
   $('#city-error').hidden = false;
 }
 
@@ -1899,10 +1899,12 @@ function start() {
     mode = 'switch';
     sound.set(withSound); sound.fx.enter();
     try { sessionStorage.setItem('moonians.city', '1'); } catch { /* optional */ }
-    wipeEl.classList.add('is-on');
-    await wait(.72);
+    gateEl.hidden = progressEl.hidden = true;
+    $('#city-arrival').hidden = false;
+    body.classList.add('is-arriving');
+    // Give the status card a paint before the first city frame compiles its materials.
+    await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
     body.classList.remove('is-loading');
-    wipeEl.classList.remove('is-on');
     const token = ++introToken;
     if (motionOff()) { fliersFor(0); finishIntro(); return; }
     mode = 'intro'; fliersFor(WELCOME_AT);
@@ -1953,12 +1955,16 @@ function start() {
   gateEl.addEventListener('submit', event => {
     event.preventDefault(); const withSound = !event.submitter || event.submitter.value !== 'off';
     if (mode === 'gate') enter(withSound);
-    else if (mode === 'loading') { choice = withSound; sound.set(withSound); gateEl.hidden = true; }
+    else if (mode === 'loading') {
+      choice = withSound;
+      sound.set(withSound);
+      gateEl.hidden = true;
+      progressEl.querySelector('.city-progress-note').textContent = tr('街を読み込んでいるよ。ちょっと待ってね。');
+    }
   });
 
   function ready() {
     loaded = true; mode = 'gate';
-    loadPyonpy(); loadLandmarks(); loadTraffic(); loadScreens(); loadCast(); loadPlants(); loadSigns();
     if (returning) { enter(false).then(() => { /* sound comes back on the first tap if it was on */ }); return; }
     if (choice !== null) { enter(choice); return; }
     progressEl.hidden = true;
@@ -1966,7 +1972,7 @@ function start() {
 
   // Coming back with the browser's Back button: put the city back as it was.
   addEventListener('pageshow', event => {
-    if (!event.persisted || !loaded) return;
+    if (!event.persisted || !loaded || body.matches('.is-loading, .is-arriving')) return;
     wipeEl.classList.remove('is-on'); body.classList.remove('is-travelling'); links.forEach(a => a.classList.remove('is-going')); snsLink.classList.remove('is-going'); traffic.forEach(t => { t.halt = false; });
     Object.assign(boost, {gear: 1, ring: 1, eq: 1, ear: 0, note: 1, ufo: 1, shutter: .86, screen: .72, beam: 0, bubbles: 0, crescent: 1});
     setShutters(boost.shutter); jobs.clear(); orbitPose(camPos, camLook); mode = 'orbit'; asking = null; enterEl.hidden = true; body.classList.remove('is-asking');
@@ -1975,7 +1981,7 @@ function start() {
 
   modelLoader().load('assets/city/pastel-moon-city.glb?v=20261120-2', gltf => {
     try { build(gltf); } catch (error) { console.error(error); fail(); return; }
-    progress = 1;
+    progress = progressView = 1;
   }, event => { progress = Math.min(.98, event.loaded / (event.total || 3501824)); }, () => fail());
 
   /* ── frame loop ── */
@@ -2008,7 +2014,7 @@ function start() {
       const shown = Math.round(progressView * 100);
       percentEl.textContent = shown; barEl.style.width = shown + '%';
       drawProgress(progressView);
-      if (progress >= 1 && progressView > .995 && mode === 'loading') ready();
+      if (progress >= 1 && mode === 'loading') ready();
       gate.rotation.y = Math.sin(time * .5) * .35; gate.position.y = Math.sin(time * 1.3) * .12;
       moonWire.rotation.y += dt * .5; moonWire.rotation.x += dt * .2; moonCore.rotation.y -= dt * .3;
       crescent.rotation.y += dt * 1.3;
@@ -2021,6 +2027,13 @@ function start() {
       update(dt);
       drawMirror();
       renderer.render(scene, camera);
+      if (body.classList.contains('is-arriving')) {
+        body.classList.remove('is-arriving');
+        // Start optional scenery after the base city has had a frame on screen.
+        requestAnimationFrame(() => {
+          loadPyonpy(); loadLandmarks(); loadTraffic(); loadScreens(); loadCast(); loadPlants(); loadSigns();
+        });
+      }
       if (mode === 'orbit') {           // drop quality if this device struggles
         slow += dt; frames++;
         if (frames === 90) {

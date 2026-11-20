@@ -136,7 +136,9 @@ body.is-asking .city-menu,body.is-asking .city-sns,body.is-asking .city-hint{opa
 .city-loader{position:fixed;inset:0;z-index:40;display:grid;place-items:center;padding:24px var(--pad-r) calc(24px + env(safe-area-inset-bottom,0px)) var(--pad-x);
   color:#fff;transition:opacity .9s,visibility .9s;pointer-events:none}
 .city-loader>*{pointer-events:auto}
-body:not(.is-loading) .city-loader{opacity:0;visibility:hidden}
+body.is-arriving .city-loader{background:radial-gradient(ellipse at center,#d9cbf8,#a3a5e6);pointer-events:auto}
+body.is-arriving .city-arrival{animation:none}
+body:not(.is-loading):not(.is-arriving) .city-loader{opacity:0;visibility:hidden}
 .city-progress{align-self:end;margin-bottom:6vh;text-align:center;width:min(86vw,360px)}
 .city-progress-title{margin:0;font:.8rem var(--city-dot);letter-spacing:.24em;text-shadow:0 0 10px var(--city-mint)}
 .city-progress-title i{font-style:normal;color:var(--city-pink)}
