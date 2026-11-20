@@ -454,7 +454,7 @@ function start() {
         · the screens' light – how much lands on each corner of every building is worked out once and kept on the model.
         · mirror glass – the panes show a picture of the city saved as a file (assets/city/bake/mirror-*.webp).
         · relief – the lines drawn on the walls sink in a little, read from the wall pictures themselves.
-        ?sun brings back sliders that turn the sun; the 凹凸 button opens sliders for the relief. ── */
+        ?sun brings back the sliders for the sun and the relief. ── */
   let sunTestTick = () => {}, mirrorShot = null;
   const SUN_TEST = new URL(location.href).searchParams.has('sun');
   {
@@ -463,9 +463,8 @@ function start() {
     sun.castShadow = true; sun.shadow.mapSize.set(size, size);
     box.left = box.bottom = -130; box.right = box.top = 130; box.near = 20; box.far = 560; box.updateProjectionMatrix();
     scene.add(sun.target);
-    const state = {turn: 290, rise: 46, dark: 68, wall: 30, model: 30};     // where the sun was settled; how deep the relief is
+    const state = {turn: 290, rise: 46, dark: 68, wall: 12, model: 0};     // where the sun was settled; how deep the relief is (walls only, as settled)
     let moved = false, open = SUN_TEST;
-    try { const kept = JSON.parse(localStorage.getItem('moonians.city-relief')); if (kept) { state.wall = kept.wall; state.model = kept.model; } } catch { /* optional */ }
     if (SUN_TEST) try { const kept = JSON.parse(localStorage.getItem('moonians.city-sun3')); if (kept) Object.assign(state, kept); } catch { /* optional */ }
     const uSunMap = {value: null}, uSunMatrix = {value: sun.shadow.matrix}, uSunDark = {value: 0}, uSunTexel = {value: 1 / size};
     const uCityCube = {value: null}, uCityMirror = {value: 0}, uGlowK = {value: 1}, uBumpWall = {value: 0}, uBumpModel = {value: 0}, uBumpNone = {value: 0};
@@ -474,7 +473,7 @@ function start() {
       sunDir.set(Math.sin(a) * Math.cos(e), Math.sin(e), Math.cos(a) * Math.cos(e)); sun.position.copy(sunDir).multiplyScalar(280);
       uBumpWall.value = state.wall / 100 * .14; uBumpModel.value = state.model / 100 * .14;
       renderer.shadowMap.needsUpdate = true;
-      if (moved) try { localStorage.setItem('moonians.city-sun3', JSON.stringify(state)); localStorage.setItem('moonians.city-relief', JSON.stringify({wall: state.wall, model: state.model})); } catch { /* optional */ }
+      if (moved) try { localStorage.setItem('moonians.city-sun3', JSON.stringify(state)); } catch { /* optional */ }
     };
     const panel = document.createElement('div'), out = document.createElement('div');
     panel.style.cssText = 'position:fixed;left:50%;top:calc(env(safe-area-inset-top,0px) + 70px);transform:translateX(-50%);z-index:60;width:min(340px,88vw);padding:10px 14px;border-radius:16px;background:rgba(255,255,255,.86);color:#3a2f66;font:600 13px/1.5 system-ui,sans-serif;box-shadow:0 6px 24px rgba(60,40,120,.18);display:none';
@@ -496,7 +495,7 @@ function start() {
       panel.append(hide); document.body.append(panel);
       const button = document.createElement('button'), nightButton = $('#night-toggle'); button.type = 'button'; button.className = 'city-night-toggle'; button.textContent = '凹凸';
       button.addEventListener('click', () => { open = !open; });
-      if (nightButton) nightButton.after(button);
+      if (nightButton && SUN_TEST) nightButton.after(button);       // everything is settled; the sliders only come back with ?sun
     }
     place(); show();
 
