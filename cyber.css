@@ -1259,7 +1259,7 @@ body.character-open-lock{overflow:hidden}
 @media (prefers-reduced-motion:reduce){.deck-card{transform:none!important}}
 
 /* English: the guide shows the English name as the title, so hide the duplicate subtitle */
-html[lang=en] .g-card h4>small{display:none}
+html:not([lang=ja]) .g-card h4>small{display:none}
 
 /* Home music card: the record's label is the "ぼくらはム〜ニアンズ" jacket, cut round, spinning with the disc. */
 .record>.record-label{position:relative;width:58%;height:58%;padding:0;overflow:hidden;border:3px solid #8dffd9;border-radius:50%;background:#2a2040;box-shadow:0 0 0 4px #3c314c,0 0 22px -4px #8dffd9}

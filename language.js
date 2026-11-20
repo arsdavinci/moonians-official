@@ -746,10 +746,143 @@
     'デモインプの攻撃の姿を見る':'See Demon Imp’s attack pose',
     '宇宙に浮かぶラーメン屋台の宇宙船':'A ramen-stall spaceship floating in space', '3Dアニメ劇場':'3D Anime Theater'
   });
+  Object.assign(copy, {
+    'らんぴょんとの関係':'Her bond with Ranpyon',
+    '兄のらんぴょんには、つい強気な口をきいてしまうけれど、いちばんの理解者。地球でがんばる兄の動画は、こっそり全部チェックしています。':'She can’t help talking tough to her big brother Ranpyon, but nobody understands him better. She secretly watches every video he makes down on Earth.',
+    'DJらむねのSNS・曲':'DJ Ramune’s socials and music',
+    '曲を聴く ↗':'Listen ↗',
+    'およそ45cm':'About 45 cm',
+    'ぴょんぴー、らむねの曲、ふかふかの場所':'Pyonpy, Ramune’s tracks, and anywhere soft and fluffy',
+    'らむねのステージの盛り上げ役':'Hype-maker at Ramune’s shows',
+    'らむねとのコンビ':'A duo with Ramune',
+    'らむねがDJブースに立つと、PTはその肩やスピーカーの上が定位置。小さな体で大きく手を振って、フロアをあおります。ぴょんぴーが近くに来ると、急におとなしくなるのはここだけの話。':'When Ramune steps into the DJ booth, PT’s spot is on her shoulder or on top of a speaker. That tiny body waves its arms wide and fires up the floor. Just between us: PT goes suddenly quiet whenever Pyonpy comes near.',
+    '三日月大使館（クレッセントエンバシー）':'The Crescent Embassy',
+    '二人を見守る上司':'The boss who watches over the duo',
+    '三日月の胸飾りと、マイク':'A crescent brooch and a microphone',
+    '部下の成長、静かな月の夜':'Seeing the team grow, and quiet nights on the Moon',
+    '二人を送り出した人':'The one who sent them off',
+    'らんぴょんとぴょんぴーに「地球で人を笑顔にしてきなさい」と声をかけ、送り出した人。めったに怒らないけれど、報告書の締め切りにだけは、にっこり笑顔のまま厳しいそうです。':'The one who told Ranpyon and Pyonpy, “Go and make the people of Earth smile,” and sent them on their way. Almost never angry — but when it comes to report deadlines, strict, they say, with the same gentle smile.',
+    'ホログラムの長い手足、大きな前歯':'Long holographic limbs and big front teeth',
+    'いつでも両手をあげる':'Arms always in the air',
+    'ずっと、ごきげん':'Cheerful, all the time',
+    'どこから来たのかは、だれも知らない':'Nobody knows where it came from',
+    'もげらのひみつ':'Mogera’s secret',
+    '気づくと、いつのまにかそこにいる。しゃべっているところを見た人はいないのに、なぜか気持ちはちゃんと伝わります。両手をあげているのは、あいさつなのか、よろこんでいるのか。それもまだ、謎のままです。':'You look round and there it is, as if it had always been there. Nobody has ever seen it speak, and yet somehow you always know how it feels. Are those raised arms a hello, or pure joy? That is still a mystery too.',
+    'ミントグリーンの毛並みに、つぎはぎと舌ぺろ。耳には宇宙人のチャーム、体には光るパーツ。夜になると、どこからともなく街に現れて、ふらふら歩き回ります。ちょっとこわいけど、どこかにくめないやつ。':'Mint-green fur, patchwork stitches and a little tongue poking out. An alien charm on one ear, glowing parts on the body. When night falls it turns up in the city out of nowhere and wanders about. A bit scary, but somehow impossible to dislike.',
+    'ミントグリーンの毛並みに、つぎはぎと舌ぺろ。夜になると、どこからともなく街に現れて、ふらふら歩き回ります。ちょっとこわいけど、どこかにくめないやつ。':'Mint-green fur, patchwork stitches and a little tongue poking out. When night falls it turns up in the city out of nowhere and wanders about. A bit scary, but somehow impossible to dislike.',
+    'ミントグリーン':'Mint green',
+    '耳についた宇宙人のチャーム':'The alien charm on its ear',
+    'つぎはぎと、光るパーツ':'Patchwork stitches and glowing parts',
+    '舌をぺろっと出す':'Sticking its tongue out',
+    'こわくないゾンビ':'The zombie who isn’t scary',
+    '見た目はちょっとこわいけれど、人をおどかすのは苦手。むしろ、おどろかされるとすぐに固まってしまいます。体の光るパーツは、うれしいときほど明るく光るので、気持ちがすぐにばれます。':'It looks a little scary, but it is no good at frightening people. If anything, it freezes on the spot when someone startles it. The glowing parts shine brighter the happier it is, so its feelings are never a secret.',
+    '同時翻訳の人工知能':'A live-translation AI',
+    '翻訳酸素カプセルの中':'Inside the translation oxygen capsule',
+    'ぴょんぴーのムーニアン語を日本語に':'Turning Pyonpy’s Moonian into Japanese',
+    '画面に出る、6つの表情':'Six faces shown on its screen',
+    'DJらむね、ピーティープティ、グルーパーなど、らんぴょんとぴょんぴーのまわりにいる、ムーニアンズの愉快な仲間たちの紹介ページです。':'Meet DJ Ramune, PTPUTY, Grouper and the rest of the Moon friends who gather around Ranpyon and Pyonpy.',
+    'ムーニアンズの愉快な仲間たち':'Moon friends',
+    '前のキャラクターへ':'Previous character',
+    '次のキャラクターへ':'Next character',
+    'DJらむねのプロフィール':'DJ Ramune’s profile',
+    'ピーティープティのプロフィール':'PTPUTY’s profile',
+    'ザ・ルーヴァ・セレスのプロフィール':'Za-Luva Seles’s profile',
+    'もげらのプロフィール':'Mogera’s profile',
+    'ゾンピーのプロフィール':'Zompy’s profile',
+    'ヤナビスのプロフィール':'Y.A.N.A.V.I.S’s profile',
+    'グルーパーのプロフィール':'Grouper’s profile',
+    'かぐや様のプロフィール':'Princess Kaguya’s profile',
+    'らんぴょんのプロフィール':'Ranpyon’s profile',
+    'ぴょんぴーのプロフィール':'Pyonpy’s profile',
+    '▶ 体験版を今すぐ遊ぶ':'▶ Play the demo now',
+    '図鑑を見るには、JavaScript をオンにしてください。':'Please turn on JavaScript to see the encyclopedia.',
+    'ゲーム画面の下にあるブラウザのバー。四角から矢印が上に出ている共有ボタンに赤い丸がついている':'The browser bar under the game screen, with a red circle around the Share button — a square with an arrow pointing up',
+    '共有メニューの一覧。「ホーム画面に追加」に赤い丸がついている':'The Share menu list, with a red circle around “Add to Home Screen”',
+    '月あめ平原のザコ':'Minions of the Moon Candy Field',
+    '火星ネオンコロニーのザコ':'Minions of the Mars Neon Colony',
+    'クリスタル氷星のザコ':'Minions of the Crystal Ice Planet',
+    '星の海のザコ':'Minions of the Star Ocean',
+    'リングメカ工場のザコ':'Minions of the Ring Mecha Factory',
+    '魔王星のザコ':'Minions of the Demon Star',
+    'ぴょんぴーの大冒険 図鑑・攻略':'Pyonpy’s Great Adventure: Encyclopedia & Tips',
+    'ゲームのページの「図鑑と攻略」へ移動しました。':'This page has moved to “Encyclopedia & Tips” on the game page.',
+    'ムーニアンズ 制作ラボへ移動しました。':'This page has moved to the Moonians Lab.',
+    '設定をひらく':'Open settings',
+    'ぼくらは':'We Are',
+    '声なし（効果音あり）':'No vocals (with sound effects)',
+    '声なし（効果音なし）':'No vocals (no sound effects)',
+    '声だけ':'Vocals only',
+    '友情と':'Friendship &',
+    '条約':'a Treaty',
+    '友情と条約':'Friendship & a Treaty',
+    'ネタ動画「I\'m Grouper」で流した曲。':'The song from our comedy video “I\'m Grouper”.',
+    'ムーニアンズ × グルーパー。ぶつかったあとは、笑い合おう。':'Moonians × Grouper. After the clash, let’s laugh together.',
+    '「I\'m Grouper」より。':'From “I\'m Grouper”.',
+    'ムーニアンズの音楽ページ。テーマソング「ぼくらはムーニアンズ」を歌詞つきで聴けて、自由にダウンロードできます。':'The Moonians’ music page. Listen to the theme song “We Are Moonians” with lyrics, and download it freely.',
+    '「ぼくらはムーニアンズ」のジャケット。UFOに乗ったらんぴょんとぴょんぴーが、月と地球のあいだを飛んでいる':'The cover of “We Are Moonians”: Ranpyon and Pyonpy riding a UFO between the Moon and the Earth',
+    '「友情と条約」のジャケット。夜の路地裏で、ラジカセ頭のグルーパーとムーニアンズのふたりがヒップホップの服で並んでいる':'The cover of “Friendship & a Treaty”: boombox-headed Grouper and the two Moonians in hip-hop clothes, side by side in a back alley at night',
+    'お仕事のご依頼｜ムーニアンズ':'Work with us | Moonians',
+    'ムーニアンズへの出演、イベント、楽曲や映像の制作、コラボレーション、取材などのご相談は、下のフォームからお送りください。':'For appearances, events, music or video production, collaborations, interviews and similar enquiries for the Moonians, please use the form below.',
+    'ご依頼の流れ':'How it works',
+    '下のフォームに、ご依頼の内容をご記入のうえ送信してください。':'Fill in the form below with the details of your request and send it.',
+    '受付後、所属事務所にて内容を確認いたします。':'Once received, our management office reviews it.',
+    '確認が済みしだい、担当者よりご記入のご連絡先へお返事いたします。':'After the review, the person in charge replies to the contact details you gave.',
+    'フォームの送信は「ご相談の受付」です。この時点では、ご依頼をお引き受けすることは確定しておりません。':'Sending the form only registers your enquiry. At this point the request has not been accepted.',
+    '正式なお引き受けは、所属事務所の確認と、条件のご相談を経てからとなります。':'A request is formally accepted only after our management office has confirmed it and the terms have been discussed.',
+    '内容や日程によっては、お返事までお時間をいただく場合や、お引き受けできない場合がございます。あらかじめご了承ください。':'Depending on the content and schedule, a reply may take some time, or we may be unable to accept. Thank you for your understanding.',
+    '営業・勧誘を目的としたご連絡には、お返事を差し上げておりません。':'We do not reply to sales or solicitation messages.',
+    'お名前':'Name',
+    '必須':'Required',
+    '会社名・団体名':'Company or organisation',
+    '任意':'Optional',
+    'メールアドレス':'Email address',
+    '電話番号':'Phone number',
+    'ご依頼の種類':'Type of request',
+    'えらんでください':'Please choose',
+    '出演・イベント':'Appearance / event',
+    '楽曲・映像などの制作':'Music, video or other production',
+    'コラボレーション・タイアップ':'Collaboration / tie-in',
+    '取材・メディア掲載':'Interview / media coverage',
+    'その他':'Other',
+    'ご希望の日程・納期':'Preferred date or deadline',
+    'ご予算の目安':'Approximate budget',
+    'ご依頼の内容':'Details of your request',
+    'このらんは空のままにしてください':'Please leave this field empty',
+    'ご記入いただいた内容は、ご依頼の確認とお返事のためだけに使用し、所属事務所と共有します。上の「ご依頼の流れ」と合わせて確認し、同意します。':'What you enter is used only to review and answer your request, and is shared with our management office. I have read this together with “How it works” above, and I agree.',
+    'この内容で送信する':'Send this request',
+    '送信しました。ありがとうございます。':'Sent. Thank you very much.',
+    '所属事務所にて内容を確認のうえ、担当者よりご連絡いたします。':'Our management office will review it, and the person in charge will contact you.',
+    'ムーニアンズへの出演、イベント、制作、コラボレーション、取材などのご依頼は、こちらのフォームからお送りください。':'Send requests for Moonians appearances, events, production, collaborations, interviews and more through this form.',
+    '例：来年3月ごろ、未定 など':'e.g. around next March, not decided yet',
+    '例：ご相談のうえ決めたい など':'e.g. to be decided together',
+    '企画の概要、場所、ご希望の内容などをお書きください。':'Tell us about the project: an outline, the place, what you would like, and so on.',
+    '「お名前」をご記入ください。':'Please fill in “Name”.',
+    '「メールアドレス」をご記入ください。':'Please fill in “Email address”.',
+    '「ご依頼の種類」をご記入ください。':'Please fill in “Type of request”.',
+    '「ご依頼の内容」をご記入ください。':'Please fill in “Details of your request”.',
+    'メールアドレスの形をご確認ください。':'Please check the format of the email address.',
+    '内容をご確認のうえ、同意のチェックを入れてください。':'Please check the details and tick the box to agree.',
+    '申し訳ありません。フォームはただいま準備中です。お急ぎの場合は、SNSのメッセージからご連絡ください。':'We are sorry — the form is still being prepared. If it is urgent, please message us on social media.',
+    '送信しています…':'Sending…',
+    '送信しました':'Sent',
+    '送信できませんでした。通信の状態をご確認のうえ、もう一度お試しください。':'It could not be sent. Please check your connection and try again.',
+  });
+  /* Japanese is the page itself; English lives above; every other language is a small file in lang/
+     that is fetched only by the people who read that language. */
+  const LANGUAGES = {ja:'日本語', en:'English', 'zh-Hans':'简体中文', 'zh-Hant':'繁體中文', ko:'한국어', es:'Español', fr:'Français', th:'ไทย'};
+  const PACK_VERSION = '20261120-1';
+  const packs = {en:copy};
+  function matchLanguage(value) {
+    if (!value) return null;
+    const tag = String(value).toLowerCase();
+    if (tag.startsWith('zh')) return /hant|-tw|-hk|-mo/.test(tag) ? 'zh-Hant' : 'zh-Hans';
+    const base = tag.split('-')[0];
+    return Object.keys(LANGUAGES).find(code => code === base) || null;
+  }
   function resolveLanguage(saved, languages, requested) {
-    if (requested === 'ja' || requested === 'en') return requested;
-    if (saved === 'ja' || saved === 'en') return saved;
-    return (languages || []).map(value => value.toLowerCase().split('-')[0]).find(value => value === 'ja' || value === 'en') || 'ja';
+    const list = (languages || []).filter(Boolean);
+    // A reader whose language we do not have gets English rather than Japanese.
+    return matchLanguage(requested) || matchLanguage(saved) || list.map(matchLanguage).find(Boolean) || (list.length ? 'en' : 'ja');
   }
   let saved;
   try { saved = localStorage.getItem('moonians.language'); } catch { /* Private browsing still works. */ }
@@ -757,26 +890,53 @@
   document.documentElement.lang = language;
   const originals = new WeakMap();
   const attributes = new WeakMap();
-  const reverse = new Map(Object.entries(copy).map(([ja,en]) => [en,ja]));
-  const t = value => language === 'en' ? copy[value] || value : value;
-  window.MoonLanguage = {t, resolveLanguage, get current() { return language; }};
+  const reverses = {};
+  const translate = ja => language === 'ja' ? ja : (packs[language] && packs[language][ja]) || copy[ja] || ja;
+  // What a script wrote may already be in the reader's language: find the Japanese it came from.
+  function toJapanese(text) {
+    if (copy[text] !== undefined) return text;
+    for (const code of language === 'en' || !packs[language] ? ['en'] : [language, 'en']) {
+      const reverse = reverses[code] || (reverses[code] = new Map(Object.entries(packs[code]).map(([ja, value]) => [value, ja])));
+      const ja = reverse.get(text);
+      if (ja !== undefined) return ja;
+    }
+    return undefined;
+  }
+  const t = value => translate(value);
+  const packUrl = code => 'lang/' + code.toLowerCase() + '.js?v=' + PACK_VERSION;
+  function loadPack(code, done) {
+    if (code === 'ja' || packs[code]) { done(); return; }
+    const script = document.createElement('script');
+    script.src = packUrl(code);
+    script.onload = script.onerror = done;   // without the file the page simply stays in English
+    document.head.appendChild(script);
+  }
+  window.MoonLanguage = {t, resolveLanguage, languages:LANGUAGES, get current() { return language; },
+    register(code, pack) { packs[code] = pack; delete reverses[code]; }};
+  // While the page is still being read, the reader's language file is pulled in before anything is drawn,
+  // so the page never flashes another language first.
+  if (language !== 'ja' && !packs[language] && document.readyState === 'loading' && document.currentScript && !document.currentScript.async && !document.currentScript.defer) {
+    document.write('<script src="' + packUrl(language) + '"><\/script>');
+  }
   const trackedAttributes = ['aria-label','alt','placeholder','title','data-caption','content'];
   function localizeText(node) {
     if (!node.parentElement || node.parentElement.closest('script,style,[data-language-switch],[translate=no]')) return;
     const raw = node.nodeValue;
-    const text = raw.trim();
     let record = originals.get(node);
-    if (!record || (raw !== record.ja && raw !== record.en)) {
-      const ja = copy[text] ? text : reverse.get(text);
+    if (!record || (raw !== record.out && raw !== record.prefix + record.ja + record.suffix)) {
+      const text = raw.trim();
+      const ja = text && toJapanese(text);
       if (!ja) return;
       const prefix = raw.slice(0, raw.indexOf(text));
       const suffix = raw.slice(raw.indexOf(text) + text.length);
-      // Japanese line breaks need a word boundary when English text reflows.
+      // Japanese line breaks need a word boundary when translated text reflows.
       const separator = !suffix && node.nextSibling?.nodeType === 1 && node.nextSibling.matches('br,span,small,b,strong') ? ' ' : '';
-      record = {ja:prefix + ja + suffix, en:prefix + copy[ja] + suffix + separator};
+      record = {ja, prefix, suffix, separator, out:raw};
       originals.set(node, record);
     }
-    if (raw !== record[language]) node.nodeValue = record[language];
+    const next = language === 'ja' ? record.prefix + record.ja + record.suffix : record.prefix + translate(record.ja) + record.suffix + record.separator;
+    record.out = next;
+    if (raw !== next) node.nodeValue = next;
   }
   function localizeElement(el) {
     if (el.closest('[data-language-switch],[translate=no]')) return;
@@ -786,12 +946,14 @@
       const value = el.getAttribute(key);
       if (value === null) continue;
       let record = records[key];
-      if (!record || (value !== record.ja && value !== record.en)) {
-        const ja = copy[value] ? value : reverse.get(value);
+      if (!record || (value !== record.out && value !== record.ja)) {
+        const ja = toJapanese(value);
         if (!ja) continue;
-        record = {ja,en:copy[ja]}; records[key] = record;
+        record = {ja, out:value}; records[key] = record;
       }
-      if (value !== record[language]) el.setAttribute(key, record[language]);
+      const next = translate(record.ja);
+      record.out = next;
+      if (value !== next) el.setAttribute(key, next);
     }
   }
   function walk(node) {
@@ -801,18 +963,20 @@
     for (const child of node.childNodes) walk(child);
   }
   function updateBrand() {
+    const english = language !== 'ja';   // every language but Japanese carries the English logo
     // Images with a separate English version: <img src="ja" data-src-en="en">
     document.querySelectorAll('img[data-src-en]').forEach(img => {
       if (!img.dataset.srcJa) img.dataset.srcJa = img.getAttribute('src');
-      const next = language === 'en' ? img.dataset.srcEn : img.dataset.srcJa;
+      const next = english ? img.dataset.srcEn : img.dataset.srcJa;
       if (img.getAttribute('src') !== next) img.setAttribute('src', next);
     });
     document.querySelectorAll('.brand img:not([data-src-en])').forEach(img => {
-      img.src = language === 'en' ? 'assets/logo-english.png?v=20261110-12' : 'assets/logo.png?v=20261110-11';
-      img.width = language === 'en' ? 1024 : 2421;
-      img.height = language === 'en' ? 352 : 833;
+      const next = english ? 'assets/logo-english.png?v=20261110-12' : 'assets/logo.png?v=20261110-11';
+      if (img.getAttribute('src') !== next) img.src = next;
+      img.width = english ? 1024 : 2421;
+      img.height = english ? 352 : 833;
     });
-    document.querySelectorAll('[data-language]').forEach(button => button.setAttribute('aria-pressed', String(button.dataset.language === language)));
+    document.querySelectorAll('[data-language-switch] select').forEach(select => { select.value = language; });
     document.querySelectorAll('[data-language-link]').forEach(link => {
       const url = new URL(link.href);
       url.searchParams.set('lang', language);
@@ -828,23 +992,39 @@
     observe();
   });
   function observe() { observer.observe(document.documentElement, {subtree:true,childList:true,characterData:true,attributes:true,attributeFilter:trackedAttributes}); }
-  function setLanguage(next) {
-    if (next !== 'ja' && next !== 'en') return;
-    language = next;
-    document.documentElement.lang = language;
-    try { localStorage.setItem('moonians.language', language); } catch { /* Optional preference. */ }
-    const url = new URL(location.href); url.searchParams.set('lang', language);
-    history.replaceState(null, '', url);
+  function apply() {
     observer.disconnect();
     walk(document.documentElement);
     updateBrand();
     observe();
-    document.dispatchEvent(new CustomEvent('moonians:languagechange'));
+  }
+  function setLanguage(next) {
+    if (!LANGUAGES[next] || next === language) return;
+    loadPack(next, () => {
+      language = next;
+      document.documentElement.lang = language;
+      try { localStorage.setItem('moonians.language', language); } catch { /* Optional preference. */ }
+      const url = new URL(location.href); url.searchParams.set('lang', language);
+      history.replaceState(null, '', url);
+      apply();
+      document.dispatchEvent(new CustomEvent('moonians:languagechange'));
+    });
+  }
+  function buildSwitch(holder) {
+    const select = document.createElement('select');
+    select.setAttribute('aria-label', 'Language / 言語');
+    for (const [code, name] of Object.entries(LANGUAGES)) {
+      const option = document.createElement('option');
+      option.value = code; option.lang = code; option.textContent = name;
+      select.appendChild(option);
+    }
+    select.value = language;
+    select.addEventListener('change', () => setLanguage(select.value));
+    holder.replaceChildren(select);
   }
   document.addEventListener('DOMContentLoaded', () => {
-    document.querySelectorAll('[data-language]').forEach(button => button.addEventListener('click', () => setLanguage(button.dataset.language)));
-    walk(document.documentElement);
-    updateBrand();
-    observe();
+    document.querySelectorAll('[data-language-switch]').forEach(buildSwitch);
+    // If the language file could not be pulled in ahead of the page, fetch it now.
+    loadPack(language, apply);
   });
 })();

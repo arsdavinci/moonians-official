@@ -137,7 +137,7 @@
   });
 
   passport.querySelector('.passport-download').addEventListener('click', () => {
-    const date = new Intl.DateTimeFormat(window.MoonLanguage.current==='en'?'en-GB':'ja-JP',{year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
+    const date = new Intl.DateTimeFormat(window.MoonLanguage.current==='ja'?'ja-JP':window.MoonLanguage.current==='en'?'en-GB':window.MoonLanguage.current,{year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
     const stamps = destinations.map((d,i) => {
       const x=145+(i%3)*195, y=350+Math.floor(i/3)*165;
       const active=visited.has(d.id);
