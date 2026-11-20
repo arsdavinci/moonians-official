@@ -1869,21 +1869,28 @@ function start() {
     ufoAngle = aUfo - UFO_TURN * secondsLeft; ufoRise = 1;
     const d = aShip * skyR - shipSpeed * secondsLeft; if (ship) ship.d = d; else airshipStart = d;
   }
-  gateEl.addEventListener('submit', event => { event.preventDefault(); enter(!event.submitter || event.submitter.value !== 'off'); });
+  // The question about sound is asked straight away, while the city is still arriving, so nobody sits watching a bar
+  // and then has to answer as well. Whoever answers early goes in the moment the city is ready.
+  let choice = null, returning = false;
+  // Only someone coming back from one of this site's own pages skips the question; opening or reloading the home always asks.
+  try {
+    const nav = performance.getEntriesByType('navigation')[0], from = document.referrer ? new URL(document.referrer) : null;
+    const inside = from && from.origin === location.origin && !/^\/(index\.html)?$/.test(from.pathname);
+    returning = sessionStorage.getItem('moonians.city') === '1' && (!nav || nav.type !== 'reload') && (inside || (nav && nav.type === 'back_forward'));
+  } catch { /* optional */ }
+  if (!returning) { gateEl.hidden = false; const first = gateEl.querySelector('button'); if (first) first.focus({preventScroll: true}); }
+  gateEl.addEventListener('submit', event => {
+    event.preventDefault(); const withSound = !event.submitter || event.submitter.value !== 'off';
+    if (mode === 'gate') enter(withSound);
+    else if (mode === 'loading') { choice = withSound; sound.set(withSound); gateEl.hidden = true; }
+  });
 
   function ready() {
     loaded = true; mode = 'gate';
     loadPyonpy(); loadLandmarks(); loadTraffic(); loadScreens(); loadCast(); loadPlants(); loadSigns();
-    let returning = false;
-    // Only someone coming back from one of this site's own pages skips the question; opening or reloading the home always asks.
-    try {
-      const nav = performance.getEntriesByType('navigation')[0], from = document.referrer ? new URL(document.referrer) : null;
-      const inside = from && from.origin === location.origin && !/^\/(index\.html)?$/.test(from.pathname);
-      returning = sessionStorage.getItem('moonians.city') === '1' && (!nav || nav.type !== 'reload') && (inside || (nav && nav.type === 'back_forward'));
-    } catch { /* optional */ }
     if (returning) { enter(false).then(() => { /* sound comes back on the first tap if it was on */ }); return; }
-    progressEl.hidden = true; gateEl.hidden = false;
-    const first = gateEl.querySelector('button'); if (first) first.focus({preventScroll: true});
+    if (choice !== null) { enter(choice); return; }
+    progressEl.hidden = true;
   }
 
   // Coming back with the browser's Back button: put the city back as it was.
