@@ -497,7 +497,7 @@ function start() {
     // The city is lit so brightly that plain shadows wash out. So whatever the sun does not reach is also tinted violet:
     // the ground under a building, and the side of a building that is turned away from the sun.
     const uCityCube = {value: null}, uCityMirror = {value: 0};
-    const GLOWS = 13, uGlowPos = {value: Array.from({length: GLOWS}, () => V(0, -999, 0))}, uGlowCol = {value: Array.from({length: GLOWS}, () => new THREE.Color(0))};
+    const uGlowK = {value: 1};
     const tint = material => {
       if (!material.isMeshStandardMaterial || material.userData.sunTint) return; material.userData.sunTint = true;
       const before = material.onBeforeCompile, key = material.customProgramCacheKey, kind = key.call(material);
@@ -505,18 +505,12 @@ function start() {
       const pane = kind.indexOf('skin-') === 0 ? ['skinRaw', '0.05, 0.15', '0.10, 0.22'] : kind === 'night-lights' && /^M_R\d/.test(material.name || '') ? ['lit', '0.12, 0.30', '9.0, 9.1'] : null;
       material.onBeforeCompile = (shader, r) => {
         before.call(material, shader, r);
-        // The screens' light is a plain sum worked out here, far cheaper than thirteen real lamps: each screen has a place and a colour.
-        shader.uniforms.uGlowPos = uGlowPos; shader.uniforms.uGlowCol = uGlowCol;
-        shader.fragmentShader = shader.fragmentShader.replace('#include <common>', '#include <common>'+String.fromCharCode(10)+'uniform vec3 uGlowPos[ ' + GLOWS + ' ]; uniform vec3 uGlowCol[ ' + GLOWS + ' ];')
-          .replace('#include <tonemapping_fragment>', `{
-          vec3 glowAt = (vec4(-vViewPosition, 0.) * viewMatrix).xyz + cameraPosition, glowUp = inverseTransformDirection(normal, viewMatrix), glowSum = vec3(0.);
-          for (int i = 0; i < ${GLOWS}; i++) {
-            vec3 glowTo = uGlowPos[ i ] - glowAt; float glowFar = dot(glowTo, glowTo), glowNear = max(0., 1. - glowFar / 900.);
-            glowSum += uGlowCol[ i ] * glowNear * glowNear * max(dot(glowUp, glowTo * inversesqrt(glowFar)) * .6 + .4, 0.);
-          }
-          gl_FragColor.rgb += (gl_FragColor.rgb * .85 + .04) * glowSum;
-        }
-        #include <tonemapping_fragment>`);
+        // The screens' light is baked: each corner of every building already carries how much of it lands there (see bake below),
+        // so drawing it is one multiplication. Only its strength changes, between day and night.
+        shader.uniforms.uGlowK = uGlowK;
+        shader.vertexShader = shader.vertexShader.replace('#include <common>', '#include <common>'+String.fromCharCode(10)+'attribute vec3 glow; varying vec3 vGlow;').replace('#include <begin_vertex>', '#include <begin_vertex>'+String.fromCharCode(10)+'vGlow = glow;');
+        shader.fragmentShader = shader.fragmentShader.replace('#include <common>', '#include <common>'+String.fromCharCode(10)+'varying vec3 vGlow; uniform float uGlowK;')
+          .replace('#include <tonemapping_fragment>', 'gl_FragColor.rgb += (gl_FragColor.rgb * .85 + .04) * vGlow * uGlowK;'+String.fromCharCode(10)+'#include <tonemapping_fragment>');
         if (pane) {
           shader.uniforms.uCityCube = uCityCube; shader.uniforms.uCityMirror = uCityMirror;
           shader.fragmentShader = shader.fragmentShader.replace('#include <common>', '#include <common>'+String.fromCharCode(10)+'uniform samplerCube uCityCube; uniform float uCityMirror;')
@@ -560,13 +554,11 @@ function start() {
       if (!glows.length && N.Scr023 && N.Anime_Screen) {
         const names = ['Anime_Screen', ...Array.from({length: 12}, (_, i) => 'Scr0' + (23 + i))];
         for (const name of names) { const node = N[name]; if (!node) continue;
-          const at = uGlowPos.value[glows.length];
+          const at = V(0, 0, 0), big = name === 'Anime_Screen';
           node.getWorldPosition(at).add(V(0, 0, name === 'Anime_Screen' ? 4 : 2.5).applyQuaternion(node.getWorldQuaternion(new THREE.Quaternion())));
-          glows.push({color: uGlowCol.value[glows.length], big: name === 'Anime_Screen'}); }
+          glows.push({at, color: new THREE.Color().setHSL((.62 + .3 * Math.sin(glows.length * 1.7) + 1) % 1, .75, .6).multiplyScalar(big ? 1.6 : 1)}); }
       }
-      glows.forEach((g, i) => {
-        g.color.setHSL((.62 + .3 * Math.sin(time * .23 + i * 1.7) + 1) % 1, .75, .6).multiplyScalar(lerp(.5, 1.5, night) * (g.big ? 1.6 : 1) * (.82 + .18 * Math.sin(time * 1.4 + i * 2.1)));
-      });
+      uGlowK.value = lerp(.5, 1.5, night);
       if (tick++ % 40) return;
       const movers = [pyon, N.UFO, ...cast.map(m => m.group), ...traffic.map(t => t.car)];
       const moves = o => { for (; o; o = o.parent) if (movers.includes(o)) return true; return false; };
@@ -574,10 +566,27 @@ function start() {
         const m = new THREE.Mesh(new THREE.CircleGeometry(radius, 64), new THREE.ShadowMaterial({color: 0x2a1a78, opacity: .25, depthWrite: false, fog: false, polygonOffset: true, polygonOffsetFactor: -4, polygonOffsetUnits: -4}));
         m.rotation.x = -Math.PI / 2; m.position.y = y; m.renderOrder = 2; m.receiveShadow = true; m.userData.sunSeen = true; scene.add(m); catchers.push(m); place();
       }
+      if (!glows.length) return;
+      const bake = o => {             // how much screen light reaches each corner of this thing, worked out once and kept on the model
+        if (o.geometry.attributes.glow) o.geometry = o.geometry.clone();
+        const pos = o.geometry.attributes.position, nor = o.geometry.attributes.normal; if (!pos || !nor) return;
+        o.updateWorldMatrix(true, false);
+        const out = new Float32Array(pos.count * 3), turn = new THREE.Matrix3().getNormalMatrix(o.matrixWorld), p = V(0, 0, 0), n = V(0, 0, 0), d = V(0, 0, 0);
+        for (let i = 0; i < pos.count; i++) {
+          p.fromBufferAttribute(pos, i).applyMatrix4(o.matrixWorld); n.fromBufferAttribute(nor, i).applyMatrix3(turn).normalize();
+          for (const g of glows) {
+            const far = d.copy(g.at).sub(p).lengthSq(), near = Math.max(0, 1 - far / 900); if (!near || !far) continue;
+            const k = near * near * Math.max(n.dot(d) / Math.sqrt(far) * .6 + .4, 0);
+            out[i * 3] += g.color.r * k; out[i * 3 + 1] += g.color.g * k; out[i * 3 + 2] += g.color.b * k;
+          }
+        }
+        o.geometry.setAttribute('glow', new THREE.BufferAttribute(out, 3));
+      };
       scene.traverse(o => {
         if (!o.isMesh || o.userData.sunSeen) return; o.userData.sunSeen = true;
         const m = Array.isArray(o.material) ? o.material[0] : o.material; if (!m || !m.isMeshStandardMaterial) return;
         o.receiveShadow = true; o.castShadow = (!m.transparent || m.alphaTest > 0) && !o.isSkinnedMesh && !moves(o); if (o.castShadow) { renderer.shadowMap.needsUpdate = true; envWait = 50; }
+        if (!o.isSkinnedMesh && !o.isInstancedMesh && !moves(o)) bake(o);
         for (const one of Array.isArray(o.material) ? o.material : [o.material]) if (/M_(W_|GLASS$)/.test(one.name || '') && !mirrors.includes(one)) {
           one.metalness = 1; one.roughness = .04; one.envMapIntensity = 1.1; one.color.set(0xe6efff); mirrors.push(one); if (/M_W_/.test(one.name)) glass.push(one); envWait = 50;
         }
