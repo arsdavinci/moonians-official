@@ -237,6 +237,7 @@ function start() {
     r.addColorStop(0, '#fff'); r.addColorStop(.35, 'rgba(255,255,255,.8)'); r.addColorStop(1, 'rgba(255,255,255,0)'); g.fillStyle = r; g.fillRect(0, 0, 64, 64); return new THREE.CanvasTexture(c); })();
   const envDay = pmrem.fromScene(envScene, .03).texture;
   scene.environment = envDay;
+  const cityEnv = [null, null];     // what the glass mirrors: the city itself, photographed all round from the plaza, by day and by night
 
   /* ── day and night ── */
   const NIGHT_SKY = ['#5a3d9c', '#2c2170', '#140f45', '#070522'];
@@ -459,17 +460,19 @@ function start() {
     sun.castShadow = true; sun.shadow.mapSize.set(size, size); sun.shadow.bias = -.0004; sun.shadow.normalBias = .08;
     box.left = box.bottom = -130; box.right = box.top = 130; box.near = 20; box.far = 560; box.updateProjectionMatrix();
     scene.add(sun.target);
-    const state = {turn: 318, rise: 50, dark: 70};
-    if (SUN_TEST) try { Object.assign(state, JSON.parse(localStorage.getItem('moonians.city-sun')) || {}); } catch { /* optional */ }
+    const state = {turn: 318, rise: 50, dark: 85};
+    let moved = false;
+    try { const kept = JSON.parse(localStorage.getItem('moonians.city-sun2')); if (kept) Object.assign(state, kept); } catch { /* optional */ }
     const catchers = [];            // the plaza and stage pictures are unlit, so a see-through sheet over each one catches the shadows
     const place = () => {
       const a = state.turn * Math.PI / 180, e = state.rise * Math.PI / 180;
       sunDir.set(Math.sin(a) * Math.cos(e), Math.sin(e), Math.cos(a) * Math.cos(e)); sun.position.copy(sunDir).multiplyScalar(280);
       renderer.shadowMap.needsUpdate = true;
-      if (SUN_TEST) try { localStorage.setItem('moonians.city-sun', JSON.stringify(state)); } catch { /* optional */ }
+      envWait = 20;
+      if (moved) try { localStorage.setItem('moonians.city-sun2', JSON.stringify(state)); } catch { /* optional */ }
     };
-    const panel = document.createElement('div'); let show = () => {};
-    if (SUN_TEST) {
+    const panel = document.createElement('div'); let show = () => {}, open = SUN_TEST, envWait = 0;
+    {
     panel.style.cssText = 'position:fixed;left:50%;top:calc(env(safe-area-inset-top,0px) + 70px);transform:translateX(-50%);z-index:60;width:min(340px,88vw);padding:10px 14px;border-radius:16px;background:rgba(255,255,255,.86);color:#3a2f66;font:600 13px/1.5 system-ui,sans-serif;box-shadow:0 6px 24px rgba(60,40,120,.18)';
     const out = document.createElement('div'); out.style.cssText = 'text-align:center;font-size:15px;margin-bottom:4px';
     panel.append(out);
@@ -477,7 +480,7 @@ function start() {
     for (const [key, label, min, max] of [['turn', '向き', 0, 359], ['rise', '高さ', 8, 88], ['dark', '濃さ', 10, 100]]) {
       const row = document.createElement('label'); row.style.cssText = 'display:flex;align-items:center;gap:8px';
       const input = document.createElement('input'); Object.assign(input, {type: 'range', min, max, step: 1, value: state[key]}); input.style.cssText = 'flex:1;height:30px';
-      input.addEventListener('input', () => { state[key] = +input.value; place(); show(); });
+      input.addEventListener('input', () => { state[key] = +input.value; moved = true; place(); show(); });
       row.append(label, input); panel.append(row);
     }
     const hide = document.createElement('button'), menu = $('.city-menu'); hide.type = 'button'; hide.textContent = 'メニューを隠す';
@@ -485,6 +488,10 @@ function start() {
     hide.addEventListener('click', () => { const off = menu.style.display !== 'none'; menu.style.display = off ? 'none' : ''; hide.textContent = off ? 'メニューを出す' : 'メニューを隠す'; });
     panel.append(hide); panel.style.display = 'none';
     document.body.append(panel);
+      // a sun button beside the night button opens and closes the sliders; while they are open the shadows are redrawn live
+      const button = document.createElement('button'), nightButton = $('#night-toggle'); button.type = 'button'; button.className = 'city-night-toggle'; button.textContent = '☀ 太陽';
+      button.addEventListener('click', () => { open = !open; renderer.shadowMap.autoUpdate = open; renderer.shadowMap.needsUpdate = true; });
+      if (nightButton) nightButton.after(button);
     }
     place(); show();
     // The city is lit so brightly that plain shadows wash out. So whatever the sun does not reach is also tinted violet:
@@ -498,20 +505,42 @@ function start() {
           DirectionalLightShadow sunShadow = directionalLightShadows[ 0 ];
           float sunLit = getShadow( directionalShadowMap[ 0 ], sunShadow.shadowMapSize, sunShadow.shadowIntensity, sunShadow.shadowBias, sunShadow.shadowRadius, vDirectionalShadowCoord[ 0 ] );
           // sides turned away from the sun fall into shade as well, so every building has a bright side and a dark side
-          float sunFace = mix(1., smoothstep(-.15, .5, dot(normal, directionalLights[ 0 ].direction)), sunShadow.shadowIntensity);
-          gl_FragColor.rgb *= mix(vec3(.5, .45, .8), vec3(1.07, 1.04, .98), min(sunLit, sunFace));
+          float sunFace = mix(1., smoothstep(-.08, .42, dot(normal, directionalLights[ 0 ].direction)), sunShadow.shadowIntensity);
+          gl_FragColor.rgb *= mix(vec3(.3, .27, .58), vec3(1. + .08 * sunShadow.shadowIntensity, 1. + .05 * sunShadow.shadowIntensity, 1.), min(sunLit, sunFace));
         #endif
         #include <tonemapping_fragment>`);
       };
       material.customProgramCacheKey = () => key.call(material) + '-sun'; material.needsUpdate = true;
     };
-    let tick = 0;
+    let tick = 0, envFor = -1;
+    const glass = [], mirrors = [], glows = [], cubeRT = new THREE.WebGLCubeRenderTarget(256, {type: THREE.HalfFloatType}), cubeCam = new THREE.CubeCamera(1, 1200, cubeRT); cubeCam.position.set(0, 10, 0);
     sunTestTick = () => {           // the models arrive one by one, so new ones are picked up as they come
       const dark = state.dark / 100 * (1 - night);      // no sun at night, so its shade and shadows fade out with the daylight
       sun.shadow.intensity = dark; for (const m of catchers) m.material.opacity = dark * .6;
-      if (SUN_TEST) panel.style.display = mode === 'loading' || mode === 'gate' || mode === 'intro' ? 'none' : '';
+      panel.style.display = !open || mode === 'loading' || mode === 'gate' || mode === 'intro' ? 'none' : '';
+      for (const m of glass) m.emissiveIntensity = lerp(.1, .82, night);      // by day the windows are mirrors; at night they light up as before
+      const settled = night === 0 ? 0 : night === 1 ? 1 : -1;
+      if (settled >= 0 && settled !== envFor) { envFor = settled; envWait = 8; }
+      if (envWait && !--envWait && mode !== 'loading' && envFor >= 0) {          // photograph the city all round, for the glass to mirror
+        for (const m of mirrors) m.envMap = null;                                 // so one photograph does not pile onto the last
+        cubeCam.update(renderer, scene);
+        const old = cityEnv[envFor]; cityEnv[envFor] = pmrem.fromCubemap(cubeRT.texture).texture; if (old) old.dispose();
+        for (const m of mirrors) { if (!m.envMap) m.needsUpdate = true; m.envMap = cityEnv[envFor]; }
+      }
+      // Each screen round the plaza throws its light on what stands near it, shifting colour as the picture on it changes.
+      if (!glows.length && N.Scr023 && N.Anime_Screen) {
+        const names = coarse ? ['Anime_Screen', 'Scr023', 'Scr026', 'Scr029', 'Scr032'] : ['Anime_Screen', ...Array.from({length: 12}, (_, i) => 'Scr0' + (23 + i))];
+        for (const name of names) { const node = N[name]; if (!node) continue;
+          const light = new THREE.PointLight(0xbfe0ff, 0, name === 'Anime_Screen' ? 44 : 30, 1.6);
+          node.getWorldPosition(light.position).add(V(0, 0, name === 'Anime_Screen' ? 4 : 2.5).applyQuaternion(node.getWorldQuaternion(new THREE.Quaternion())));
+          scene.add(light); glows.push({light, big: name === 'Anime_Screen'}); }
+      }
+      glows.forEach((g, i) => {
+        g.light.color.setHSL((.62 + .3 * Math.sin(time * .23 + i * 1.7) + 1) % 1, .75, .72);
+        g.light.intensity = lerp(22, 70, night) * (g.big ? 2.2 : 1) * (.82 + .18 * Math.sin(time * 1.4 + i * 2.1));
+      });
       if (tick++ % 40) return;
-      const movers = SUN_TEST ? [] : [pyon, N.UFO, ...cast.map(m => m.group), ...traffic.map(t => t.car)];
+      const movers = [pyon, N.UFO, ...cast.map(m => m.group), ...traffic.map(t => t.car)];
       const moves = o => { for (; o; o = o.parent) if (movers.includes(o)) return true; return false; };
       if (!catchers.length && N.plazaArt) for (const [radius, y] of [[17.2, .3], [2.62, .715]]) {
         const m = new THREE.Mesh(new THREE.CircleGeometry(radius, 64), new THREE.ShadowMaterial({color: 0x2a1a78, opacity: .25, depthWrite: false, fog: false, polygonOffset: true, polygonOffsetFactor: -4, polygonOffsetUnits: -4}));
@@ -520,7 +549,10 @@ function start() {
       scene.traverse(o => {
         if (!o.isMesh || o.userData.sunSeen) return; o.userData.sunSeen = true;
         const m = Array.isArray(o.material) ? o.material[0] : o.material; if (!m || !m.isMeshStandardMaterial) return;
-        o.receiveShadow = true; o.castShadow = (!m.transparent || m.alphaTest > 0) && !o.isSkinnedMesh && !moves(o) || SUN_TEST && !m.transparent; if (o.castShadow) renderer.shadowMap.needsUpdate = true;
+        o.receiveShadow = true; o.castShadow = (!m.transparent || m.alphaTest > 0) && !o.isSkinnedMesh && !moves(o); if (o.castShadow) { renderer.shadowMap.needsUpdate = true; envWait = 50; }
+        for (const one of Array.isArray(o.material) ? o.material : [o.material]) if (/M_(W_|GLASS$)/.test(one.name || '') && !mirrors.includes(one)) {
+          one.metalness = 1; one.roughness = .04; one.envMapIntensity = 1.1; one.color.set(0xe6efff); mirrors.push(one); if (/M_W_/.test(one.name)) glass.push(one); envWait = 50;
+        }
         for (const one of Array.isArray(o.material) ? o.material : [o.material]) tint(one);
       });
     };
