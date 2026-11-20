@@ -481,8 +481,8 @@ function start() {
     hide.addEventListener('click', () => { const off = menu.style.display !== 'none'; menu.style.display = off ? 'none' : ''; hide.textContent = off ? 'メニューを出す' : 'メニューを隠す'; });
     panel.append(hide); panel.style.display = 'none';
     document.body.append(panel); place(); show();
-    // The city is lit so brightly that plain shadows wash out. So wherever the ground faces up, the shadow is also
-    // tinted violet: that is how the painted shadows will look, and they will lie on the ground only.
+    // The city is lit so brightly that plain shadows wash out. So whatever the sun does not reach is also tinted violet:
+    // the ground under a building, and the side of a building that is turned away from the sun.
     const tint = material => {
       if (!material.isMeshStandardMaterial || material.userData.sunTint) return; material.userData.sunTint = true;
       const before = material.onBeforeCompile, key = material.customProgramCacheKey;
@@ -491,7 +491,9 @@ function start() {
         shader.fragmentShader = shader.fragmentShader.replace('#include <tonemapping_fragment>', `#if defined( USE_SHADOWMAP ) && NUM_DIR_LIGHT_SHADOWS > 0
           DirectionalLightShadow sunShadow = directionalLightShadows[ 0 ];
           float sunLit = getShadow( directionalShadowMap[ 0 ], sunShadow.shadowMapSize, sunShadow.shadowIntensity, sunShadow.shadowBias, sunShadow.shadowRadius, vDirectionalShadowCoord[ 0 ] );
-          gl_FragColor.rgb *= mix(vec3(1.), vec3(.5, .45, .8), (1. - sunLit) * smoothstep(.6, .95, dot(normal, normalize((viewMatrix * vec4(0., 1., 0., 0.)).xyz))));
+          // sides turned away from the sun fall into shade as well, so every building has a bright side and a dark side
+          float sunFace = mix(1., smoothstep(-.15, .5, dot(normal, directionalLights[ 0 ].direction)), sunShadow.shadowIntensity);
+          gl_FragColor.rgb *= mix(vec3(.5, .45, .8), vec3(1.07, 1.04, .98), min(sunLit, sunFace));
         #endif
         #include <tonemapping_fragment>`);
       };
