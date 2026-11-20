@@ -649,6 +649,12 @@ function start() {
   let ufoAngle = 2.4, ufoRise = 1, airshipStart = null;
   const UFO_R = 66, UFO_Y = 34, UFO_TURN = .16;      // the UFO's circle: radius, height, radians a second
 
+  let animePoster, animeScreen;
+  function updateAnimePicture() {
+    if (!animeScreen) return;
+    const {el, texture} = animeScreen.userData.entry;
+    animeScreen.material.map = el.readyState >= 2 ? texture : animePoster || texture;
+  }
   function build(gltf) {
     const root = gltf.scene; scene.add(root);
     root.traverse(node => {
@@ -670,6 +676,7 @@ function start() {
         if (have > want) { texture.repeat.x = want / have; texture.offset.x = (1 - texture.repeat.x) / 2; }
         else { texture.repeat.y = have / want; texture.offset.y = (1 - texture.repeat.y) / 2; }
         face.material.map = texture; face.material.color.set(0xffffff); face.material.needsUpdate = true;
+        animePoster = texture; updateAnimePicture();
       });
     }
     ['Anime_ShutterL', 'Anime_ShutterR'].forEach(name => { if (N[name]) shutterBase[name] = N[name].position.clone(); });
@@ -1167,7 +1174,10 @@ function start() {
     screenProjection.elements[0] *= .88; screenProjection.elements[5] *= .88; // warm up clips just outside the frame
     screenView.setFromProjectionMatrix(screenProjection.multiply(camera.matrixWorldInverse));
     let started = false;
-    for (const player of [...Object.values(snsPlayers), ...videos]) {
+    const featured = animeScreen?.userData.entry;
+    const players = [...Object.values(snsPlayers), ...videos.filter(player => player !== featured)];
+    if (featured) players.unshift(featured);
+    for (const player of players) {
       if (player.planes.some(nearView)) {
         if (player.active || started) continue;
         player.active = true;
@@ -1288,6 +1298,11 @@ function start() {
     });
     window.__clipGap = Math.min(...shown.flatMap(list => list.flatMap((p, i) => list.slice(i + 1).map(q => p.distanceTo(q)))));
     const anchor = PLACES.anime.node, big = videoScreen('city/v/ramen', 11.9, 6.7);
+    animeScreen = big;
+    const featured = big.userData.entry;
+    featured.el.addEventListener('loadeddata', updateAnimePicture, {once: true});
+    updateAnimePicture();
+    featured.el.preload = 'auto'; featured.el.src = featured.url;
     const holder = new THREE.Group(); holder.position.copy(anchor.position); holder.quaternion.copy(anchor.quaternion);
     big.position.set(0, 10.5, 5.8); holder.add(big); scene.add(holder); N.bigScreen = holder; holder.visible = !!landmarkModels.anime;   // shown once its building is there
   }
