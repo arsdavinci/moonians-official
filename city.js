@@ -460,16 +460,16 @@ function start() {
     sun.castShadow = true; sun.shadow.mapSize.set(size, size); sun.shadow.bias = -.0004; sun.shadow.normalBias = .08;
     box.left = box.bottom = -130; box.right = box.top = 130; box.near = 20; box.far = 560; box.updateProjectionMatrix();
     scene.add(sun.target);
-    const state = {turn: 318, rise: 50, dark: 85};
+    const state = {turn: 290, rise: 46, dark: 68};     // where the sun was settled
     let moved = false;
-    try { const kept = JSON.parse(localStorage.getItem('moonians.city-sun2')); if (kept) Object.assign(state, kept); } catch { /* optional */ }
+    if (SUN_TEST) try { const kept = JSON.parse(localStorage.getItem('moonians.city-sun3')); if (kept) Object.assign(state, kept); } catch { /* optional */ }
     const catchers = [];            // the plaza and stage pictures are unlit, so a see-through sheet over each one catches the shadows
     const place = () => {
       const a = state.turn * Math.PI / 180, e = state.rise * Math.PI / 180;
       sunDir.set(Math.sin(a) * Math.cos(e), Math.sin(e), Math.cos(a) * Math.cos(e)); sun.position.copy(sunDir).multiplyScalar(280);
       renderer.shadowMap.needsUpdate = true;
       envWait = 20;
-      if (moved) try { localStorage.setItem('moonians.city-sun2', JSON.stringify(state)); } catch { /* optional */ }
+      if (moved) try { localStorage.setItem('moonians.city-sun3', JSON.stringify(state)); } catch { /* optional */ }
     };
     const panel = document.createElement('div'); let show = () => {}, open = SUN_TEST, envWait = 0;
     {
@@ -491,12 +491,13 @@ function start() {
       // a sun button beside the night button opens and closes the sliders; while they are open the shadows are redrawn live
       const button = document.createElement('button'), nightButton = $('#night-toggle'); button.type = 'button'; button.className = 'city-night-toggle'; button.textContent = '☀ 太陽';
       button.addEventListener('click', () => { open = !open; renderer.shadowMap.autoUpdate = open; renderer.shadowMap.needsUpdate = true; });
-      if (nightButton) nightButton.after(button);
+      if (nightButton && SUN_TEST) nightButton.after(button);      // the sun is settled; the button only comes back with ?sun
     }
     place(); show();
     // The city is lit so brightly that plain shadows wash out. So whatever the sun does not reach is also tinted violet:
     // the ground under a building, and the side of a building that is turned away from the sun.
     const uCityCube = {value: null}, uCityMirror = {value: 0};
+    const GLOWS = 13, uGlowPos = {value: Array.from({length: GLOWS}, () => V(0, -999, 0))}, uGlowCol = {value: Array.from({length: GLOWS}, () => new THREE.Color(0))};
     const tint = material => {
       if (!material.isMeshStandardMaterial || material.userData.sunTint) return; material.userData.sunTint = true;
       const before = material.onBeforeCompile, key = material.customProgramCacheKey, kind = key.call(material);
@@ -504,6 +505,18 @@ function start() {
       const pane = kind.indexOf('skin-') === 0 ? ['skinRaw', '0.05, 0.15', '0.10, 0.22'] : kind === 'night-lights' && /^M_R\d/.test(material.name || '') ? ['lit', '0.12, 0.30', '9.0, 9.1'] : null;
       material.onBeforeCompile = (shader, r) => {
         before.call(material, shader, r);
+        // The screens' light is a plain sum worked out here, far cheaper than thirteen real lamps: each screen has a place and a colour.
+        shader.uniforms.uGlowPos = uGlowPos; shader.uniforms.uGlowCol = uGlowCol;
+        shader.fragmentShader = shader.fragmentShader.replace('#include <common>', '#include <common>'+String.fromCharCode(10)+'uniform vec3 uGlowPos[ ' + GLOWS + ' ]; uniform vec3 uGlowCol[ ' + GLOWS + ' ];')
+          .replace('#include <tonemapping_fragment>', `{
+          vec3 glowAt = (vec4(-vViewPosition, 0.) * viewMatrix).xyz + cameraPosition, glowUp = inverseTransformDirection(normal, viewMatrix), glowSum = vec3(0.);
+          for (int i = 0; i < ${GLOWS}; i++) {
+            vec3 glowTo = uGlowPos[ i ] - glowAt; float glowFar = dot(glowTo, glowTo), glowNear = max(0., 1. - glowFar / 900.);
+            glowSum += uGlowCol[ i ] * glowNear * glowNear * max(dot(glowUp, glowTo * inversesqrt(glowFar)) * .6 + .4, 0.);
+          }
+          gl_FragColor.rgb += (gl_FragColor.rgb * .85 + .04) * glowSum;
+        }
+        #include <tonemapping_fragment>`);
         if (pane) {
           shader.uniforms.uCityCube = uCityCube; shader.uniforms.uCityMirror = uCityMirror;
           shader.fragmentShader = shader.fragmentShader.replace('#include <common>', '#include <common>'+String.fromCharCode(10)+'uniform samplerCube uCityCube; uniform float uCityMirror;')
@@ -545,15 +558,14 @@ function start() {
       }
       // Each screen round the plaza throws its light on what stands near it, shifting colour as the picture on it changes.
       if (!glows.length && N.Scr023 && N.Anime_Screen) {
-        const names = coarse ? ['Anime_Screen', 'Scr023', 'Scr026', 'Scr029', 'Scr032'] : ['Anime_Screen', ...Array.from({length: 12}, (_, i) => 'Scr0' + (23 + i))];
+        const names = ['Anime_Screen', ...Array.from({length: 12}, (_, i) => 'Scr0' + (23 + i))];
         for (const name of names) { const node = N[name]; if (!node) continue;
-          const light = new THREE.PointLight(0xbfe0ff, 0, name === 'Anime_Screen' ? 44 : 30, 1.6);
-          node.getWorldPosition(light.position).add(V(0, 0, name === 'Anime_Screen' ? 4 : 2.5).applyQuaternion(node.getWorldQuaternion(new THREE.Quaternion())));
-          scene.add(light); glows.push({light, big: name === 'Anime_Screen'}); }
+          const at = uGlowPos.value[glows.length];
+          node.getWorldPosition(at).add(V(0, 0, name === 'Anime_Screen' ? 4 : 2.5).applyQuaternion(node.getWorldQuaternion(new THREE.Quaternion())));
+          glows.push({color: uGlowCol.value[glows.length], big: name === 'Anime_Screen'}); }
       }
       glows.forEach((g, i) => {
-        g.light.color.setHSL((.62 + .3 * Math.sin(time * .23 + i * 1.7) + 1) % 1, .75, .72);
-        g.light.intensity = lerp(22, 70, night) * (g.big ? 2.2 : 1) * (.82 + .18 * Math.sin(time * 1.4 + i * 2.1));
+        g.color.setHSL((.62 + .3 * Math.sin(time * .23 + i * 1.7) + 1) % 1, .75, .6).multiplyScalar(lerp(.5, 1.5, night) * (g.big ? 1.6 : 1) * (.82 + .18 * Math.sin(time * 1.4 + i * 2.1)));
       });
       if (tick++ % 40) return;
       const movers = [pyon, N.UFO, ...cast.map(m => m.group), ...traffic.map(t => t.car)];
