@@ -1722,10 +1722,10 @@ function start() {
           if (id === 'airship') {       // the video sits flat inside the monitor's rim (measured on the model), with a raised frame round it
             const rim = new THREE.MeshStandardMaterial({color: 0x63d8cf, roughness: .5, metalness: 0});
             for (const side of [1, -1]) {
-              const set = new THREE.Group(); set.position.set(-.052, .562, .283 * side); if (side < 0) set.rotation.y = Math.PI;
+              const set = new THREE.Group(); set.position.set(-.052, .562, .297 * side);   // far enough out that no fold of the hull pokes through the picture if (side < 0) set.rotation.y = Math.PI;
               set.add(snsScreen(.404, .208));
               for (const [w, h, x, y] of [[.44, .018, 0, .113], [.44, .018, 0, -.113], [.018, .208, -.211, 0], [.018, .208, .211, 0]]) {
-                const bar = new THREE.Mesh(new THREE.BoxGeometry(w, h, .03), rim); bar.position.set(x, y, 0); set.add(bar);
+                const bar = new THREE.Mesh(new THREE.BoxGeometry(w, h, .06), rim); bar.position.set(x, y, -.014); set.add(bar);
               }
               body.add(set);
             }
