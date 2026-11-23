@@ -1047,10 +1047,36 @@
     '前の画像・動画へ':'Previous photo or clip',
     '次の画像・動画へ':'Next photo or clip',
   });
+  Object.assign(copy, {
+    'ルナリンクガントレット':'Luna Link Gauntlet',
+    'ルナリンクガントレット01':'Luna Link Gauntlet 01',
+    'ロボピーを操作するための、腕につけるガジェット。':'A gadget worn on the arm, for controlling Robopy.',
+    '折りたたみスマホをはめこんで、コントローラーにする。':'A folding phone docks into it and becomes the controller.',
+    '完成予想図':'Concept art',
+    '腕から、':'From the arm,',
+    'ロボピーを動かす。':'Robopy moves.',
+    'これは完成予想図です。腕のドックにGoogle Pixel Foldをはめこんで開くと、キーボードとディスプレイになります。手の甲にも、小さなディスプレイがつきます。':'This is concept art. A Google Pixel Fold clicks into the dock on the arm and opens into a keyboard and a display. The back of the hand gets a small display too.',
+    'いまは、ディスプレイ（操作画面）が完成したところです。':'So far, the display (the control screen) is finished.',
+    'ロボピーの操作':'Controlling Robopy',
+    'ルナリンクガントレット01の完成予想図。腕につけたドックに折りたたみスマホがはまり、手の甲にもディスプレイがある':'Concept art of Luna Link Gauntlet 01: a folding phone docked on the forearm, and a display on the back of the hand',
+    'まずは、動くアプリから。':'First, an app that works.',
+    'ロボピーを遠隔操作するAndroidアプリを、エラーと戦いながらつくる。':'Building the Android app that controls Robopy remotely, one error at a time.',
+    'エラーと戦いながらも、どんどんUIが完璧になってゆく。':'Fighting errors, and the UI keeps getting better.',
+    '1万回のトライ＆エラーをくり返して、60時間くらいかけて、ようやくできた。':'Ten thousand rounds of trial and error, about sixty hours, and it finally works.',
+    '単純な構造だけど、遠隔操作用のAndroidアプリができた。10時間作業中。まだまだできる。':'Simple inside, but the remote-control Android app is done. Ten hours in, and still going.',
+    '一時停止ボタンと、音量調節ボタンをつくった。':'Made a pause button and a volume control.',
+    '画面を、かわいくする。':'Making the screen cute.',
+    'ラフ画からデザインを起こして、ボタンとスライダーをひとつずつ、つないでいく。':'From a rough sketch to a finished design, then wiring up the buttons and sliders one by one.',
+    'ラフ画。':'The rough sketch.',
+    'デザイン、でけた。':'The design is done.',
+    'どーーーん。このあと、ボタン設定とスライダー調整、いろいろ。':'Ta-da. Next: setting up the buttons, tuning the sliders, and more.',
+    '音量スライダーとPlayボタン、設定できた。':'The volume slider and the Play button are working.',
+    '70%、完成した。':'70% complete.',
+  });
   /* Japanese is the page itself; English lives above; every other language is a small file in lang/
      that is fetched only by the people who read that language. */
   const LANGUAGES = {ja:'日本語', en:'English', 'zh-Hans':'简体中文', 'zh-Hant':'繁體中文', ko:'한국어', es:'Español', fr:'Français', th:'ไทย'};
-  const PACK_VERSION = '20261123-11';
+  const PACK_VERSION = '20261123-12';
   const packs = {en:copy};
   function matchLanguage(value) {
     if (!value) return null;
