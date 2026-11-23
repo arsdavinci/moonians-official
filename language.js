@@ -1040,10 +1040,13 @@
     '気づいたら、昼。少し寝る。':'And suddenly it’s noon. Time for a little sleep.',
     '設計して、プリントして、ROSで動かすまで。':'From design, to printing, to moving it with ROS.',
   });
+  Object.assign(copy, {
+    '動画を大きく再生する':'Play the clip large',
+  });
   /* Japanese is the page itself; English lives above; every other language is a small file in lang/
      that is fetched only by the people who read that language. */
   const LANGUAGES = {ja:'日本語', en:'English', 'zh-Hans':'简体中文', 'zh-Hant':'繁體中文', ko:'한국어', es:'Español', fr:'Français', th:'ไทย'};
-  const PACK_VERSION = '20261123-9';
+  const PACK_VERSION = '20261123-10';
   const packs = {en:copy};
   function matchLanguage(value) {
     if (!value) return null;

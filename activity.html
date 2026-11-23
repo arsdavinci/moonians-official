@@ -16,7 +16,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DotGothic16&family=M+PLUS+Rounded+1c:wght@500;700;800;900&display=swap" rel="stylesheet">
-  <script src="language.js?v=20261123-9"></script>
+  <script src="language.js?v=20261123-10"></script>
   <style>
     :root{--ink:#2a2152;--soft:#5a4f8c;--pink:#ff7fc0;--pink-d:#e2439a;--mint:#3fe3c8;--mint-d:#0d9d8a;--lav:#b9a3f5;
       --round:"M PLUS Rounded 1c","Hiragino Maru Gothic ProN","Yu Gothic",sans-serif;--dot:"DotGothic16",monospace}
@@ -58,9 +58,13 @@
     .sub{margin:20px 0 0;font:.76rem var(--dot);letter-spacing:.2em;color:var(--pink-d)}
     .soon{margin-top:18px;padding:18px 22px;border:2px dashed #fff;border-radius:22px;background:rgba(255,255,255,.4);font-weight:500;line-height:1.9;font-size:.92rem}
     footer{margin-top:34px;display:flex;gap:10px;flex-wrap:wrap}
-    .zoom{position:fixed;inset:0;z-index:20;display:grid;place-items:center;padding:18px;background:rgba(30,20,70,.82);border:0;width:100%;cursor:zoom-out}
-    .zoom[hidden]{display:none}
-    .zoom img{max-width:100%;max-height:calc(100vh - 36px);border-radius:16px;border:3px solid #fff}
+    figure .clip{position:relative;cursor:zoom-in}
+    figure .clip img{aspect-ratio:auto}
+    .play{position:absolute;left:8px;top:8px;padding:3px 10px;border-radius:999px;background:rgba(30,20,70,.78);color:#fff;font:.7rem var(--dot);letter-spacing:.1em}
+    .zoom{position:fixed;inset:0;z-index:20;display:grid;place-items:center;padding:18px;background:rgba(30,20,70,.88);cursor:zoom-out}
+    .zoom[hidden],.zoom [hidden]{display:none}
+    .zoom img,.zoom video{height:calc(100dvh - 36px);width:auto;max-width:100%;object-fit:contain;border-radius:16px;border:3px solid #fff;background:#1b1740;cursor:auto}
+    .zoom-close{position:absolute;top:14px;right:14px;z-index:1;width:42px;height:42px;border-radius:50%;border:2px solid #fff;background:rgba(30,20,70,.7);color:#fff;font-size:1.3rem;line-height:1;cursor:pointer}
     @media (max-width:640px){.entry{padding:18px}.media{grid-template-columns:1fr 1fr;gap:10px}figcaption{padding:7px 9px 9px;font-size:.74rem}}
   </style>
 </head>
@@ -112,7 +116,7 @@
 
         <p class="sub" translate="no">MOVIE</p>
         <div class="media">
-          <figure><video controls playsinline preload="none" poster="assets/activity/2022-10-kyoto/stage.webp" width="480" height="740"><source src="assets/activity/2022-10-kyoto/stage.mp4" type="video/mp4"></video><figcaption>MCのはずが、紹介していただきました</figcaption></figure>
+          <figure><button type="button" class="clip" data-clip="assets/activity/2022-10-kyoto/stage.mp4" aria-label="動画を大きく再生する"><img src="assets/activity/2022-10-kyoto/stage.webp" alt="" width="480" height="740" loading="lazy"><span class="play" translate="no">▶ MOVIE ♪</span></button><figcaption>MCのはずが、紹介していただきました</figcaption></figure>
         </div>
       </article>
       <article class="entry">
@@ -129,9 +133,9 @@
 
         <p class="sub" translate="no">MOVIE</p>
         <div class="media">
-          <figure><video controls playsinline preload="none" poster="assets/activity/2022-09-showroom/moon.webp" width="480" height="680"><source src="assets/activity/2022-09-showroom/moon.mp4" type="video/mp4"></video><figcaption>「38万キロ離れた月から来ました」</figcaption></figure>
-          <figure><video controls playsinline preload="none" poster="assets/activity/2022-09-showroom/warp.webp" width="480" height="680"><source src="assets/activity/2022-09-showroom/warp.mp4" type="video/mp4"></video><figcaption>「特急ワープを使うと、2時間です」</figcaption></figure>
-          <figure><video controls playsinline preload="none" poster="assets/activity/2022-09-showroom/nervous.webp" width="480" height="680"><source src="assets/activity/2022-09-showroom/nervous.mp4" type="video/mp4"></video><figcaption>キンチョーしてるところ</figcaption></figure>
+          <figure><button type="button" class="clip" data-clip="assets/activity/2022-09-showroom/moon.mp4" aria-label="動画を大きく再生する"><img src="assets/activity/2022-09-showroom/moon.webp" alt="" width="480" height="680" loading="lazy"><span class="play" translate="no">▶ MOVIE ♪</span></button><figcaption>「38万キロ離れた月から来ました」</figcaption></figure>
+          <figure><button type="button" class="clip" data-clip="assets/activity/2022-09-showroom/warp.mp4" aria-label="動画を大きく再生する"><img src="assets/activity/2022-09-showroom/warp.webp" alt="" width="480" height="680" loading="lazy"><span class="play" translate="no">▶ MOVIE ♪</span></button><figcaption>「特急ワープを使うと、2時間です」</figcaption></figure>
+          <figure><button type="button" class="clip" data-clip="assets/activity/2022-09-showroom/nervous.mp4" aria-label="動画を大きく再生する"><img src="assets/activity/2022-09-showroom/nervous.webp" alt="" width="480" height="680" loading="lazy"><span class="play" translate="no">▶ MOVIE ♪</span></button><figcaption>キンチョーしてるところ</figcaption></figure>
         </div>
       </article>
 
@@ -144,21 +148,27 @@
       </footer>
     </main>
   </div>
-  <button class="zoom" id="zoom" type="button" hidden aria-label="とじる"><img alt=""></button>
+  <div class="zoom" id="zoom" hidden><button class="zoom-close" type="button" aria-label="とじる">×</button><img alt="" hidden><video controls playsinline hidden></video></div>
 
   <script>
   (function () {
     'use strict';
-    var zoom = document.getElementById('zoom'), picture = zoom.querySelector('img');
+    // Photos and clips open large on top of the page; clips play there with their sound.
+    var zoom = document.getElementById('zoom'), picture = zoom.querySelector('img'), movie = zoom.querySelector('video');
+    var quiet = new URL(location.href).searchParams.get('quiet-test') === '1';
+    function open(showMovie) { picture.hidden = showMovie; movie.hidden = !showMovie; zoom.hidden = false; zoom.querySelector('.zoom-close').focus(); }
+    function close() { zoom.hidden = true; movie.pause(); movie.removeAttribute('src'); movie.load(); picture.removeAttribute('src'); }
     document.querySelectorAll('[data-zoom]').forEach(function (button) {
-      button.addEventListener('click', function () { picture.src = button.getAttribute('data-zoom'); zoom.hidden = false; zoom.focus(); });
+      button.addEventListener('click', function () { picture.src = button.getAttribute('data-zoom'); open(false); });
     });
-    function close() { zoom.hidden = true; picture.removeAttribute('src'); }
-    zoom.addEventListener('click', close);
+    document.querySelectorAll('[data-clip]').forEach(function (button) {
+      button.addEventListener('click', function () {
+        movie.src = button.getAttribute('data-clip'); movie.poster = button.querySelector('img').src; movie.volume = quiet ? .05 : 1; open(true);
+        var p = movie.play(); if (p && p.catch) p.catch(function () {});
+      });
+    });
+    zoom.addEventListener('click', function (event) { if (event.target !== movie) close(); });
     document.addEventListener('keydown', function (event) { if (event.key === 'Escape' && !zoom.hidden) close(); });
-    // one clip at a time
-    var clips = document.querySelectorAll('video');
-    clips.forEach(function (clip) { clip.addEventListener('play', function () { clips.forEach(function (other) { if (other !== clip) other.pause(); }); }); });
   })();
   </script>
   <!-- Cloudflare Web Analytics --><script type='module' src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "1cb8e603855941a5a322d69a4580dd87"}'></script><!-- End Cloudflare Web Analytics -->
