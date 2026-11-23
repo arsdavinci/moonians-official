@@ -1008,10 +1008,42 @@
     '早く君を、ヘッドマウントディスプレイで操作したい。':'I can’t wait to control you with a head-mounted display.',
     '顔が、ついた。':'It has a face.',
   });
+  Object.assign(copy, {
+    '首を、なおす。':'Fixing the neck.',
+    '首が折れてしまう問題を、やわらかいTPU素材のじゃばらで解決する。':'The neck kept snapping, so it gets a bellows printed in flexible TPU.',
+    'ぴょんぴーの首折れ問題を、解決する。':'Solving Pyonpy’s broken-neck problem.',
+    'でけた。':'Done.',
+    'はじめてのTPU素材。けっこう硬め。':'My first TPU print. Stiffer than expected.',
+    '試作品1号、失敗。':'Prototype no. 1: failed.',
+    'ROSで、制御する。':'Controlling it with ROS.',
+    '起動したら自動でプログラムが走るようにして、両手と目をROSで動かす。':'The program starts by itself at boot, and ROS moves both arms and the eyes.',
+    '起動したら自動でPython3のプログラムを走らせれば、完成。のはず。':'Make it run a Python 3 program automatically at boot, and it’s done. Supposedly.',
+    '両手のROS制御、完了。煽りぴょんぴー。':'ROS control of both arms: done. Pyonpy, taunting.',
+    '目の動きをそろえるだけで、3時間かかった。まだまだ勉強が必要。':'Just getting the eyes to move together took three hours. Still a lot to learn.',
+    '目で見て、おぼえる。':'Seeing, and learning.',
+    '画像認識のAIで、数字や文字を読めるようにする。':'Image-recognition AI, so that it can read numbers and letters.',
+    'Pythonで、画像認識AIのテスト。':'Testing image-recognition AI in Python.',
+    'ぴょんぴー、数字の勉強中。':'Pyonpy, studying numbers.',
+    '文字を読むプログラム。汚い字でも、認識してくれる。これで、文字と単語をおぼえさせる。':'A program that reads writing. It recognises even messy handwriting. This is how Pyonpy will learn letters and words.',
+    '動きをつける道具を、つくる。':'Building a tool to animate it.',
+    'ロボピーに動きをつけるための、アニメーションツールを自作する。':'A home-made animation tool for giving Robopy its movements.',
+    'エラー、直した。3時間くらいかかった。':'Error fixed. It took about three hours.',
+    '2つのキーフレームの中間を、自動で計算してくれるようにした。':'It now works out the frames between two keyframes by itself.',
+    'キーフレームは、ドラッグで動かせる。この実装、褒めてほしい。':'Keyframes can be dragged around. Please praise this bit of work.',
+    'つかみにくかったキーに、ホバー機能を追加。地味に必須。':'Added a hover highlight to keys that were hard to grab. Quietly essential.',
+    'キー削除ボタンを、追加。':'Added a delete-key button.',
+    'SAVEボタンをつくって、アニメーションを保存できるようにした。':'Made a SAVE button, so animations can be stored.',
+    '保存したアニメーションに、名前とサムネイルがつく。これは便利。':'Saved animations get a name and a thumbnail. Very handy.',
+    'JSONファイルで書き出して、また読みこめるスクリプトができた。':'A script that exports to a JSON file and loads it back in.',
+    '音声の波形から、自動でリップシンクするようにできた。':'Automatic lip sync, straight from the audio waveform.',
+    'バグ。':'A bug.',
+    '気づいたら、昼。少し寝る。':'And suddenly it’s noon. Time for a little sleep.',
+    '設計して、プリントして、ROSで動かすまで。':'From design, to printing, to moving it with ROS.',
+  });
   /* Japanese is the page itself; English lives above; every other language is a small file in lang/
      that is fetched only by the people who read that language. */
   const LANGUAGES = {ja:'日本語', en:'English', 'zh-Hans':'简体中文', 'zh-Hant':'繁體中文', ko:'한국어', es:'Español', fr:'Français', th:'ไทย'};
-  const PACK_VERSION = '20261123-8';
+  const PACK_VERSION = '20261123-9';
   const packs = {en:copy};
   function matchLanguage(value) {
     if (!value) return null;
