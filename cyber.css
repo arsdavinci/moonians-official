@@ -1406,3 +1406,11 @@ html:not([lang=ja]) .g-card h4>small{display:none}
 .lab-zoom .character-dialog-nav.is-prev{left:max(12px,calc(50% - 300px))}
 .lab-zoom .character-dialog-nav.is-next{right:max(12px,calc(50% - 300px))}
 @media(max-width:920px){.lab-zoom .character-dialog-nav.is-prev{left:12px}.lab-zoom .character-dialog-nav.is-next{right:12px}.lab-zoom{padding-bottom:70px}.lab-zoom img,.lab-zoom video{height:calc(100dvh - 140px);max-height:calc(100dvh - 140px)}}
+
+/* making lab: a column inside a project keeps its picture grid clear of the card edge */
+.lab-column .lab-photos{margin-top:18px}
+.lab-zoom img{background:#fff}
+/* viewer tabs stand at the screen edges, so a wide drawing never sits under them */
+.lab-zoom .character-dialog-nav.is-prev{left:14px}
+.lab-zoom .character-dialog-nav.is-next{right:14px}
+@media(min-width:921px){.lab-zoom{padding-inline:84px}}

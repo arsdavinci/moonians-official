@@ -1073,10 +1073,19 @@
     '音量スライダーとPlayボタン、設定できた。':'The volume slider and the Play button are working.',
     '70%、完成した。':'70% complete.',
   });
+  Object.assign(copy, {
+    '三面図。正面・横・上と、ななめから見た図':'Three-view drawing: front, side and top, plus an angled view',
+    'ななめ前から':'From the front, at an angle',
+    'ななめ後ろから。背中に基板が入る':'From behind, at an angle. The circuit board sits in the back',
+    '外装を透明にした、正面':'Front view, with the shell made transparent',
+    '外装を透明にした、横':'Side view, with the shell made transparent',
+    'ロボピーの三面図。':'Robopy’s three-view drawing.',
+    'ロボピーは、3DのCADで設計しています。実際の設計データから出した三面図と、外装を透明にして中身を見せた図です。図面の数字では、高さ約56cm、両腕を広げた幅は約43cm。画像を押すと、大きく見られます。':'Robopy is designed in 3D CAD. These come straight from the real design data: a three-view drawing, and views with the shell made transparent to show what is inside. By the numbers on the drawing it stands about 56 cm tall and about 43 cm across with both arms out. Tap a picture to see it larger.',
+  });
   /* Japanese is the page itself; English lives above; every other language is a small file in lang/
      that is fetched only by the people who read that language. */
   const LANGUAGES = {ja:'日本語', en:'English', 'zh-Hans':'简体中文', 'zh-Hant':'繁體中文', ko:'한국어', es:'Español', fr:'Français', th:'ไทย'};
-  const PACK_VERSION = '20261123-12';
+  const PACK_VERSION = '20261123-13';
   const packs = {en:copy};
   function matchLanguage(value) {
     if (!value) return null;
