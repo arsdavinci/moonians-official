@@ -913,10 +913,22 @@
     'ライブや出演のきろくは、これから少しずつ足していきます。':'More shows and appearances will be added here little by little.',
     'とじる':'Close',
   });
+  Object.assign(copy, {
+    '2022年10月22日':'October 22, 2022',
+    'ライブ':'Live show',
+    '京都国際映画祭のお笑いライブに出演しました。':'We performed at a comedy show of the Kyoto International Film and Art Festival.',
+    'コロコロチキチキペッパーズさん、ニューヨークさんとご一緒させていただきました。':'We shared the stage with Korokoro Chikichiki Peppers and New York.',
+    'MCをするはずが、ムーニアンズの紹介をしていただきました。めちゃくちゃ緊張して焦っていましたが、お二組が面白くしてくれました。プロはすごい。':'They were supposed to be hosting, and ended up introducing Moonians instead. We were terribly nervous and flustered, but the two duos made it funny. Pros are amazing.',
+    '舞台で4人にかこまれた、らんぴょんとぴょんぴー':'Ranpyon and Pyonpy on stage among four comedians',
+    'コロコロチキチキペッパーズさん、ニューヨークさんとの集合写真':'Group photo with Korokoro Chikichiki Peppers and New York',
+    'ライブのようす':'On stage',
+    'おわったあとに、みんなで':'All together after the show',
+    'MCのはずが、紹介していただきました':'The hosts ended up introducing us',
+  });
   /* Japanese is the page itself; English lives above; every other language is a small file in lang/
      that is fetched only by the people who read that language. */
   const LANGUAGES = {ja:'日本語', en:'English', 'zh-Hans':'简体中文', 'zh-Hant':'繁體中文', ko:'한국어', es:'Español', fr:'Français', th:'ไทย'};
-  const PACK_VERSION = '20261123-2';
+  const PACK_VERSION = '20261123-3';
   const packs = {en:copy};
   function matchLanguage(value) {
     if (!value) return null;
