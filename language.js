@@ -934,10 +934,24 @@
     '番組の画面。ぴょんぴーを手にのせて話す、らんぴょん':'A screen from the show: Ranpyon talking with Pyonpy on one hand',
     'ネタのとちゅう':'In the middle of the routine',
   });
+  Object.assign(copy, {
+    '外装':'Outer skin',
+    'ふわふわの外装を、つくる。':'Making the fluffy outside.',
+    'からくりを包む、ふわふわの体づくり。目ん玉から、毛皮の縫いつけまでのきろくです。':'Building the fluffy body that wraps the mechanism: a record from the eyeballs to sewing on the fur.',
+    '透明な半球から、はじまり。':'It starts with a clear half-sphere.',
+    '色をぬって、ぴょんぴーの目ん玉に。':'Painted, it becomes Pyonpy’s eyeball.',
+    '頭にはめると、ギョロギョロ動く。':'Set into the head, it rolls around.',
+    'ふわふわのまぶたをつけた目ん玉。':'Eyeballs with fluffy eyelids.',
+    'アームの生地を切り出す。':'Cutting out the fabric for the arms.',
+    '背中のパーツ。「背上」と「背下」。':'The back pieces: “upper back” and “lower back”.',
+    'マジックテープを、ミシンで縫いつける。':'Sewing on the hook-and-loop tape by machine.',
+    '顔が、できてきた。':'The face is coming together.',
+    '外装が、ひとまず完成。機械を入れたあと、手足は作り直します。':'The outside is done for now. After the machinery goes in, the arms and legs will be remade.',
+  });
   /* Japanese is the page itself; English lives above; every other language is a small file in lang/
      that is fetched only by the people who read that language. */
   const LANGUAGES = {ja:'日本語', en:'English', 'zh-Hans':'简体中文', 'zh-Hant':'繁體中文', ko:'한국어', es:'Español', fr:'Français', th:'ไทย'};
-  const PACK_VERSION = '20261123-4';
+  const PACK_VERSION = '20261123-5';
   const packs = {en:copy};
   function matchLanguage(value) {
     if (!value) return null;

@@ -1389,3 +1389,10 @@ html:not([lang=ja]) .g-card h4>small{display:none}
 .lab-cad-keys li{display:flex;align-items:baseline;gap:8px;padding:7px 13px;border:1px solid var(--c-border-strong);border-radius:25px;font-size:12px;line-height:1.5}
 .lab-cad-keys b{color:var(--c-mint)}
 @media(max-width:560px){.lab-photos.is-cad{grid-template-columns:1fr 1fr}.lab-photos.is-cad span{padding:8px 9px 10px;font-size:11px}}
+
+/* making lab: portrait story frames (stills and one clip) with a caption under each */
+.lab-photos.is-story{grid-template-columns:repeat(auto-fill,minmax(170px,1fr))}
+.lab-photos.is-story button,.lab-photos.is-story figure{display:flex;flex-direction:column;margin:0;padding:0;color:inherit;text-align:left;border:1px solid var(--c-border-strong);border-radius:12px;overflow:hidden;background:var(--c-bg-2)}
+.lab-photos.is-story img,.lab-photos.is-story video{display:block;width:100%;height:auto;aspect-ratio:9/16;object-fit:cover}
+.lab-photos.is-story span,.lab-photos.is-story figcaption{display:block;padding:10px 12px 12px;color:var(--c-text,#fff);font-size:12px;line-height:1.6;flex:1}
+@media(max-width:560px){.lab-photos.is-story{grid-template-columns:1fr 1fr}.lab-photos.is-story span,.lab-photos.is-story figcaption{padding:8px 9px 10px;font-size:11px}}
