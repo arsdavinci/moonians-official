@@ -979,10 +979,39 @@
     'にじ色に光るホログラム生地のアップ':'Close-up of hologram fabric shining in rainbow colours',
     '手に持った白とうす紫のシューズ。かかとから、うさ耳がのびている':'A white and pale purple shoe held in one hand, with a rabbit ear rising from the heel',
   });
+  Object.assign(copy, {
+    'ロボピー':'Robopy',
+    'ロボピー制作日記':'Robopy build diary',
+    'ぴょんぴーを、ロボットに。':'Turning Pyonpy into a robot.',
+    '設計して、プリントして、動かすまで。':'From design, to printing, to making it move.',
+    '3Dプリント':'3D printed',
+    'まずは、設計から。':'First, the design.',
+    'ネジ一本、ボルト一個まで、CADでつくっていく。':'Every screw and every bolt is modelled in CAD.',
+    '改善。':'Improving.',
+    '設計、楽しい。':'Designing is fun.',
+    'ボルト。':'Bolt.',
+    'ねじねじ。':'Screw, screw.',
+    '美しいネジ穴。':'A beautiful threaded hole.',
+    'プリントして、形にする。':'Printing it into shape.',
+    'パーツをならべて、3Dプリンターで出力。サポート材をはずしたら、顔が出てくる。':'Laying out the parts and printing them in 3D. Take off the supports, and a face appears.',
+    'ならべるだけで、1時間かかった。':'Just arranging them took an hour.',
+    'シミュレーション。':'Simulation.',
+    'プリント中って、ずっと観てられる。':'I could watch a print run forever.',
+    'あと、すこし。':'Almost there.',
+    'お！':'Oh!',
+    'ここから、サポート材をはずす。':'Next, the supports come off.',
+    'サポートの跡はちょっと荒いけど、成功。':'The support marks are a little rough, but it worked.',
+    '頭脳を入れて、動かす。':'Giving it a brain, and making it move.',
+    'Raspberry Pi 5をのせて、カメラの映像を飛ばす。そして、顔がついた。':'A Raspberry Pi 5 goes in, streaming the camera picture. And then, it got a face.',
+    'ついに手に入れた、Raspberry Pi 5。':'Finally got one: a Raspberry Pi 5.',
+    'できてたわ。ひとつ解決するのに、何時間かかったんだ。':'It was working after all. How many hours did that one fix take?',
+    '早く君を、ヘッドマウントディスプレイで操作したい。':'I can’t wait to control you with a head-mounted display.',
+    '顔が、ついた。':'It has a face.',
+  });
   /* Japanese is the page itself; English lives above; every other language is a small file in lang/
      that is fetched only by the people who read that language. */
   const LANGUAGES = {ja:'日本語', en:'English', 'zh-Hans':'简体中文', 'zh-Hant':'繁體中文', ko:'한국어', es:'Español', fr:'Français', th:'ไทย'};
-  const PACK_VERSION = '20261123-7';
+  const PACK_VERSION = '20261123-8';
   const packs = {en:copy};
   function matchLanguage(value) {
     if (!value) return null;
