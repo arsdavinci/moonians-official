@@ -867,10 +867,35 @@
     '送信しました':'Sent',
     '送信できませんでした。通信の状態をご確認のうえ、もう一度お試しください。':'It could not be sent. Please check your connection and try again.',
   });
+  Object.assign(copy, {
+    '設計図':'Blueprints',
+    '設計図も、のぞいてみる。':'A peek at the blueprints.',
+    'からくりぴょんぴーは、3DのCADで設計しています。実際の設計データから切り出した断面図と、動かし方の図です。画像を押すと、大きく見られます。':'Karakuri Pyonpy is designed in 3D CAD. These are cross-sections cut straight from the real design data, plus a chart of how it is operated. Tap a picture to see it larger.',
+    'どの指で、どこが動くか':'Which finger moves what',
+    '頭を縦に切った断面図':'The head, cut top to bottom',
+    '緑のレバーを押し、青いレバーを左右にふる':'Press the green levers, swing the blue one left and right',
+    '後ろから見た、目と耳のしかけ':'The eye and ear mechanism, seen from behind',
+    '上から見た断面図':'Cross-section seen from above',
+    '下からのぞいた、持ち手まわり':'Around the handle, looking up from below',
+    '正面。目をあけたところ':'Front view, eyes open',
+    '正面。まぶたを閉じたところ':'Front view, eyelids closed',
+    '横から見たところ':'Seen from the side',
+    '舌を出したところ':'With the tongue out',
+    '親指':'Thumb',
+    '人差し指':'Index finger',
+    '中指':'Middle finger',
+    '薬指':'Ring finger',
+    '小指':'Little finger',
+    '目を左右に動かす':'Moves the eyes left and right',
+    '口を開け閉めする':'Opens and closes the mouth',
+    'まぶたを閉じる':'Closes the eyelids',
+    '耳をたらす':'Droops the ears',
+    'ハンドルをにぎる':'Holds the handle',
+  });
   /* Japanese is the page itself; English lives above; every other language is a small file in lang/
      that is fetched only by the people who read that language. */
   const LANGUAGES = {ja:'日本語', en:'English', 'zh-Hans':'简体中文', 'zh-Hant':'繁體中文', ko:'한국어', es:'Español', fr:'Français', th:'ไทย'};
-  const PACK_VERSION = '20261120-1';
+  const PACK_VERSION = '20261123-1';
   const packs = {en:copy};
   function matchLanguage(value) {
     if (!value) return null;

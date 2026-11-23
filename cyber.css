@@ -1379,3 +1379,13 @@ html:not([lang=ja]) .g-card h4>small{display:none}
   .game-install-steps img{display:block;width:100%;max-width:420px;height:auto;margin-top:10px;border-radius:14px;border:1px solid var(--c-border-strong)}
   .game-install-note{margin:16px 0 0;font-size:11.5px;line-height:1.7;opacity:.75}
 }
+
+/* making lab: CAD drawings sit whole on a white card with their caption underneath */
+.lab-photos.is-cad{grid-template-columns:repeat(auto-fill,minmax(200px,1fr))}
+.lab-photos.is-cad button{display:flex;flex-direction:column;background:#fff;color:inherit;text-align:left}
+.lab-photos.is-cad img{aspect-ratio:4/3;object-fit:contain;background:#fff}
+.lab-photos.is-cad span{display:block;padding:10px 12px 12px;background:var(--c-bg-2);color:var(--c-text,#fff);font-size:12px;line-height:1.6;flex:1}
+.lab-cad-keys{display:flex;flex-wrap:wrap;gap:8px;margin:16px 0 0;padding:0;list-style:none}
+.lab-cad-keys li{display:flex;align-items:baseline;gap:8px;padding:7px 13px;border:1px solid var(--c-border-strong);border-radius:25px;font-size:12px;line-height:1.5}
+.lab-cad-keys b{color:var(--c-mint)}
+@media(max-width:560px){.lab-photos.is-cad{grid-template-columns:1fr 1fr}.lab-photos.is-cad span{padding:8px 9px 10px;font-size:11px}}
