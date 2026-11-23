@@ -1396,3 +1396,8 @@ html:not([lang=ja]) .g-card h4>small{display:none}
 .lab-photos.is-story img,.lab-photos.is-story video{display:block;width:100%;height:auto;aspect-ratio:9/16;object-fit:cover}
 .lab-photos.is-story span,.lab-photos.is-story figcaption{display:block;padding:10px 12px 12px;color:var(--c-text,#fff);font-size:12px;line-height:1.6;flex:1}
 @media(max-width:560px){.lab-photos.is-story{grid-template-columns:1fr 1fr}.lab-photos.is-story span,.lab-photos.is-story figcaption{padding:8px 9px 10px;font-size:11px}}
+
+/* making lab viewer: small story frames are shown as tall as the screen allows; clips play here with sound */
+.lab-zoom img,.lab-zoom video{height:calc(100dvh - 90px);width:auto;max-width:100%;max-height:calc(100dvh - 90px);object-fit:contain;border-radius:10px;background:#07061a}
+.lab-zoom [hidden]{display:none}
+.reel-media video{cursor:zoom-in}
