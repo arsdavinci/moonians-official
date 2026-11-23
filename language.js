@@ -957,10 +957,32 @@
     '4人とも、○':'A ○ from all four',
     'アバター作成権、ゲット！':'Avatar won!',
   });
+  Object.assign(copy, {
+    'ハイジャンピー':'High Jumpy',
+    'ハイジャンピー01':'High Jumpy 01',
+    'らんぴょんの、うさ耳つきシューズ。':'Ranpyon’s shoes, with rabbit ears.',
+    '2020年5月につくりました。':'Made in May 2020.',
+    '2020年5月':'May 2020',
+    'ホログラム生地':'Hologram fabric',
+    'くつを、月のくつに。':'Turning shoes into Moon shoes.',
+    'パーツをけずって、うさ耳をつけて、ホログラム生地を張る。らんぴょんの足もとができるまで。':'Sanding the parts, adding rabbit ears, covering it in hologram fabric: how Ranpyon’s footwear came to be.',
+    'さて、作りますか。':'Right, let’s build.',
+    'けずって、粉だらけ。':'Sanding. Dust everywhere.',
+    'らんぴょんシューズ、でけた。もう片方つくるの、めんどい。':'One Ranpyon shoe, done. Making the other one is a pain.',
+    'ホログラム生地を張って、熱風でのばす。':'Covering it in hologram fabric and stretching it with hot air.',
+    'この作業、めちゃくちゃ好き。':'I absolutely love this part.',
+    'High Jumpy01、完成。':'High Jumpy 01, complete.',
+    '机にならべた材料。スプレー、LEDのリモコン、こまかいパーツ':'Materials laid out on a desk: spray cans, an LED remote, small parts',
+    'うす紫のパーツをけずっている手もと':'Hands sanding a pale purple part',
+    'うさ耳のついた片方のシューズと、ぴょんぴー':'One shoe with a rabbit ear, next to Pyonpy',
+    '靴のパーツにホログラム生地を張っているところ':'Hologram fabric being applied to a shoe part',
+    'にじ色に光るホログラム生地のアップ':'Close-up of hologram fabric shining in rainbow colours',
+    '手に持った白とうす紫のシューズ。かかとから、うさ耳がのびている':'A white and pale purple shoe held in one hand, with a rabbit ear rising from the heel',
+  });
   /* Japanese is the page itself; English lives above; every other language is a small file in lang/
      that is fetched only by the people who read that language. */
   const LANGUAGES = {ja:'日本語', en:'English', 'zh-Hans':'简体中文', 'zh-Hant':'繁體中文', ko:'한국어', es:'Español', fr:'Français', th:'ไทย'};
-  const PACK_VERSION = '20261123-6';
+  const PACK_VERSION = '20261123-7';
   const packs = {en:copy};
   function matchLanguage(value) {
     if (!value) return null;
