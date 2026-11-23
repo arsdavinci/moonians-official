@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#cdbdf7">
+  <title>活動のきろく｜ムーニアンズ</title>
+  <meta name="description" content="ライブ、テレビや配信番組への出演など、ムーニアンズの芸能活動をまとめたページです。">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="活動のきろく｜ムーニアンズ">
+  <meta property="og:image" content="https://moonians-official.com/assets/moon-city.png">
+  <link rel="canonical" href="https://moonians-official.com/activity.html">
+  <link rel="icon" href="assets/favicon.png?v=1" type="image/png" sizes="256x256">
+  <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png?v=4">
+  <meta name="apple-mobile-web-app-title" content="ムーニアンズ">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DotGothic16&family=M+PLUS+Rounded+1c:wght@500;700;800;900&display=swap" rel="stylesheet">
+  <script src="language.js?v=20261123-2"></script>
+  <style>
+    :root{--ink:#2a2152;--soft:#5a4f8c;--pink:#ff7fc0;--pink-d:#e2439a;--mint:#3fe3c8;--mint-d:#0d9d8a;--lav:#b9a3f5;
+      --round:"M PLUS Rounded 1c","Hiragino Maru Gothic ProN","Yu Gothic",sans-serif;--dot:"DotGothic16",monospace}
+    *{box-sizing:border-box}
+    body{margin:0;min-height:100vh;color:var(--ink);font-family:var(--round);font-weight:700;overflow-x:hidden;
+      background:linear-gradient(#7fb2fb 0,#b7cdff 38%,#f3d6f2 78%,#fdeefa 100%) fixed}
+    .wrap{max-width:980px;margin:0 auto;padding:calc(18px + env(safe-area-inset-top,0px)) max(18px,env(safe-area-inset-right,0px)) 72px max(18px,env(safe-area-inset-left,0px))}
+    header{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+    .brand{display:block;width:min(40vw,180px);filter:drop-shadow(0 2px 0 #fff) drop-shadow(0 6px 14px rgba(120,90,220,.35))}
+    .brand img{display:block;width:100%;height:auto}
+    .tools{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+    .pill,.language-switch{background:rgba(255,255,255,.7);border:1.5px solid #fff;border-radius:999px;-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);box-shadow:0 8px 24px rgba(98,74,190,.2)}
+    .pill{padding:8px 16px;color:var(--ink);text-decoration:none;font-size:.82rem}
+    .pill:hover{background:#fff}
+    .pill.is-main{background:linear-gradient(90deg,var(--pink),#8fd8ff);color:#fff}
+    .language-switch{display:flex;gap:2px;padding:3px}
+    .language-switch button{font:800 .78rem var(--round);color:var(--soft);background:transparent;border:0;border-radius:999px;padding:5px 12px;cursor:pointer}
+    .kicker{margin:26px 0 0;font:.82rem var(--dot);letter-spacing:.24em;color:#fff;text-shadow:0 0 10px var(--pink),0 1px 0 rgba(80,50,160,.6)}
+    h1{margin:6px 0 12px;font:900 clamp(1.9rem,6vw,3.2rem)/1.15 var(--round);color:#fff;text-shadow:0 2px 0 var(--pink-d),0 0 24px rgba(255,127,192,.75),0 8px 26px rgba(70,40,150,.4)}
+    .lead{margin:0 0 8px;max-width:34em;font-size:1rem;line-height:1.9;font-weight:500}
+    .year{display:flex;align-items:center;gap:14px;margin:34px 0 14px;font:900 1.7rem/1 var(--round);color:#fff;text-shadow:0 2px 0 var(--pink-d),0 6px 18px rgba(70,40,150,.35)}
+    .year::after{content:"";flex:1;height:3px;border-radius:3px;background:linear-gradient(90deg,#fff,rgba(255,255,255,0))}
+    .entry{background:rgba(255,255,255,.82);border:2px solid #fff;border-radius:26px;padding:24px;-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);box-shadow:0 14px 36px rgba(98,74,190,.22)}
+    .entry + .entry{margin-top:18px}
+    .entry-head{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+    .when{font:.86rem var(--dot);letter-spacing:.1em;color:var(--soft)}
+    .tag{font:.72rem var(--dot);letter-spacing:.12em;color:#fff;padding:2px 11px;border-radius:999px;background:linear-gradient(135deg,var(--pink),var(--lav))}
+    .entry h2{margin:10px 0 8px;font-size:1.35rem;font-weight:900;line-height:1.4}
+    .entry p{margin:0;font-weight:500;line-height:1.9;font-size:.96rem}
+    .entry p + p{margin-top:6px}
+    .media{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:14px;margin-top:18px}
+    figure{margin:0;border-radius:18px;overflow:hidden;background:#fff;border:2px solid #fff;box-shadow:0 8px 20px rgba(98,74,190,.2)}
+    figure button{display:block;width:100%;padding:0;border:0;background:none;cursor:zoom-in}
+    figure img,figure video{display:block;width:100%;height:auto;background:#1b1740}
+    figure img{aspect-ratio:9/16;object-fit:cover}
+    figure video{aspect-ratio:12/17;object-fit:cover}
+    figcaption{padding:9px 12px 11px;font-size:.8rem;font-weight:700;line-height:1.6;color:var(--soft)}
+    .sub{margin:20px 0 0;font:.76rem var(--dot);letter-spacing:.2em;color:var(--pink-d)}
+    .soon{margin-top:18px;padding:18px 22px;border:2px dashed #fff;border-radius:22px;background:rgba(255,255,255,.4);font-weight:500;line-height:1.9;font-size:.92rem}
+    footer{margin-top:34px;display:flex;gap:10px;flex-wrap:wrap}
+    .zoom{position:fixed;inset:0;z-index:20;display:grid;place-items:center;padding:18px;background:rgba(30,20,70,.82);border:0;width:100%;cursor:zoom-out}
+    .zoom[hidden]{display:none}
+    .zoom img{max-width:100%;max-height:calc(100vh - 36px);border-radius:16px;border:3px solid #fff}
+    @media (max-width:640px){.entry{padding:18px}.media{grid-template-columns:1fr 1fr;gap:10px}figcaption{padding:7px 9px 9px;font-size:.74rem}}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <a class="brand" href="./" data-language-link aria-label="ムーニアンズ ホーム"><img src="assets/logo.png?v=20261110-11" alt="ムーニアンズ" width="2421" height="833"></a>
+      <div class="tools">
+        <a class="pill" href="./" data-language-link>← ムーニアンズの街へ戻る</a>
+        <div class="language-switch" data-language-switch role="group" aria-label="Language / 言語"><button type="button" data-language="ja" lang="ja" aria-pressed="true">日本語</button><button type="button" data-language="en" lang="en" aria-pressed="false">EN</button></div>
+      </div>
+    </header>
+
+    <main>
+      <p class="kicker" translate="no">MOONIANS ON STAGE</p>
+      <h1>活動のきろく</h1>
+      <p class="lead">ライブ、テレビや配信番組への出演など、ムーニアンズの芸能活動をまとめていくページです。</p>
+
+      <h2 class="year" translate="no">2022</h2>
+      <article class="entry">
+        <div class="entry-head"><span class="when">2022年9月</span><span class="tag">配信番組</span></div>
+        <h2>SHOWROOMの番組に出演しました。</h2>
+        <p>吉本坂46でもあるエグスプロージョンのまちゃあきさん、ビスケッティ佐竹さんと共演させていただきました。</p>
+        <p>佐竹さんは撮影のあとも、ディレクターさんにムーニアンズを推してくれました。ほんとうにいい人でした。</p>
+
+        <p class="sub" translate="no">PHOTO</p>
+        <div class="media">
+          <figure><button type="button" data-zoom="assets/activity/2022-09-showroom/machaaki.webp" aria-label="写真を大きく見る"><img src="assets/activity/2022-09-showroom/machaaki.webp" alt="白い道着のまちゃあきさんと、ぴょんぴーを抱えたらんぴょん" width="900" height="1600" loading="lazy"></button><figcaption>エグスプロージョンのまちゃあきさんと</figcaption></figure>
+          <figure><button type="button" data-zoom="assets/activity/2022-09-showroom/satake.webp" aria-label="写真を大きく見る"><img src="assets/activity/2022-09-showroom/satake.webp" alt="ビスケッティ佐竹さんと、らんぴょん、ぴょんぴーの自撮り" width="900" height="1600" loading="lazy"></button><figcaption>ビスケッティ佐竹さんと</figcaption></figure>
+        </div>
+
+        <p class="sub" translate="no">MOVIE</p>
+        <div class="media">
+          <figure><video controls playsinline preload="none" poster="assets/activity/2022-09-showroom/moon.webp" width="480" height="680"><source src="assets/activity/2022-09-showroom/moon.mp4" type="video/mp4"></video><figcaption>「38万キロ離れた月から来ました」</figcaption></figure>
+          <figure><video controls playsinline preload="none" poster="assets/activity/2022-09-showroom/warp.webp" width="480" height="680"><source src="assets/activity/2022-09-showroom/warp.mp4" type="video/mp4"></video><figcaption>「特急ワープを使うと、2時間です」</figcaption></figure>
+          <figure><video controls playsinline preload="none" poster="assets/activity/2022-09-showroom/nervous.webp" width="480" height="680"><source src="assets/activity/2022-09-showroom/nervous.mp4" type="video/mp4"></video><figcaption>キンチョーしてるところ</figcaption></figure>
+        </div>
+      </article>
+
+      <p class="soon">ライブや出演のきろくは、これから少しずつ足していきます。</p>
+
+      <footer>
+        <a class="pill" href="./" data-language-link>← ムーニアンズの街へ戻る</a>
+        <a class="pill is-main" href="work.html" data-language-link>お仕事のご依頼はこちら</a>
+        <a class="pill" href="sns.html" data-language-link>SNS</a>
+      </footer>
+    </main>
+  </div>
+  <button class="zoom" id="zoom" type="button" hidden aria-label="とじる"><img alt=""></button>
+
+  <script>
+  (function () {
+    'use strict';
+    var zoom = document.getElementById('zoom'), picture = zoom.querySelector('img');
+    document.querySelectorAll('[data-zoom]').forEach(function (button) {
+      button.addEventListener('click', function () { picture.src = button.getAttribute('data-zoom'); zoom.hidden = false; zoom.focus(); });
+    });
+    function close() { zoom.hidden = true; picture.removeAttribute('src'); }
+    zoom.addEventListener('click', close);
+    document.addEventListener('keydown', function (event) { if (event.key === 'Escape' && !zoom.hidden) close(); });
+    // one clip at a time
+    var clips = document.querySelectorAll('video');
+    clips.forEach(function (clip) { clip.addEventListener('play', function () { clips.forEach(function (other) { if (other !== clip) other.pause(); }); }); });
+  })();
+  </script>
+  <!-- Cloudflare Web Analytics --><script type='module' src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "1cb8e603855941a5a322d69a4580dd87"}'></script><!-- End Cloudflare Web Analytics -->
+</body>
+</html>

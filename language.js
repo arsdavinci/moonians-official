@@ -892,10 +892,31 @@
     '耳をたらす':'Droops the ears',
     'ハンドルをにぎる':'Holds the handle',
   });
+  Object.assign(copy, {
+    '活動のきろく｜ムーニアンズ':'Activity log | Moonians',
+    '活動のきろく':'Activity log',
+    'ライブ・出演':'Shows & appearances',
+    'ライブ、テレビや配信番組への出演など、ムーニアンズの芸能活動をまとめていくページです。':'Live shows, TV and streaming appearances — this page gathers what Moonians have been doing as entertainers.',
+    '2022年9月':'September 2022',
+    '配信番組':'Streaming show',
+    'SHOWROOMの番組に出演しました。':'We appeared on a SHOWROOM show.',
+    '吉本坂46でもあるエグスプロージョンのまちゃあきさん、ビスケッティ佐竹さんと共演させていただきました。':'We had the honour of appearing with Machaaki of EGU-SPLOSION, who is also a member of Yoshimotozaka46, and Satake of Bisuketti.',
+    '佐竹さんは撮影のあとも、ディレクターさんにムーニアンズを推してくれました。ほんとうにいい人でした。':'Even after the shoot, Satake kept recommending Moonians to the director. Truly a kind person.',
+    '写真を大きく見る':'See the photo larger',
+    '白い道着のまちゃあきさんと、ぴょんぴーを抱えたらんぴょん':'Machaaki in a white martial-arts uniform, with Ranpyon holding Pyonpy',
+    'ビスケッティ佐竹さんと、らんぴょん、ぴょんぴーの自撮り':'A selfie of Satake of Bisuketti with Ranpyon and Pyonpy',
+    'エグスプロージョンのまちゃあきさんと':'With Machaaki of EGU-SPLOSION',
+    'ビスケッティ佐竹さんと':'With Satake of Bisuketti',
+    '「38万キロ離れた月から来ました」':'“We came from the Moon, 380,000 km away.”',
+    '「特急ワープを使うと、2時間です」':'“By express warp, it takes two hours.”',
+    'キンチョーしてるところ':'A nervous moment',
+    'ライブや出演のきろくは、これから少しずつ足していきます。':'More shows and appearances will be added here little by little.',
+    'とじる':'Close',
+  });
   /* Japanese is the page itself; English lives above; every other language is a small file in lang/
      that is fetched only by the people who read that language. */
   const LANGUAGES = {ja:'日本語', en:'English', 'zh-Hans':'简体中文', 'zh-Hant':'繁體中文', ko:'한국어', es:'Español', fr:'Français', th:'ไทย'};
-  const PACK_VERSION = '20261123-1';
+  const PACK_VERSION = '20261123-2';
   const packs = {en:copy};
   function matchLanguage(value) {
     if (!value) return null;
