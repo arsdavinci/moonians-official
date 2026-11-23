@@ -948,10 +948,19 @@
     '顔が、できてきた。':'The face is coming together.',
     '外装が、ひとまず完成。機械を入れたあと、手足は作り直します。':'The outside is done for now. After the machinery goes in, the arms and legs will be remade.',
   });
+  Object.assign(copy, {
+    'ネタは「翻訳酸素カプセル」。「3050年の笑い」「すごいクリエイター」と言っていただき、4人全員の○で、アバター作成権をゲットしました。':'The routine was “The Translation Oxygen Capsule”. It was called “comedy from the year 3050” and “an amazing creator”, and with a ○ from all four judges, we won the avatar.',
+    '番組の画面':'A screen from the show',
+    'ネタは「翻訳酸素カプセル」':'The routine: “The Translation Oxygen Capsule”',
+    '「3050年の笑い」':'“Comedy from the year 3050”',
+    '「すごいクリエイター」':'“An amazing creator”',
+    '4人とも、○':'A ○ from all four',
+    'アバター作成権、ゲット！':'Avatar won!',
+  });
   /* Japanese is the page itself; English lives above; every other language is a small file in lang/
      that is fetched only by the people who read that language. */
   const LANGUAGES = {ja:'日本語', en:'English', 'zh-Hans':'简体中文', 'zh-Hant':'繁體中文', ko:'한국어', es:'Español', fr:'Français', th:'ไทย'};
-  const PACK_VERSION = '20261123-5';
+  const PACK_VERSION = '20261123-6';
   const packs = {en:copy};
   function matchLanguage(value) {
     if (!value) return null;
