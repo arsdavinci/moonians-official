@@ -1401,3 +1401,8 @@ html:not([lang=ja]) .g-card h4>small{display:none}
 .lab-zoom img,.lab-zoom video{height:calc(100dvh - 90px);width:auto;max-width:100%;max-height:calc(100dvh - 90px);object-fit:contain;border-radius:10px;background:#07061a}
 .lab-zoom [hidden]{display:none}
 .reel-media video{cursor:zoom-in}
+
+/* making lab viewer: the same neon PREV / NEXT tabs as the profile sheets, standing beside the picture */
+.lab-zoom .character-dialog-nav.is-prev{left:max(12px,calc(50% - 300px))}
+.lab-zoom .character-dialog-nav.is-next{right:max(12px,calc(50% - 300px))}
+@media(max-width:920px){.lab-zoom .character-dialog-nav.is-prev{left:12px}.lab-zoom .character-dialog-nav.is-next{right:12px}.lab-zoom{padding-bottom:70px}.lab-zoom img,.lab-zoom video{height:calc(100dvh - 140px);max-height:calc(100dvh - 140px)}}

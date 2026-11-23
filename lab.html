@@ -18,9 +18,9 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DotGothic16&family=M+PLUS+Rounded+1c:wght@700;800;900&family=Noto+Sans+JP:wght@400;500;600;700;800;900&family=Unbounded:wght@700;900&display=swap" rel="stylesheet">
   <style>@import url("style.css?v=20261110-2") layer(legacy);@import url("experience.css?v=20261110-18") layer(legacy);@import url("language.css?v=20261120-w1") layer(legacy);</style>
-  <link rel="stylesheet" href="cyber.css?v=20261123-3">
+  <link rel="stylesheet" href="cyber.css?v=20261123-4">
   <script type="importmap">{"imports":{"three":"./vendor/three/three.module.min.js"}}</script>
-  <script src="language.js?v=20261123-10"></script>
+  <script src="language.js?v=20261123-11"></script>
   <script src="cyber.js?v=20261114-1" defer></script>
 </head>
 <body class="anime-page lab-page">
@@ -208,33 +208,50 @@
         var tag = document.createElement('span'); tag.className = 'reel-tag'; tag.setAttribute('translate', 'no');
         tag.textContent = clip.hasAttribute('data-sound') ? '▶ MOVIE ♪' : '▶ MOVIE';
         clip.parentNode.appendChild(tag);
-        clip.addEventListener('click', function () { showClip(clip); });
+        clip.addEventListener('click', function () { show(clip); });
       });
       // Same quiet check as the other pages: ?quiet-test=1 keeps the sound at 5%.
       var quiet = new URL(location.href).searchParams.get('quiet-test') === '1';
       var finished = document.getElementById('capsule-complete-video');
       if (finished && quiet) finished.volume = .05;
       // Photos and clips open large in a simple full-screen viewer; clips play there with their sound.
+      // PREV / NEXT step through the photos and clips of the same project, in page order.
       var dialog = document.querySelector('.lab-zoom');
-      var image = dialog.querySelector('img'), movie = dialog.querySelector('video');
-      function showClip(clip) {
-        image.hidden = true; movie.hidden = false;
-        movie.src = clip.currentSrc || clip.querySelector('source').src;
-        movie.poster = clip.poster; movie.loop = true; movie.muted = false; movie.volume = quiet ? .05 : 1;
-        movie.setAttribute('aria-label', clip.getAttribute('aria-label') || '');
-        clips.forEach(function (other) { other.pause(); });
-        dialog.showModal();
-        var p = movie.play(); if (p && p.catch) p.catch(function () {});
+      var image = dialog.querySelector('img'), movie = dialog.querySelector('video'), current = null;
+      var all = [].slice.call(document.querySelectorAll('[data-zoom], .reel video'));
+      function show(item) {
+        current = item;
+        var isClip = item.tagName === 'VIDEO';
+        movie.pause(); image.hidden = isClip; movie.hidden = !isClip;
+        if (isClip) {
+          movie.src = item.currentSrc || item.querySelector('source').src;
+          movie.poster = item.poster; movie.loop = true; movie.muted = false; movie.volume = quiet ? .05 : 1;
+          movie.setAttribute('aria-label', item.getAttribute('aria-label') || '');
+          clips.forEach(function (other) { other.pause(); });
+        } else {
+          movie.removeAttribute('src'); movie.load();
+          image.src = item.dataset.zoom;
+          image.alt = item.querySelector('img').alt;
+        }
+        if (!dialog.open) dialog.showModal();
+        if (isClip) { var p = movie.play(); if (p && p.catch) p.catch(function () {}); }
       }
-      document.querySelectorAll('[data-zoom]').forEach(function (button) {
-        button.addEventListener('click', function () {
-          movie.hidden = true; image.hidden = false;
-          image.src = button.dataset.zoom;
-          image.alt = button.querySelector('img').alt;
-          dialog.showModal();
-        });
+      function step(dir) {
+        if (!current) return;
+        var home = current.closest('section'), group = all.filter(function (item) { return item.closest('section') === home; });
+        if (group.length < 2) return;
+        show(group[(group.indexOf(current) + dir + group.length) % group.length]);
+      }
+      [[-1, '前の画像・動画へ', '«', 'PREV'], [1, '次の画像・動画へ', '»', 'NEXT']].forEach(function (d) {
+        var button = document.createElement('button');
+        button.type = 'button'; button.className = 'character-dialog-nav ' + (d[0] < 0 ? 'is-prev' : 'is-next'); button.setAttribute('aria-label', d[1]);
+        button.innerHTML = '<i aria-hidden="true">' + d[2] + '</i><b aria-hidden="true">' + d[3] + '</b>';
+        button.addEventListener('click', function (event) { event.stopPropagation(); step(d[0]); });
+        dialog.appendChild(button);
       });
-      dialog.addEventListener('close', function () { movie.pause(); movie.removeAttribute('src'); movie.load(); });
+      dialog.addEventListener('keydown', function (event) { if (event.key === 'ArrowRight') step(1); else if (event.key === 'ArrowLeft') step(-1); });
+      document.querySelectorAll('[data-zoom]').forEach(function (button) { button.addEventListener('click', function () { show(button); }); });
+      dialog.addEventListener('close', function () { if (dialog.open) return; movie.pause(); movie.removeAttribute('src'); movie.load(); });
       dialog.querySelector('.lab-zoom-close').addEventListener('click', function () { dialog.close(); });
       dialog.addEventListener('click', function (event) { if (event.target === dialog) dialog.close(); });
     })();

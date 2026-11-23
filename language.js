@@ -1043,10 +1043,14 @@
   Object.assign(copy, {
     '動画を大きく再生する':'Play the clip large',
   });
+  Object.assign(copy, {
+    '前の画像・動画へ':'Previous photo or clip',
+    '次の画像・動画へ':'Next photo or clip',
+  });
   /* Japanese is the page itself; English lives above; every other language is a small file in lang/
      that is fetched only by the people who read that language. */
   const LANGUAGES = {ja:'日本語', en:'English', 'zh-Hans':'简体中文', 'zh-Hant':'繁體中文', ko:'한국어', es:'Español', fr:'Français', th:'ไทย'};
-  const PACK_VERSION = '20261123-10';
+  const PACK_VERSION = '20261123-11';
   const packs = {en:copy};
   function matchLanguage(value) {
     if (!value) return null;
