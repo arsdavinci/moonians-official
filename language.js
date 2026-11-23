@@ -925,10 +925,19 @@
     'おわったあとに、みんなで':'All together after the show',
     'MCのはずが、紹介していただきました':'The hosts ended up introducing us',
   });
+  Object.assign(copy, {
+    '2023年3月':'March 2023',
+    'テレビ':'TV',
+    'チョコレートプラネットさんの番組「メタバースプラネット」に出演しました。':'We appeared on Chocolate Planet’s TV show “Metaverse Planet”.',
+    'アバターを作ってもらえる権利をかけて、ネタを披露しました。':'We performed a routine for the chance to have an avatar made of us.',
+    'ネタは「翻訳酸素カプセル」。「3050年の笑い」と言っていただき、アバター作成権をゲットしました。':'The routine was “The Translation Oxygen Capsule”. It was called “comedy from the year 3050”, and we won the avatar.',
+    '番組の画面。ぴょんぴーを手にのせて話す、らんぴょん':'A screen from the show: Ranpyon talking with Pyonpy on one hand',
+    'ネタのとちゅう':'In the middle of the routine',
+  });
   /* Japanese is the page itself; English lives above; every other language is a small file in lang/
      that is fetched only by the people who read that language. */
   const LANGUAGES = {ja:'日本語', en:'English', 'zh-Hans':'简体中文', 'zh-Hant':'繁體中文', ko:'한국어', es:'Español', fr:'Français', th:'ไทย'};
-  const PACK_VERSION = '20261123-3';
+  const PACK_VERSION = '20261123-4';
   const packs = {en:copy};
   function matchLanguage(value) {
     if (!value) return null;
