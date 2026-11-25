@@ -16,7 +16,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DotGothic16&family=M+PLUS+Rounded+1c:wght@500;700;800;900&display=swap" rel="stylesheet">
-  <script src="language.js?v=20261123-13"></script>
+  <script src="language.js?v=20261125-1"></script>
   <style>
     :root{--ink:#2a2152;--soft:#5a4f8c;--pink:#ff7fc0;--pink-d:#e2439a;--mint:#3fe3c8;--mint-d:#0d9d8a;--lav:#b9a3f5;
       --round:"M PLUS Rounded 1c","Hiragino Maru Gothic ProN","Yu Gothic",sans-serif;--dot:"DotGothic16",monospace}
@@ -60,10 +60,12 @@
     footer{margin-top:34px;display:flex;gap:10px;flex-wrap:wrap}
     figure .clip{position:relative;cursor:zoom-in}
     figure .clip img{aspect-ratio:auto}
+    figure.is-wide .clip img{aspect-ratio:16/9}
+    figure.is-wide .play{top:auto;bottom:8px}
     .play{position:absolute;left:8px;top:8px;padding:3px 10px;border-radius:999px;background:rgba(30,20,70,.78);color:#fff;font:.7rem var(--dot);letter-spacing:.1em}
     .zoom{position:fixed;inset:0;z-index:20;display:grid;place-items:center;padding:18px;background:rgba(30,20,70,.88);cursor:zoom-out}
     .zoom[hidden],.zoom [hidden]{display:none}
-    .zoom img,.zoom video{height:calc(100dvh - 36px);width:auto;max-width:100%;object-fit:contain;border-radius:16px;border:3px solid #fff;background:#1b1740;cursor:auto}
+    .zoom img,.zoom video{width:min(100%,calc((100dvh - 36px)*var(--r,.5625)));height:auto;border-radius:16px;border:3px solid #fff;background:#1b1740;cursor:auto}
     .zoom-close{position:absolute;top:14px;right:14px;z-index:1;width:42px;height:42px;border-radius:50%;border:2px solid #fff;background:rgba(30,20,70,.7);color:#fff;font-size:1.3rem;line-height:1;cursor:pointer}
     @media (max-width:640px){.entry{padding:18px}.media{grid-template-columns:1fr 1fr;gap:10px}figcaption{padding:7px 9px 9px;font-size:.74rem}}
   </style>
@@ -110,13 +112,13 @@
 
         <p class="sub" translate="no">PHOTO</p>
         <div class="media">
-          <figure><button type="button" data-zoom="assets/activity/2022-10-kyoto/live.webp" aria-label="写真を大きく見る"><img src="assets/activity/2022-10-kyoto/live.webp" alt="舞台で4人にかこまれた、らんぴょんとぴょんぴー" width="900" height="1600" loading="lazy"></button><figcaption>ライブのようす</figcaption></figure>
+          <figure class="is-wide"><button type="button" data-zoom="assets/activity/2022-10-kyoto/live.webp?v=2" aria-label="写真を大きく見る"><img src="assets/activity/2022-10-kyoto/live.webp?v=2" alt="舞台で4人にかこまれた、らんぴょんとぴょんぴー" width="1125" height="633" loading="lazy"></button><figcaption>めちゃくちゃ緊張して焦ってたけど、コロコロチキチキペッパーズさんとニューヨークさんが面白くしてくれた。プロすごい。</figcaption></figure>
           <figure><button type="button" data-zoom="assets/activity/2022-10-kyoto/group.webp" aria-label="写真を大きく見る"><img src="assets/activity/2022-10-kyoto/group.webp" alt="コロコロチキチキペッパーズさん、ニューヨークさんとの集合写真" width="900" height="1600" loading="lazy"></button><figcaption>おわったあとに、みんなで</figcaption></figure>
         </div>
 
         <p class="sub" translate="no">MOVIE</p>
         <div class="media">
-          <figure><button type="button" class="clip" data-clip="assets/activity/2022-10-kyoto/stage.mp4" aria-label="動画を大きく再生する"><img src="assets/activity/2022-10-kyoto/stage.webp" alt="" width="480" height="740" loading="lazy"><span class="play" translate="no">▶ MOVIE ♪</span></button><figcaption>MCのはずが、紹介していただきました</figcaption></figure>
+          <figure class="is-wide"><button type="button" class="clip" data-clip="assets/activity/2022-10-kyoto/stage.mp4?v=2" aria-label="動画を大きく再生する"><img src="assets/activity/2022-10-kyoto/stage.webp?v=2" alt="" width="480" height="270" loading="lazy"><span class="play" translate="no">▶ MOVIE ♪</span></button><figcaption>京都国際映画祭にて。MCをするはずが、ムーニアンズの紹介をしていただきました。</figcaption></figure>
         </div>
       </article>
       <article class="entry">
@@ -133,9 +135,9 @@
 
         <p class="sub" translate="no">MOVIE</p>
         <div class="media">
-          <figure><button type="button" class="clip" data-clip="assets/activity/2022-09-showroom/moon.mp4" aria-label="動画を大きく再生する"><img src="assets/activity/2022-09-showroom/moon.webp" alt="" width="480" height="680" loading="lazy"><span class="play" translate="no">▶ MOVIE ♪</span></button><figcaption>「38万キロ離れた月から来ました」</figcaption></figure>
-          <figure><button type="button" class="clip" data-clip="assets/activity/2022-09-showroom/warp.mp4" aria-label="動画を大きく再生する"><img src="assets/activity/2022-09-showroom/warp.webp" alt="" width="480" height="680" loading="lazy"><span class="play" translate="no">▶ MOVIE ♪</span></button><figcaption>「特急ワープを使うと、2時間です」</figcaption></figure>
-          <figure><button type="button" class="clip" data-clip="assets/activity/2022-09-showroom/nervous.mp4" aria-label="動画を大きく再生する"><img src="assets/activity/2022-09-showroom/nervous.webp" alt="" width="480" height="680" loading="lazy"><span class="play" translate="no">▶ MOVIE ♪</span></button><figcaption>キンチョーしてるところ</figcaption></figure>
+          <figure class="is-wide"><button type="button" class="clip" data-clip="assets/activity/2022-09-showroom/moon.mp4?v=2" aria-label="動画を大きく再生する"><img src="assets/activity/2022-09-showroom/moon.webp?v=2" alt="" width="480" height="270" loading="lazy"><span class="play" translate="no">▶ MOVIE ♪</span></button><figcaption>リスナーさんがくれた動画。「38万キロ離れた月から来ました」</figcaption></figure>
+          <figure class="is-wide"><button type="button" class="clip" data-clip="assets/activity/2022-09-showroom/warp.mp4?v=2" aria-label="動画を大きく再生する"><img src="assets/activity/2022-09-showroom/warp.webp?v=2" alt="" width="480" height="270" loading="lazy"><span class="play" translate="no">▶ MOVIE ♪</span></button><figcaption>「特急ワープ使うと、2時間です」</figcaption></figure>
+          <figure class="is-wide"><button type="button" class="clip" data-clip="assets/activity/2022-09-showroom/nervous.mp4?v=2" aria-label="動画を大きく再生する"><img src="assets/activity/2022-09-showroom/nervous.webp?v=2" alt="" width="480" height="270" loading="lazy"><span class="play" translate="no">▶ MOVIE ♪</span></button><figcaption>キンチョーしてるw</figcaption></figure>
         </div>
       </article>
 
@@ -156,6 +158,9 @@
     // Photos and clips open large on top of the page; clips play there with their sound.
     var zoom = document.getElementById('zoom'), picture = zoom.querySelector('img'), movie = zoom.querySelector('video');
     var quiet = new URL(location.href).searchParams.get('quiet-test') === '1';
+    function fit(w, h) { if (w && h) zoom.style.setProperty('--r', w / h); }
+    picture.addEventListener('load', function () { fit(picture.naturalWidth, picture.naturalHeight); });
+    movie.addEventListener('loadedmetadata', function () { fit(movie.videoWidth, movie.videoHeight); });
     function open(showMovie) { picture.hidden = showMovie; movie.hidden = !showMovie; zoom.hidden = false; zoom.querySelector('.zoom-close').focus(); }
     function close() { zoom.hidden = true; movie.pause(); movie.removeAttribute('src'); movie.load(); picture.removeAttribute('src'); }
     document.querySelectorAll('[data-zoom]').forEach(function (button) {
@@ -163,7 +168,7 @@
     });
     document.querySelectorAll('[data-clip]').forEach(function (button) {
       button.addEventListener('click', function () {
-        movie.src = button.getAttribute('data-clip'); movie.poster = button.querySelector('img').src; movie.volume = quiet ? .05 : 1; open(true);
+        var still = button.querySelector('img'); fit(still.naturalWidth, still.naturalHeight); movie.src = button.getAttribute('data-clip'); movie.poster = button.querySelector('img').src; movie.volume = quiet ? .05 : 1; open(true);
         var p = movie.play(); if (p && p.catch) p.catch(function () {});
       });
     });

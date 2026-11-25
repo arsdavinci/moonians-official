@@ -1414,3 +1414,7 @@ html:not([lang=ja]) .g-card h4>small{display:none}
 .lab-zoom .character-dialog-nav.is-prev{left:14px}
 .lab-zoom .character-dialog-nav.is-next{right:14px}
 @media(min-width:921px){.lab-zoom{padding-inline:84px}}
+
+/* making lab viewer: sized from the picture's own proportions (--r is set by the page), tall or wide alike */
+.lab-zoom img,.lab-zoom video{width:min(100%,calc((100dvh - 90px)*var(--r,.5625)));height:auto;max-height:none}
+@media(max-width:920px){.lab-zoom img,.lab-zoom video{width:min(100%,calc((100dvh - 140px)*var(--r,.5625)));height:auto;max-height:none}}

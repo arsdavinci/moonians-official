@@ -1082,10 +1082,17 @@
     'ロボピーの三面図。':'Robopy’s three-view drawing.',
     'ロボピーは、3DのCADで設計しています。実際の設計データから出した三面図と、外装を透明にして中身を見せた図です。図面の数字では、高さ約56cm、両腕を広げた幅は約43cm。画像を押すと、大きく見られます。':'Robopy is designed in 3D CAD. These come straight from the real design data: a three-view drawing, and views with the shell made transparent to show what is inside. By the numbers on the drawing it stands about 56 cm tall and about 43 cm across with both arms out. Tap a picture to see it larger.',
   });
+  Object.assign(copy, {
+    'リスナーさんがくれた動画。「38万キロ離れた月から来ました」':'A clip a listener sent us. “We came from the Moon, 380,000 km away.”',
+    '「特急ワープ使うと、2時間です」':'“By express warp, it takes two hours.”',
+    'キンチョーしてるw':'So nervous, lol',
+    '京都国際映画祭にて。MCをするはずが、ムーニアンズの紹介をしていただきました。':'At the Kyoto International Film and Art Festival. They were meant to be hosting, and ended up introducing Moonians.',
+    'めちゃくちゃ緊張して焦ってたけど、コロコロチキチキペッパーズさんとニューヨークさんが面白くしてくれた。プロすごい。':'I was terribly nervous and flustered, but Korokoro Chikichiki Peppers and New York made it funny. Pros are amazing.',
+  });
   /* Japanese is the page itself; English lives above; every other language is a small file in lang/
      that is fetched only by the people who read that language. */
   const LANGUAGES = {ja:'日本語', en:'English', 'zh-Hans':'简体中文', 'zh-Hant':'繁體中文', ko:'한국어', es:'Español', fr:'Français', th:'ไทย'};
-  const PACK_VERSION = '20261123-13';
+  const PACK_VERSION = '20261125-1';
   const packs = {en:copy};
   function matchLanguage(value) {
     if (!value) return null;
