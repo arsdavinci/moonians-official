@@ -1418,3 +1418,10 @@ html:not([lang=ja]) .g-card h4>small{display:none}
 /* making lab viewer: sized from the picture's own proportions (--r is set by the page), tall or wide alike */
 .lab-zoom img,.lab-zoom video{width:min(100%,calc((100dvh - 90px)*var(--r,.5625)));height:auto;max-height:none}
 @media(max-width:920px){.lab-zoom img,.lab-zoom video{width:min(100%,calc((100dvh - 140px)*var(--r,.5625)));height:auto;max-height:none}}
+
+/* page menu with ten places: it never pushes the header wider than the screen; when it does not fit it slides sideways */
+.page-nav{min-width:0;flex:0 1 auto;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain}
+.page-nav::-webkit-scrollbar{display:none}
+.page-nav a{flex:0 0 auto}
+@media(max-width:1500px){.page-nav{gap:2px}.page-nav a{padding:7px 10px}}
+@media(max-width:760px){.page-nav{justify-content:flex-start}.page-nav a{flex:0 0 auto;padding:7px 12px}}

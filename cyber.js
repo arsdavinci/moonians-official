@@ -683,3 +683,9 @@
     if (taps >= 3) { taps = 0; lowGravity(); }
   });
 })();
+
+// The page menu slides sideways on narrow screens: start with the current page in view.
+(() => {
+  const nav = document.querySelector('.page-nav'), here = nav && nav.querySelector('[aria-current=page]');
+  if (here) nav.scrollLeft = here.offsetLeft - (nav.clientWidth - here.offsetWidth) / 2;
+})();
